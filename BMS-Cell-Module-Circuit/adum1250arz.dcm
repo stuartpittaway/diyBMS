@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP ADUM1250ARZ
+D ADuM1250/ADuM1251
+K ADuM1250
+F http://www.analog.com/media/en/technical-documentation/data-sheets/ADUM1250_1251.pdf
+$ENDCMP
+#
+#End Doc Library

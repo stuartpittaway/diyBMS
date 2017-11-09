@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP SI2312BDS-T1-E3
+D Si2312BDS N-Channel 20 V (D-S) MOSFET
+K MOSFET
+F http://www.farnell.com/datasheets/2045689.pdf
+$ENDCMP
+#
+#End Doc Library

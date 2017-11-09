@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="D">
+  <design>
+    <source>E:\Dropbox\BMS\BMS_Cell_Module.sch</source>
+    <date>06/11/2017 22:01:56</date>
+    <tool>Eeschema 4.0.7</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title/>
+        <company/>
+        <rev/>
+        <date/>
+        <source>BMS_Cell_Module.sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="TH1">
+      <value>B57891M0103K000</value>
+      <datasheet>http://uk.farnell.com/epcos/b57891m0103k000/thermistor-ntc-radial-leaded/dp/2285471</datasheet>
+      <libsource lib="device" part="Thermistor_NTC"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>59FF3A05</tstamp>
+    </comp>
+    <comp ref="U2">
+      <value>ATTINY85-20SU</value>
+      <footprint>Housings_SOIC:SOIC-8_3.9x4.9mm_Pitch1.27mm</footprint>
+      <libsource lib="atmel" part="ATTINY85-20SU"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>59FF3B15</tstamp>
+    </comp>
+    <comp ref="U1">
+      <value>MCP1703A-3302_SOT223</value>
+      <footprint>TO_SOT_Packages_SMD:SOT-223-3Lead_TabPin2</footprint>
+      <libsource lib="regul" part="MCP1703A-3302_SOT223"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>59FF3BBA</tstamp>
+    </comp>
+    <comp ref="D1">
+      <value>LED RED</value>
+      <libsource lib="device" part="LED"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>59FF3E05</tstamp>
+    </comp>
+    <comp ref="D2">
+      <value>LED GREEN</value>
+      <libsource lib="device" part="LED"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>59FF3E62</tstamp>
+    </comp>
+    <comp ref="C3">
+      <value>0.1uF</value>
+      <libsource lib="device" part="CP"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>59FF4558</tstamp>
+    </comp>
+    <comp ref="U3">
+      <value>ADUM1250ARZ</value>
+      <libsource lib="adum1250arz" part="ADUM1250ARZ"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A00B074</tstamp>
+    </comp>
+    <comp ref="C2">
+      <value>1uF</value>
+      <libsource lib="device" part="C"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A00BF06</tstamp>
+    </comp>
+    <comp ref="C1">
+      <value>1uF</value>
+      <libsource lib="device" part="C"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A00C037</tstamp>
+    </comp>
+    <comp ref="R1">
+      <value>2K2</value>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A00CA2C</tstamp>
+    </comp>
+    <comp ref="R3">
+      <value>20K</value>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A00CE37</tstamp>
+    </comp>
+    <comp ref="R2">
+      <value>2K2</value>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A00CEAB</tstamp>
+    </comp>
+    <comp ref="C4">
+      <value>0.1uF</value>
+      <libsource lib="device" part="C"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A00D03A</tstamp>
+    </comp>
+    <comp ref="C5">
+      <value>0.1uF</value>
+      <libsource lib="device" part="C"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A00FCB1</tstamp>
+    </comp>
+    <comp ref="R5">
+      <value>680K</value>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A00FE4C</tstamp>
+    </comp>
+    <comp ref="R4">
+      <value>470K</value>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A01000D</tstamp>
+    </comp>
+    <comp ref="R6">
+      <value>47K</value>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A011F78</tstamp>
+    </comp>
+    <comp ref="R7">
+      <value>10K</value>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A01584D</tstamp>
+    </comp>
+    <comp ref="R9">
+      <value>510R</value>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A017EFB</tstamp>
+    </comp>
+    <comp ref="R8">
+      <value>510R</value>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A017F96</tstamp>
+    </comp>
+    <comp ref="R10">
+      <value>2K2</value>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A018699</tstamp>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="adum1250arz" part="ADUM1250ARZ">
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">ADUM1250ARZ</field>
+      </fields>
+      <pins>
+        <pin num="1" name="VDD1" type="power_in"/>
+        <pin num="2" name="SDA1" type="BiDi"/>
+        <pin num="3" name="SCL1" type="BiDi"/>
+        <pin num="4" name="GND1" type="power_in"/>
+        <pin num="5" name="GND2" type="power_in"/>
+        <pin num="6" name="SCL2" type="BiDi"/>
+        <pin num="7" name="SDA2" type="BiDi"/>
+        <pin num="8" name="VDD2" type="power_in"/>
+      </pins>
+    </libpart>
+    <libpart lib="atmel" part="ATTINY25-20SU">
+      <aliases>
+        <alias>ATTINY45-20SU</alias>
+        <alias>ATTINY85-20SU</alias>
+      </aliases>
+      <description>SO8 Wide, 2k Flash, 128B SRAM, 128B EEPROM, Debug Wire</description>
+      <docs>http://www.atmel.com/images/atmel-2586-avr-8-bit-microcontroller-attiny25-attiny45-attiny85_datasheet.pdf</docs>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">ATTINY25-20SU</field>
+        <field name="Footprint">Housings_SOIC:SOIC-8_3.9x4.9mm_Pitch1.27mm</field>
+      </fields>
+      <pins>
+        <pin num="1" name="PB5(~RESET~/dW/ADC0/PCINT5)" type="BiDi"/>
+        <pin num="2" name="PB3(XTAL1/CLKI/~OC1B~/ADC3/PCINT3)" type="BiDi"/>
+        <pin num="3" name="PB4(XTAL2/CLKO/OC1B/ADC2/PCINT4)" type="BiDi"/>
+        <pin num="4" name="GND" type="power_in"/>
+        <pin num="5" name="PB0(MOSI/DI/SDA/AIN0/OC0A/~OC1A~/AREF/PCINT0)" type="BiDi"/>
+        <pin num="6" name="PB1(MISO/DO/AIN1/OC0B/OC1A/PCINT1)" type="BiDi"/>
+        <pin num="7" name="PB2(SCK/USCK/SCL/T0/INT0/ADC1/PCINT2)" type="BiDi"/>
+        <pin num="8" name="VCC" type="power_in"/>
+      </pins>
+    </libpart>
+    <libpart lib="device" part="C">
+      <description>Unpolarized capacitor</description>
+      <footprints>
+        <fp>C_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">C</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="device" part="CP">
+      <description>Polarised capacitor</description>
+      <footprints>
+        <fp>CP_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">CP</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="device" part="LED">
+      <description>LED generic</description>
+      <footprints>
+        <fp>LED*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">D</field>
+        <field name="Value">LED</field>
+      </fields>
+      <pins>
+        <pin num="1" name="K" type="passive"/>
+        <pin num="2" name="A" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="regul" part="MCP1703A-3302_SOT223">
+      <aliases>
+        <alias>MCP1703A-1202_SOT223</alias>
+        <alias>MCP1703A-1502_SOT223</alias>
+        <alias>MCP1703A-1802_SOT223</alias>
+        <alias>MCP1703A-2502_SOT223</alias>
+        <alias>MCP1703A-2802_SOT223</alias>
+        <alias>MCP1703A-3002_SOT223</alias>
+        <alias>MCP1703A-4002_SOT223</alias>
+        <alias>MCP1703A-5002_SOT223</alias>
+      </aliases>
+      <description>Low Quiescent Current LDO Regulator, 3.3V, 250 mA, Vin&lt;=16V, SOT-223</description>
+      <docs>http://ww1.microchip.com/downloads/en/DeviceDoc/20005122B.pdf</docs>
+      <footprints>
+        <fp>SOT?223*TabPin2*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">MCP1703A-3302_SOT223</field>
+        <field name="Footprint">TO_SOT_Packages_SMD:SOT-223-3Lead_TabPin2</field>
+      </fields>
+      <pins>
+        <pin num="1" name="VI" type="power_in"/>
+        <pin num="2" name="GND" type="power_in"/>
+        <pin num="3" name="VO" type="power_out"/>
+      </pins>
+    </libpart>
+    <libpart lib="device" part="R">
+      <description>Resistor</description>
+      <footprints>
+        <fp>R_*</fp>
+        <fp>R_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">R</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="device" part="Thermistor_NTC">
+      <description>temperature dependent resistor, negative temperature coefficient (NTC)</description>
+      <footprints>
+        <fp>*NTC*</fp>
+        <fp>*Thermistor*</fp>
+        <fp>PIN?ARRAY*</fp>
+        <fp>bornier*</fp>
+        <fp>*Terminal?Block*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">TH</field>
+        <field name="Value">Thermistor_NTC</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="adum1250arz">
+      <uri>E:\Dropbox\BMS\adum1250arz.lib</uri>
+    </library>
+    <library logical="device">
+      <uri>C:\Program Files\KiCad\share\kicad\library\device.lib</uri>
+    </library>
+    <library logical="atmel">
+      <uri>C:\Program Files\KiCad\share\kicad\library\atmel.lib</uri>
+    </library>
+    <library logical="regul">
+      <uri>C:\Program Files\KiCad\share\kicad\library\regul.lib</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="Net-(R4-Pad1)">
+      <node ref="R6" pin="2"/>
+      <node ref="R4" pin="1"/>
+    </net>
+    <net code="2" name="3V3">
+      <node ref="TH1" pin="1"/>
+      <node ref="C4" pin="1"/>
+      <node ref="R2" pin="2"/>
+      <node ref="C2" pin="2"/>
+      <node ref="U1" pin="3"/>
+      <node ref="R3" pin="1"/>
+      <node ref="C3" pin="1"/>
+      <node ref="R8" pin="1"/>
+      <node ref="R1" pin="1"/>
+      <node ref="U3" pin="8"/>
+      <node ref="U2" pin="8"/>
+    </net>
+    <net code="3" name="Net-(C5-Pad1)">
+      <node ref="R4" pin="2"/>
+      <node ref="U2" pin="2"/>
+      <node ref="C5" pin="1"/>
+      <node ref="R5" pin="1"/>
+    </net>
+    <net code="4" name="Net-(R2-Pad1)">
+      <node ref="U3" pin="7"/>
+      <node ref="R2" pin="1"/>
+      <node ref="U2" pin="5"/>
+    </net>
+    <net code="5" name="PB1">
+      <node ref="U2" pin="6"/>
+      <node ref="D2" pin="2"/>
+      <node ref="D1" pin="1"/>
+    </net>
+    <net code="6" name="PB5">
+      <node ref="U2" pin="1"/>
+      <node ref="R7" pin="1"/>
+      <node ref="TH1" pin="2"/>
+      <node ref="R3" pin="2"/>
+    </net>
+    <net code="7" name="PB4">
+      <node ref="U2" pin="3"/>
+    </net>
+    <net code="9" name="Net-(D2-Pad1)">
+      <node ref="R9" pin="1"/>
+      <node ref="R10" pin="2"/>
+      <node ref="D2" pin="1"/>
+    </net>
+    <net code="10" name="Net-(D1-Pad2)">
+      <node ref="D1" pin="2"/>
+      <node ref="R10" pin="1"/>
+      <node ref="R8" pin="2"/>
+    </net>
+    <net code="11" name="Net-(U3-Pad3)">
+      <node ref="U3" pin="3"/>
+    </net>
+    <net code="12" name="Net-(U3-Pad1)">
+      <node ref="U3" pin="1"/>
+    </net>
+    <net code="13" name="Net-(U3-Pad2)">
+      <node ref="U3" pin="2"/>
+    </net>
+    <net code="14" name="Net-(U3-Pad4)">
+      <node ref="U3" pin="4"/>
+    </net>
+    <net code="15" name="Net-(C2-Pad1)">
+      <node ref="C2" pin="1"/>
+    </net>
+    <net code="16" name="GND">
+      <node ref="R7" pin="2"/>
+      <node ref="U1" pin="2"/>
+      <node ref="C4" pin="2"/>
+      <node ref="C5" pin="2"/>
+      <node ref="R5" pin="2"/>
+      <node ref="R9" pin="2"/>
+      <node ref="U2" pin="4"/>
+      <node ref="C1" pin="1"/>
+      <node ref="U3" pin="5"/>
+      <node ref="C3" pin="2"/>
+    </net>
+    <net code="17" name="BATT+">
+      <node ref="U1" pin="1"/>
+      <node ref="R6" pin="1"/>
+      <node ref="C1" pin="2"/>
+    </net>
+    <net code="18" name="Net-(R1-Pad2)">
+      <node ref="U3" pin="6"/>
+      <node ref="R1" pin="2"/>
+      <node ref="U2" pin="7"/>
+    </net>
+  </nets>
+</export>
