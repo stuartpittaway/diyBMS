@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <export version="D">
   <design>
-    <source>E:\Dropbox\BMS\BMS_Cell_Module.sch</source>
-    <date>06/11/2017 22:01:56</date>
+    <source>E:/Dropbox/diyBMS/BMS-Cell-Module-Circuit/BMS_Cell_Module.sch</source>
+    <date>09/11/2017 19:07:18</date>
     <tool>Eeschema 4.0.7</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
@@ -21,12 +21,13 @@
   <components>
     <comp ref="TH1">
       <value>B57891M0103K000</value>
+      <footprint>Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm</footprint>
       <datasheet>http://uk.farnell.com/epcos/b57891m0103k000/thermistor-ntc-radial-leaded/dp/2285471</datasheet>
       <libsource lib="device" part="Thermistor_NTC"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>59FF3A05</tstamp>
     </comp>
-    <comp ref="U2">
+    <comp ref="U3">
       <value>ATTINY85-20SU</value>
       <footprint>Housings_SOIC:SOIC-8_3.9x4.9mm_Pitch1.27mm</footprint>
       <libsource lib="atmel" part="ATTINY85-20SU"/>
@@ -35,122 +36,219 @@
     </comp>
     <comp ref="U1">
       <value>MCP1703A-3302_SOT223</value>
-      <footprint>TO_SOT_Packages_SMD:SOT-223-3Lead_TabPin2</footprint>
+      <footprint>TO_SOT_Packages_SMD:SOT-223-3_TabPin2</footprint>
       <libsource lib="regul" part="MCP1703A-3302_SOT223"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>59FF3BBA</tstamp>
     </comp>
-    <comp ref="D1">
+    <comp ref="D3">
       <value>LED RED</value>
+      <footprint>LEDs:LED_0603_HandSoldering</footprint>
       <libsource lib="device" part="LED"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>59FF3E05</tstamp>
     </comp>
-    <comp ref="D2">
+    <comp ref="D4">
       <value>LED GREEN</value>
+      <footprint>LEDs:LED_0603_HandSoldering</footprint>
       <libsource lib="device" part="LED"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>59FF3E62</tstamp>
     </comp>
-    <comp ref="C3">
+    <comp ref="C5">
       <value>0.1uF</value>
+      <footprint>Capacitors_SMD:C_1210_HandSoldering</footprint>
       <libsource lib="device" part="CP"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>59FF4558</tstamp>
     </comp>
-    <comp ref="U3">
+    <comp ref="U2">
       <value>ADUM1250ARZ</value>
+      <footprint>SMD_Packages:SOIC-8-N</footprint>
       <libsource lib="adum1250arz" part="ADUM1250ARZ"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A00B074</tstamp>
     </comp>
     <comp ref="C2">
       <value>1uF</value>
+      <footprint>Capacitors_SMD:C_1210_HandSoldering</footprint>
       <libsource lib="device" part="C"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A00BF06</tstamp>
     </comp>
     <comp ref="C1">
       <value>1uF</value>
+      <footprint>Capacitors_SMD:C_1210_HandSoldering</footprint>
       <libsource lib="device" part="C"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A00C037</tstamp>
     </comp>
-    <comp ref="R1">
+    <comp ref="R8">
       <value>2K2</value>
+      <footprint>Resistors_SMD:R_1206_HandSoldering</footprint>
       <libsource lib="device" part="R"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A00CA2C</tstamp>
     </comp>
     <comp ref="R3">
       <value>20K</value>
+      <footprint>Resistors_SMD:R_1206_HandSoldering</footprint>
       <libsource lib="device" part="R"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A00CE37</tstamp>
     </comp>
-    <comp ref="R2">
+    <comp ref="R10">
       <value>2K2</value>
+      <footprint>Resistors_SMD:R_1206_HandSoldering</footprint>
       <libsource lib="device" part="R"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A00CEAB</tstamp>
     </comp>
     <comp ref="C4">
       <value>0.1uF</value>
+      <footprint>Capacitors_SMD:C_1210_HandSoldering</footprint>
       <libsource lib="device" part="C"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A00D03A</tstamp>
     </comp>
-    <comp ref="C5">
+    <comp ref="C3">
       <value>0.1uF</value>
+      <footprint>Capacitors_SMD:C_1210_HandSoldering</footprint>
       <libsource lib="device" part="C"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A00FCB1</tstamp>
     </comp>
-    <comp ref="R5">
+    <comp ref="R7">
       <value>680K</value>
+      <footprint>Resistors_SMD:R_1206_HandSoldering</footprint>
       <libsource lib="device" part="R"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A00FE4C</tstamp>
     </comp>
-    <comp ref="R4">
+    <comp ref="R6">
       <value>470K</value>
+      <footprint>Resistors_SMD:R_1206_HandSoldering</footprint>
       <libsource lib="device" part="R"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A01000D</tstamp>
     </comp>
-    <comp ref="R6">
+    <comp ref="R5">
       <value>47K</value>
+      <footprint>Resistors_SMD:R_1206_HandSoldering</footprint>
       <libsource lib="device" part="R"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A011F78</tstamp>
     </comp>
-    <comp ref="R7">
+    <comp ref="R4">
       <value>10K</value>
+      <footprint>Resistors_SMD:R_1206_HandSoldering</footprint>
       <libsource lib="device" part="R"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A01584D</tstamp>
     </comp>
-    <comp ref="R9">
+    <comp ref="R12">
       <value>510R</value>
+      <footprint>Resistors_SMD:R_1206_HandSoldering</footprint>
       <libsource lib="device" part="R"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A017EFB</tstamp>
     </comp>
-    <comp ref="R8">
+    <comp ref="R11">
       <value>510R</value>
+      <footprint>Resistors_SMD:R_1206_HandSoldering</footprint>
       <libsource lib="device" part="R"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A017F96</tstamp>
     </comp>
-    <comp ref="R10">
+    <comp ref="R13">
       <value>2K2</value>
+      <footprint>Resistors_SMD:R_1206_HandSoldering</footprint>
       <libsource lib="device" part="R"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A018699</tstamp>
     </comp>
+    <comp ref="J2">
+      <value>Conn_01x04_Female</value>
+      <footprint>Connectors_JST:JST_PH_S4B-PH-SM4-TB_04x2.00mm_Angled</footprint>
+      <libsource lib="conn" part="Conn_01x04_Female"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A01FF38</tstamp>
+    </comp>
+    <comp ref="J3">
+      <value>Conn_01x04_Female</value>
+      <footprint>Connectors_JST:JST_PH_S4B-PH-SM4-TB_04x2.00mm_Angled</footprint>
+      <libsource lib="conn" part="Conn_01x04_Female"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A021351</tstamp>
+    </comp>
+    <comp ref="J1">
+      <value>Conn_01x02_Male</value>
+      <footprint>Connectors_JST:JST_VH_B2PS-VH_2x2x3.96mm_Horizontal</footprint>
+      <libsource lib="conn" part="Conn_01x02_Male"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A0226E7</tstamp>
+    </comp>
+    <comp ref="R9">
+      <value>47K</value>
+      <footprint>Resistors_SMD:R_1206_HandSoldering</footprint>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A035629</tstamp>
+    </comp>
+    <comp ref="M1">
+      <value>SI2312BDS-T1-E3</value>
+      <footprint>TO_SOT_Packages_SMD:SOT-23</footprint>
+      <libsource lib="BMS_Cell_Module-cache" part="SI2312BDS-T1-E3"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A035C8B</tstamp>
+    </comp>
+    <comp ref="D2">
+      <value>LED BLUE KPL-3015QBC-D</value>
+      <footprint>LEDs:LED_0603_HandSoldering</footprint>
+      <datasheet>http://www.farnell.com/datasheets/2046216.pdf</datasheet>
+      <libsource lib="device" part="LED"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A03BFC9</tstamp>
+    </comp>
+    <comp ref="R2">
+      <value>47R 1/4W</value>
+      <footprint>Resistors_SMD:R_1206_HandSoldering</footprint>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A03CB73</tstamp>
+    </comp>
+    <comp ref="D1">
+      <value>S3D-E3/57T 3A</value>
+      <footprint>Diodes_SMD:D_SMC_Handsoldering</footprint>
+      <datasheet>http://uk.farnell.com/vishay/s3d-e3-57t/diode-standard-3a-200v/dp/9550305</datasheet>
+      <libsource lib="device" part="D"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A0412D1</tstamp>
+    </comp>
+    <comp ref="F1">
+      <value>Fuse, 2A, 32VDC, Fast Acting ERBRD2R00X</value>
+      <footprint>Resistors_SMD:R_0402</footprint>
+      <datasheet>http://www.farnell.com/datasheets/2244247.pdf</datasheet>
+      <libsource lib="device" part="Fuse"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A047495</tstamp>
+    </comp>
+    <comp ref="R1">
+      <value>HS50 3R3 J  50W Axial Wire Wound</value>
+      <footprint>Resistors_THT:R_Axial_Power_L60.0mm_W14.0mm_P71.12mm</footprint>
+      <datasheet>http://uk.rs-online.com/web/p/panel-mount-fixed-resistors/0160916/</datasheet>
+      <libsource lib="device" part="R"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5A04A81B</tstamp>
+    </comp>
   </components>
   <libparts>
     <libpart lib="adum1250arz" part="ADUM1250ARZ">
+      <description>ADuM1250/ADuM1251</description>
+      <docs>http://www.analog.com/media/en/technical-documentation/data-sheets/ADUM1250_1251.pdf</docs>
+      <footprints>
+        <fp>8-Lead_SOIC_N</fp>
+      </footprints>
       <fields>
         <field name="Reference">U</field>
         <field name="Value">ADUM1250ARZ</field>
@@ -159,8 +257,8 @@
         <pin num="1" name="VDD1" type="power_in"/>
         <pin num="2" name="SDA1" type="BiDi"/>
         <pin num="3" name="SCL1" type="BiDi"/>
-        <pin num="4" name="GND1" type="power_in"/>
-        <pin num="5" name="GND2" type="power_in"/>
+        <pin num="4" name="GND1" type="passive"/>
+        <pin num="5" name="GND2" type="passive"/>
         <pin num="6" name="SCL2" type="BiDi"/>
         <pin num="7" name="SDA2" type="BiDi"/>
         <pin num="8" name="VDD2" type="power_in"/>
@@ -211,6 +309,76 @@
       <fields>
         <field name="Reference">C</field>
         <field name="Value">CP</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="conn" part="Conn_01x02_Male">
+      <description>Generic connector, single row, 01x02</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>Connector*:*_??x*mm*</fp>
+        <fp>Connector*:*1x??x*mm*</fp>
+        <fp>Pin?Header?Straight?1X*</fp>
+        <fp>Pin?Header?Angled?1X*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x02_Male</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Pin_1" type="passive"/>
+        <pin num="2" name="Pin_2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="conn" part="Conn_01x04_Female">
+      <description>Generic connector, single row, 01x04</description>
+      <docs>~</docs>
+      <footprints>
+        <fp>Connector*:*_??x*mm*</fp>
+        <fp>Connector*:*1x??x*mm*</fp>
+        <fp>Socket?Strip?Straight?1X*</fp>
+        <fp>Socket?Strip?Angled?1X*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Conn_01x04_Female</field>
+      </fields>
+      <pins>
+        <pin num="1" name="Pin_1" type="passive"/>
+        <pin num="2" name="Pin_2" type="passive"/>
+        <pin num="3" name="Pin_3" type="passive"/>
+        <pin num="4" name="Pin_4" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="device" part="D">
+      <description>Diode</description>
+      <footprints>
+        <fp>TO-???*</fp>
+        <fp>*SingleDiode</fp>
+        <fp>*_Diode_*</fp>
+        <fp>*SingleDiode*</fp>
+        <fp>D_*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">D</field>
+        <field name="Value">D</field>
+      </fields>
+      <pins>
+        <pin num="1" name="K" type="passive"/>
+        <pin num="2" name="A" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="device" part="Fuse">
+      <description>Fuse, generic</description>
+      <footprints>
+        <fp>*Fuse*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">F</field>
+        <field name="Value">Fuse</field>
       </fields>
       <pins>
         <pin num="1" name="~" type="passive"/>
@@ -273,6 +441,22 @@
         <pin num="2" name="~" type="passive"/>
       </pins>
     </libpart>
+    <libpart lib="BMS_Cell_Module-cache" part="SI2312BDS-T1-E3">
+      <description>Si2312BDS N-Channel 20 V (D-S) MOSFET</description>
+      <docs>http://www.farnell.com/datasheets/2045689.pdf</docs>
+      <footprints>
+        <fp>SOT-23</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">M</field>
+        <field name="Value">SI2312BDS-T1-E3</field>
+      </fields>
+      <pins>
+        <pin num="1" name="G" type="passive"/>
+        <pin num="2" name="S" type="passive"/>
+        <pin num="3" name="D" type="passive"/>
+      </pins>
+    </libpart>
     <libpart lib="device" part="Thermistor_NTC">
       <description>temperature dependent resistor, negative temperature coefficient (NTC)</description>
       <footprints>
@@ -293,108 +477,145 @@
     </libpart>
   </libparts>
   <libraries>
-    <library logical="adum1250arz">
-      <uri>E:\Dropbox\BMS\adum1250arz.lib</uri>
-    </library>
     <library logical="device">
       <uri>C:\Program Files\KiCad\share\kicad\library\device.lib</uri>
     </library>
-    <library logical="atmel">
-      <uri>C:\Program Files\KiCad\share\kicad\library\atmel.lib</uri>
+    <library logical="conn">
+      <uri>C:\Program Files\KiCad\share\kicad\library\conn.lib</uri>
     </library>
     <library logical="regul">
       <uri>C:\Program Files\KiCad\share\kicad\library\regul.lib</uri>
     </library>
+    <library logical="atmel">
+      <uri>C:\Program Files\KiCad\share\kicad\library\atmel.lib</uri>
+    </library>
+    <library logical="adum1250arz">
+      <uri>E:\Dropbox\diyBMS\BMS-Cell-Module-Circuit\adum1250arz.lib</uri>
+    </library>
+    <library logical="BMS_Cell_Module-cache">
+      <uri>E:\Dropbox\diyBMS\BMS-Cell-Module-Circuit\BMS_Cell_Module-cache.lib</uri>
+    </library>
   </libraries>
   <nets>
-    <net code="1" name="Net-(R4-Pad1)">
-      <node ref="R6" pin="2"/>
+    <net code="1" name="Net-(D3-Pad1)">
+      <node ref="U3" pin="6"/>
+      <node ref="D4" pin="2"/>
+      <node ref="D3" pin="1"/>
+    </net>
+    <net code="2" name="Net-(R10-Pad1)">
+      <node ref="R10" pin="1"/>
+      <node ref="U3" pin="5"/>
+      <node ref="U2" pin="7"/>
+    </net>
+    <net code="3" name="Net-(D3-Pad2)">
+      <node ref="R11" pin="2"/>
+      <node ref="R13" pin="1"/>
+      <node ref="D3" pin="2"/>
+    </net>
+    <net code="4" name="Net-(R3-Pad2)">
+      <node ref="U3" pin="1"/>
+      <node ref="R3" pin="2"/>
+      <node ref="TH1" pin="2"/>
       <node ref="R4" pin="1"/>
     </net>
-    <net code="2" name="3V3">
-      <node ref="TH1" pin="1"/>
-      <node ref="C4" pin="1"/>
-      <node ref="R2" pin="2"/>
-      <node ref="C2" pin="2"/>
-      <node ref="U1" pin="3"/>
-      <node ref="R3" pin="1"/>
-      <node ref="C3" pin="1"/>
-      <node ref="R8" pin="1"/>
-      <node ref="R1" pin="1"/>
-      <node ref="U3" pin="8"/>
-      <node ref="U2" pin="8"/>
-    </net>
-    <net code="3" name="Net-(C5-Pad1)">
-      <node ref="R4" pin="2"/>
-      <node ref="U2" pin="2"/>
-      <node ref="C5" pin="1"/>
-      <node ref="R5" pin="1"/>
-    </net>
-    <net code="4" name="Net-(R2-Pad1)">
-      <node ref="U3" pin="7"/>
-      <node ref="R2" pin="1"/>
-      <node ref="U2" pin="5"/>
-    </net>
-    <net code="5" name="PB1">
-      <node ref="U2" pin="6"/>
-      <node ref="D2" pin="2"/>
-      <node ref="D1" pin="1"/>
-    </net>
-    <net code="6" name="PB5">
+    <net code="5" name="Net-(J2-Pad1)">
       <node ref="U2" pin="1"/>
-      <node ref="R7" pin="1"/>
-      <node ref="TH1" pin="2"/>
-      <node ref="R3" pin="2"/>
+      <node ref="J3" pin="1"/>
+      <node ref="J2" pin="1"/>
     </net>
-    <net code="7" name="PB4">
-      <node ref="U2" pin="3"/>
+    <net code="6" name="Net-(J2-Pad2)">
+      <node ref="J2" pin="2"/>
+      <node ref="J3" pin="2"/>
+      <node ref="U2" pin="2"/>
     </net>
-    <net code="9" name="Net-(D2-Pad1)">
-      <node ref="R9" pin="1"/>
-      <node ref="R10" pin="2"/>
+    <net code="7" name="Net-(R5-Pad2)">
+      <node ref="R6" pin="1"/>
+      <node ref="R5" pin="2"/>
+    </net>
+    <net code="8" name="Net-(D4-Pad1)">
+      <node ref="R13" pin="2"/>
+      <node ref="R12" pin="1"/>
+      <node ref="D4" pin="1"/>
+    </net>
+    <net code="9" name="BATT+">
+      <node ref="C1" pin="2"/>
+      <node ref="U1" pin="1"/>
+      <node ref="R1" pin="2"/>
+      <node ref="F1" pin="1"/>
+      <node ref="D2" pin="2"/>
+    </net>
+    <net code="10" name="Net-(D2-Pad1)">
+      <node ref="R2" pin="2"/>
       <node ref="D2" pin="1"/>
     </net>
-    <net code="10" name="Net-(D1-Pad2)">
-      <node ref="D1" pin="2"/>
-      <node ref="R10" pin="1"/>
-      <node ref="R8" pin="2"/>
+    <net code="11" name="Net-(D1-Pad1)">
+      <node ref="D1" pin="1"/>
+      <node ref="F1" pin="2"/>
     </net>
-    <net code="11" name="Net-(U3-Pad3)">
-      <node ref="U3" pin="3"/>
+    <net code="12" name="Net-(M1-Pad3)">
+      <node ref="R2" pin="1"/>
+      <node ref="R1" pin="1"/>
+      <node ref="M1" pin="3"/>
     </net>
-    <net code="12" name="Net-(U3-Pad1)">
-      <node ref="U3" pin="1"/>
+    <net code="13" name="Net-(J2-Pad3)">
+      <node ref="U2" pin="3"/>
+      <node ref="J2" pin="3"/>
+      <node ref="J3" pin="3"/>
     </net>
-    <net code="13" name="Net-(U3-Pad2)">
-      <node ref="U3" pin="2"/>
-    </net>
-    <net code="14" name="Net-(U3-Pad4)">
-      <node ref="U3" pin="4"/>
-    </net>
-    <net code="15" name="Net-(C2-Pad1)">
-      <node ref="C2" pin="1"/>
-    </net>
-    <net code="16" name="GND">
-      <node ref="R7" pin="2"/>
-      <node ref="U1" pin="2"/>
-      <node ref="C4" pin="2"/>
-      <node ref="C5" pin="2"/>
-      <node ref="R5" pin="2"/>
-      <node ref="R9" pin="2"/>
+    <net code="14" name="Net-(J2-Pad4)">
       <node ref="U2" pin="4"/>
-      <node ref="C1" pin="1"/>
-      <node ref="U3" pin="5"/>
+      <node ref="J3" pin="4"/>
+      <node ref="J2" pin="4"/>
+    </net>
+    <net code="15" name="BATT+RAW">
+      <node ref="R5" pin="1"/>
+      <node ref="D1" pin="2"/>
+      <node ref="J1" pin="2"/>
+    </net>
+    <net code="16" name="Net-(M1-Pad1)">
+      <node ref="U3" pin="3"/>
+      <node ref="R9" pin="1"/>
+      <node ref="M1" pin="1"/>
+    </net>
+    <net code="17" name="Net-(R8-Pad2)">
+      <node ref="R8" pin="2"/>
+      <node ref="U3" pin="7"/>
+      <node ref="U2" pin="6"/>
+    </net>
+    <net code="18" name="Net-(C3-Pad1)">
+      <node ref="U3" pin="2"/>
+      <node ref="C3" pin="1"/>
+      <node ref="R7" pin="1"/>
+      <node ref="R6" pin="2"/>
+    </net>
+    <net code="19" name="GND">
+      <node ref="R9" pin="2"/>
+      <node ref="C5" pin="2"/>
+      <node ref="M1" pin="2"/>
+      <node ref="J1" pin="1"/>
+      <node ref="C2" pin="1"/>
+      <node ref="U2" pin="5"/>
+      <node ref="C4" pin="2"/>
       <node ref="C3" pin="2"/>
+      <node ref="U1" pin="2"/>
+      <node ref="U3" pin="4"/>
+      <node ref="R12" pin="2"/>
+      <node ref="R4" pin="2"/>
+      <node ref="C1" pin="1"/>
+      <node ref="R7" pin="2"/>
     </net>
-    <net code="17" name="BATT+">
-      <node ref="U1" pin="1"/>
-      <node ref="R6" pin="1"/>
-      <node ref="C1" pin="2"/>
-    </net>
-    <net code="18" name="Net-(R1-Pad2)">
-      <node ref="U3" pin="6"/>
-      <node ref="R1" pin="2"/>
-      <node ref="U2" pin="7"/>
+    <net code="20" name="3V3">
+      <node ref="TH1" pin="1"/>
+      <node ref="U1" pin="3"/>
+      <node ref="C5" pin="1"/>
+      <node ref="U3" pin="8"/>
+      <node ref="R11" pin="1"/>
+      <node ref="U2" pin="8"/>
+      <node ref="C2" pin="2"/>
+      <node ref="C4" pin="1"/>
+      <node ref="R10" pin="2"/>
+      <node ref="R3" pin="1"/>
+      <node ref="R8" pin="1"/>
     </net>
   </nets>
 </export>
