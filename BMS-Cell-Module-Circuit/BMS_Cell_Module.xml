@@ -2,7 +2,7 @@
 <export version="D">
   <design>
     <source>E:/Dropbox/diyBMS/BMS-Cell-Module-Circuit/BMS_Cell_Module.sch</source>
-    <date>09/11/2017 19:07:18</date>
+    <date>12/11/2017 17:47:20</date>
     <tool>Eeschema 4.0.7</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
@@ -21,7 +21,7 @@
   <components>
     <comp ref="TH1">
       <value>B57891M0103K000</value>
-      <footprint>Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm</footprint>
+      <footprint>Resistors_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P2.54mm_Vertical</footprint>
       <datasheet>http://uk.farnell.com/epcos/b57891m0103k000/thermistor-ntc-radial-leaded/dp/2285471</datasheet>
       <libsource lib="device" part="Thermistor_NTC"/>
       <sheetpath names="/" tstamps="/"/>
@@ -477,14 +477,14 @@
     </libpart>
   </libparts>
   <libraries>
-    <library logical="device">
-      <uri>C:\Program Files\KiCad\share\kicad\library\device.lib</uri>
-    </library>
     <library logical="conn">
       <uri>C:\Program Files\KiCad\share\kicad\library\conn.lib</uri>
     </library>
     <library logical="regul">
       <uri>C:\Program Files\KiCad\share\kicad\library\regul.lib</uri>
+    </library>
+    <library logical="device">
+      <uri>C:\Program Files\KiCad\share\kicad\library\device.lib</uri>
     </library>
     <library logical="atmel">
       <uri>C:\Program Files\KiCad\share\kicad\library\atmel.lib</uri>
