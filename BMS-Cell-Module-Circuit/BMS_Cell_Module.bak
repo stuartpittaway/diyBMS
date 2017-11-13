@@ -451,7 +451,7 @@ U 1 1 5A0412D1
 P 1250 5550
 F 0 "D1" H 1250 5650 50  0000 C CNN
 F 1 "SE30AFG-M3/6A" V 1150 5900 50  0000 C CNN
-F 2 "Diodes_SMD:D_SMB_Modified" H 1250 5550 50  0001 C CNN
+F 2 "Diodes_SMD:D_SMA" H 1250 5550 50  0001 C CNN
 F 3 "http://uk.farnell.com/vishay/se30afg-m3-6a/rectifier-esd-400v-3a-do-221ac/dp/2313878" H 1250 5550 50  0001 C CNN
 	1    1250 5550
 	-1   0    0    1   
