@@ -6,7 +6,7 @@ https://community.openenergymonitor.org/t/diy-lithium-battery-balancer-and-monit
 
 
 
-Problem
+# Problem
 
 A DIY Powerwall is the DIY construction of a pack of battery cells to create an energy store which can be used via inverters to power electrical items in the home. Generally cells are salvaged/second hand, and typically use Lithium 18650 cells.
 
@@ -16,7 +16,7 @@ Existing balancing solutions are available in the market place, but at a relativ
 
 A large number of people have utilised the commercial BATRIUM BMS system in their powerwall devices.
 
-My Situtation/Environment
+# My Situtation/Environment
 
 UK based, with existing solar panel installation and “feed in tariff” - this is a grid tied install.
 I do not want to change/interfere with the existing installation as I get the maximum FIT rates for the next 20 years!
@@ -27,11 +27,11 @@ Therefore, I am looking at an “AC coupled” solution where excess electric ge
 
 I am NOT looking to go off-grid (or islanding) as UK power cuts are a rare event in my area.
 
-Existing Energy Usage
+# Existing Energy Usage
 
 Through the monitoring of my home electric usage using the emonTX and emonSD solutions I typically use around 9kW/H per day (excluding electric car charging). Apart from odd spikes, load it generally less than 500W for the majority of the day/night.
 
-The Plan
+# The Plan
 
 Install a DIY powerwall with the ability to supply a 1000W load to cover all regular home usage (excluding spikes which the grid will handle).
 A grid tied inverter would be required to convert the battery DC into mains level AC.
@@ -42,7 +42,7 @@ For obvious reasons, safety is critical, so care must be taken to ensure compone
 
 Why am I doing this? For fun :slight_smile: I really must get out more!
 
-Parameters
+# Parameters
 
 I’m working to the the following design parameters, which are taken from research into the area (what most others are doing!)
 
@@ -54,12 +54,14 @@ Charger and inverter would be commercial products (not DIY) to comply with neces
 BMS Design
 Building upon my existing skill set and knowledge, and also building something that others can contribute to using regular standard libraries and off the shelf components.
 
-Design a hub and spoke arrangement, for a central controller and individual cell monitoring nodes on each pack (so 14 in my case)
-Use Arduino based libraries and tools (possible move to platform.io) **
-Use esp8266-12e as the controller - to take advantage of built in WIFI for monitoring/alerting and CPU/RAM performance
-Use AVR ATTINY85 for each node
-Ensure each cell voltage is isolated from other cells and that ground voltage is isolated
-Isolated communications between controller and node is needed
-Put everything on GITHUB
-Document it!
+
+* Design a hub and spoke arrangement, for a central controller and individual cell monitoring nodes on each pack (so 14 in my case)
+* Use Arduino based libraries and tools (possible move to platform.io) **
+* Use esp8266-12e as the controller - to take advantage of built in WIFI for monitoring/alerting and CPU/RAM performance
+* Use AVR ATTINY85 for each node
+* Ensure each cell voltage is isolated from other cells and that ground voltage is isolated
+* Isolated communications between controller and node is needed
+* Put everything on GITHUB
+* Document it!
+
 ** There are better more capable CPUs than the 8-bit Arduino however they lack user friendliness and the community to support and nuture the development of code
