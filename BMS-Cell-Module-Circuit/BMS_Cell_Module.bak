@@ -315,15 +315,15 @@ F 3 "" H 6950 1100 50  0001 C CNN
 	0    1    -1   0   
 $EndComp
 $Comp
-L Conn_01x02_Male J1
+L Conn_01x02_Female J1
 U 1 1 5A0226E7
-P 750 5050
-F 0 "J1" H 750 5150 50  0000 C CNN
-F 1 "Conn_01x02_Male" V 650 4950 50  0000 C CNN
-F 2 "Connectors_JST:JST_SFH_SM02B-SFHRS-TF_02x1.80mm_Angled" H 750 5050 50  0001 C CNN
-F 3 "" H 750 5050 50  0001 C CNN
-	1    750  5050
-	1    0    0    -1  
+P 700 5150
+F 0 "J1" H 700 5250 50  0000 C CNN
+F 1 "Conn_01x02_Female" V 800 5050 50  0000 C CNN
+F 2 "Connectors_JST:JST_SFH_SM02B-SFHRS-TF_02x1.80mm_Angled" H 700 5150 50  0001 C CNN
+F 3 "" H 700 5150 50  0001 C CNN
+	1    700  5150
+	-1   0    0    1   
 $EndComp
 $Comp
 L GND #PWR01
@@ -656,7 +656,7 @@ Wire Wire Line
 	6750 1550 6750 1300
 Connection ~ 5900 1550
 Wire Wire Line
-	1150 5150 950  5150
+	900  5050 1150 5050
 Connection ~ 1050 5550
 Connection ~ 1150 5050
 Wire Wire Line
@@ -722,7 +722,7 @@ Wire Wire Line
 Wire Wire Line
 	5150 5200 6650 5200
 Wire Wire Line
-	1150 4800 1150 5150
+	1150 5050 1150 4800
 Wire Wire Line
 	1800 5550 1950 5550
 Wire Wire Line
@@ -805,9 +805,9 @@ F 3 "" H 5150 5200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	950  5050 1050 5050
+	900  5150 1050 5250
 Wire Wire Line
-	1050 5050 1050 5800
+	1050 5250 1050 5800
 Wire Wire Line
 	5050 6450 4950 6450
 $EndSCHEMATC
