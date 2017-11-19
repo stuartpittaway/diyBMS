@@ -19,6 +19,9 @@
 
 
   c:\Program Files (x86)\PuTTY\putty.exe -serial COM6 -sercfg 115200,8,n,1,N
+
+  i2c CLOCK STRETCH
+  https://github.com/esp8266/Arduino/issues/698
 */
 
 #include <Wire.h>
@@ -83,14 +86,15 @@ uint16_t read_uint16_from_cell(uint8_t cell_id) {
   //sizeof(uint16_t)
   uint8_t status = Wire.requestFrom((uint8_t)cell_id, (uint8_t)2,true);
 
-  uint8_t attempts = 500;
+  uint8_t attempts = 1000;
+
 
   //TODO: Need a timeout here and to check status
   while (Wire.available() != 2 && attempts > 0)
   {
     yield();
     attempts--;
-    delayMicroseconds(2);
+    delayMicroseconds(20);
   }
 
   if (attempts == 0) {
@@ -98,10 +102,14 @@ uint16_t read_uint16_from_cell(uint8_t cell_id) {
     return 0xFFFF;
   }
 
+
   uint8_t left = (uint8_t)Wire.read();
   uint8_t right = (uint8_t)Wire.read();
 
   clear_buffer();
+
+  //TODO: THIS SHOULDNT BE NEEDED!
+  //Wire.endTransmission(); 
   return word(left, right);
 }
 
@@ -179,7 +187,7 @@ void setup() {
   Wire.setTimeout(1000);
   Wire.setClock(100000UL);  //100khz
   
-  Wire.setClockStretchLimit(400);
+  Wire.setClockStretchLimit(255);
 
   // join i2c bus
   // SDA=GPIO4/D2   SCL=GPIO5/D1
@@ -209,7 +217,7 @@ void loop() {
 
   status = cell_green_led_on(cell_id);
   print_status(status);
-
+/*
   data16 = cell_read_voltage(cell_id);
   Serial.print("V=");
   Serial.print(data16, HEX);
@@ -224,7 +232,7 @@ void loop() {
 
   status = cell_red_led_on(cell_id);
   print_status(status);
-
+*/
   status = cell_green_led_off(cell_id);
   print_status(status);
 

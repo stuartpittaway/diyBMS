@@ -36,6 +36,7 @@
 #endif
 
 
+
 #include <avr/sleep.h>
 #include <avr/power.h>
 #include <avr/wdt.h>
@@ -54,9 +55,9 @@
 #define TEMP_READING_LOOP_FREQ 10
 
 // define the processor speed if it's not been defined at the compiler's command line.
-#ifndef F_CPU
-#define F_CPU 1000000UL
-#endif
+//#ifndef F_CPU
+//#define F_CPU 1000000UL
+//#endif
 
 // __DATE__
 
@@ -130,8 +131,12 @@ void setup() {
 
   wait_for_buffer_ready();
 
+  init_i2c();
+}
+
+void init_i2c() {
   Wire.begin(myConfig.SLAVE_ADDR);
-  //Wire.setTimeout(500);
+  //  Wire.setTimeout(500);
   Wire.onRequest(requestEvent);
   Wire.onReceive(receiveEvent);
 }
@@ -139,49 +144,30 @@ void setup() {
 
 
 void loop() {
+
 #if defined(USE_SERIAL_DEBUG)
-  mySerial.print("Loop ");
+  mySerial.print(" L");
 #endif
 
-  /*
-    if (buffer_ready) {
-      //Oversampling and take average of ADC samples use an unsigned integer or the bit shifting goes wonky
-      uint32_t extraBits = 0;
-      for (int k = 0; k < OVERSAMPLE_LOOP; k++) {
-        extraBits = extraBits + analogVal[k];
-      }
-      //Shift the bits to match OVERSAMPLE_LOOP size (buffer size of 8=3 shifts, 16=4 shifts)
-      //Assume perfect reference of 2560mV for reference
-      unsigned int raw = map((extraBits >> 4), 0, 1023, 0, 2560);
+  if (last_i2c_request != 0 && (last_i2c_request + 5000 < millis())) {
+    //Panic after 5 seconds of not receiving i2c requests...
 
-      unsigned int VCCMillivolts = (int)((float)raw * ((float)4120 / (float)2313));
+#if defined(USE_SERIAL_DEBUG)
+    mySerial.print(" PANIC ");
+#endif
 
-    #if defined(USE_SERIAL_DEBUG)
-      mySerial.print(raw);
-      mySerial.print("mV=");
-      mySerial.print(VCCMillivolts);
-      mySerial.print("mV  ");
-      mySerial.print(temperature_probe);
-      mySerial.println("oC");
-    #endif
-    } else {
-    #if defined(USE_SERIAL_DEBUG)
-      mySerial.println("Wait buffer");
-    #endif
-    }
-  */
+    //Try resetting the i2c bus
+    Wire.end();
+    init_i2c();
+    error_counter++;
+  }
+
 
   //TODO: We should probably go to sleep around here
-  delay(1000);
-
-  if (last_i2c_request+5000 > millis()) {
-    //Panic!
-    
-    #if defined(USE_SERIAL_DEBUG)
-      mySerial.print(" PANIC ");
-    #endif
-    
-  }
+  ledGreen();
+  delay(100);
+  ledOff();
+  delay(50);
 }
 
 
@@ -197,7 +183,7 @@ void wait_for_buffer_ready() {
     } else {
       ledOff();
     }
-    delay(50);
+    delay(100);
   }
 
   ledOff();
@@ -205,6 +191,8 @@ void wait_for_buffer_ready() {
 
 // function that executes whenever data is received from master
 void receiveEvent(int howMany) {
+  ledRed();
+
 #if defined(USE_SERIAL_DEBUG)
   mySerial.print("R");
 #endif
@@ -225,19 +213,19 @@ void receiveEvent(int howMany) {
 
     switch (cmdByte) {
       case command_green_led_on:
-        ledGreen();
+        //ledGreen();
         break;
 
       case command_green_led_off:
-        ledOff();
+        //ledOff();
         break;
 
       case command_red_led_on:
-        ledRed();
+        //ledRed();
         break;
 
       case command_red_led_off:
-        ledOff();
+        //ledOff();
         break;
     }
 
@@ -257,11 +245,12 @@ void sendUnsignedInt(uint16_t number) {
 
 // function that executes whenever data is requested by master (this answers requestFrom command)
 void requestEvent() {
-  last_i2c_request = millis();
 
-#if defined(USE_SERIAL_DEBUG)
-  mySerial.print("E");
-#endif
+
+  //#if defined(USE_SERIAL_DEBUG)
+  //  mySerial.print("E");
+  //#endif
+
   if (!buffer_ready) return;
 
   switch (cmdByte) {
@@ -278,6 +267,7 @@ void requestEvent() {
 
         //TODO: Get rid of the need for float variables....
         uint16_t VCCMillivolts = (int)((float)raw * myConfig.VCCCalibration);
+
         sendUnsignedInt(VCCMillivolts);
       }
       break;
@@ -293,6 +283,9 @@ void requestEvent() {
 
   //Clear cmdByte
   cmdByte = 0;
+
+  //Record the time we last processed a request
+  last_i2c_request = millis();
 }
 
 
@@ -382,10 +375,7 @@ ISR(ADC_vect) {
       */
     }
   }
-
-
 }
-
 
 void initADC()
 {
