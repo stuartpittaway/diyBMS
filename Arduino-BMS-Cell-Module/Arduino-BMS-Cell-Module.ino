@@ -26,7 +26,6 @@
   To manually configure ATTINY fuses use the command....
   .\bin\avrdude -p attiny85 -C etc\avrdude.conf -c avrisp -P COM5 -b 19200 -B2 -e -Uefuse:w:0xff:m -Uhfuse:w:0xdf:m -Ulfuse:w:0xe2:m
   If you burn incorrect fuses to ATTINY85 you may need to connect a crystal over the pins to make it work again!
-
 */
 
 
@@ -34,6 +33,11 @@
 #if !(defined(__AVR_ATtiny85__))
 #error Written for ATTINY85/V chip
 #endif
+
+#if !(F_CPU == 8000000)
+#error Processor speed should be 8Mhz internal
+#endif
+
 
 #include <avr/sleep.h>
 #include <avr/power.h>
@@ -45,29 +49,21 @@
 
 #include <EEPROM.h>
 
-
-//#define USE_SERIAL_DEBUG
 //#define SWITCH_OFF_LEDS
 
 //Number of voltage readings to take before we take a temperature reading
-#define TEMP_READING_LOOP_FREQ 10
+#define TEMP_READING_LOOP_FREQ 16
 
 // __DATE__
-
-#if defined(USE_SERIAL_DEBUG)
-#include <SoftwareSerial.h>
-SoftwareSerial mySerial(99, PB4); // RX, TX PIN3 PB4/ADC2
-#endif
 
 struct cell_module_config {
   // 7 bit slave I2C address
   uint8_t SLAVE_ADDR = 0x15;
   // Calibration factor for voltage readings
-  float VCCCalibration = 1.754;
+  float VCCCalibration = 1.630;
 };
 
 static cell_module_config myConfig;
-
 
 #define OVERSAMPLE_LOOP 16
 //If we receive a cmdByte with BIT 5 set its a command byte so there is another byte waiting for us to process
@@ -81,7 +77,7 @@ static cell_module_config myConfig;
 
 // Value to store analog result
 volatile unsigned int analogVal[OVERSAMPLE_LOOP];
-volatile unsigned int temperature_probe=0;
+volatile unsigned int temperature_probe = 0;
 volatile uint8_t analogValIndex;
 volatile uint8_t buffer_ready = 0;
 volatile uint8_t reading_count = 0;
@@ -92,10 +88,6 @@ volatile uint16_t VCCMillivolts = 0;
 uint16_t error_counter = 0;
 
 void setup() {
-#if defined(USE_SERIAL_DEBUG)
-  mySerial.begin(9600);
-  mySerial.println ("Started!");
-#endif
 
   //Pins PB0 (SDA) and PB2 (SCLOCK) are for the i2c comms with master
   //PINS https://github.com/SpenceKonde/ATTinyCore/blob/master/avr/extras/ATtiny_x5.md
@@ -119,9 +111,9 @@ void setup() {
   initADC();
 
   // Enable Global Interrupts
-  sei();                     
+  sei();
 
-    wait_for_buffer_ready();
+  wait_for_buffer_ready();
 
   init_i2c();
 }
@@ -137,20 +129,15 @@ void init_i2c() {
 
 void loop() {
 
-#if defined(USE_SERIAL_DEBUG)
-  mySerial.print(" L");
-#endif
-
   if (last_i2c_request != 0 && (last_i2c_request + 5000 < millis())) {
     //Panic after 5 seconds of not receiving i2c requests...
 
-#if defined(USE_SERIAL_DEBUG)
-    mySerial.print(" PANIC ");
-#endif
+    ledRed();
+
 
     //Try resetting the i2c bus
-    //Wire.end();
-    //init_i2c();
+    Wire.end();
+    init_i2c();
     error_counter++;
   }
 
@@ -245,9 +232,7 @@ void sendUnsignedInt(uint16_t number) {
 
 // function that executes whenever data is requested by master (this answers requestFrom command)
 void requestEvent() {
-  //#if defined(USE_SERIAL_DEBUG)
-  //  mySerial.print("E");
-  //#endif
+
 
   if (!buffer_ready) return;
 
@@ -298,20 +283,24 @@ void ledOff() {
 }
 
 
+bool skipNextADC = false;
+
 ISR(TIMER1_COMPA_vect)
 {
+  if (skipNextADC) {
+    skipNextADC = false;
+    return;
+  }
+
   //trigger ADC reading
   ADCSRA |= (1 << ADSC);
 }
 
 ISR(ADC_vect) {
-// Interrupt service routine for the ADC completion
+  // Interrupt service routine for the ADC completion
   unsigned int  value = ADCL | (ADCH << 8);
 
-  if (reading_count == TEMP_READING_LOOP_FREQ) {
-    //We ignore the first temperature reading
-    reading_count++;
-  } else   if (reading_count == TEMP_READING_LOOP_FREQ + 1) {
+  if (reading_count == TEMP_READING_LOOP_FREQ ) {
     //Use A0 (RESET PIN) to act as an analogue input
     //note that we cannot take the pin below 1.4V or the CPU resets
     //so we use the top half between 1.6V and 2.56V (voltage reference)
@@ -320,7 +309,7 @@ ISR(ADC_vect) {
 
     temperature_probe = value;
 
-    // use ADC3 for input for next reading
+    // use ADC3 for input for next reading (voltage)
     ADMUX = B10010011;
     /*
       ADMUX = (INTERNAL2V56 << 4) |
@@ -330,6 +319,11 @@ ISR(ADC_vect) {
              (1 << MUX1)  |
              (1 << MUX0);
     */
+
+    //Set skipNextADC to delay the next TIMER1 call to ADC reading to allow the
+    //ADC to settle after changing MUX
+    skipNextADC = true;
+
   } else {
 
     //Populate the rolling buffer with values from the ADC
@@ -346,7 +340,6 @@ ISR(ADC_vect) {
 
     if (reading_count == TEMP_READING_LOOP_FREQ) {
       // use ADC0 for temp probe input on next ADC loop
-      // this will need to be moved to another pin
 
       //We have to set the registers directly because the ATTINYCORE appears broken for internal 2v56 register without bypass capacitor
       ADMUX = B10010000;
@@ -358,6 +351,9 @@ ISR(ADC_vect) {
                (0 << MUX1)  |
                (0 << MUX0);
       */
+
+      //Set skipNextADC to delay the next TIMER1 call to ADC reading to allow the ADC to settle after changing MUX
+      skipNextADC = true;
     }
   }
 }
@@ -385,15 +381,15 @@ void initADC()
             16 MHz   128 (125kHz)
 
 
-ADPS2 ADPS1 ADPS0 Division Factor
-000 2
-001 2
-010 4
-011 8
-100 16
-101 32
-110 64
-111 128           
+    ADPS2 ADPS1 ADPS0 Division Factor
+    000 2
+    001 2
+    010 4
+    011 8
+    100 16
+    101 32
+    110 64
+    111 128
 
   */
 
@@ -433,7 +429,7 @@ ADPS2 ADPS1 ADPS0 Division Factor
     (0 << ADPS0);       // set prescaler bit 0
 #endif
 
-ADCSRA |=(1 << ADIE);      //enable the ADC interrupt.
+  ADCSRA |= (1 << ADIE);     //enable the ADC interrupt.
 }
 
 static inline void initTimer1(void)
