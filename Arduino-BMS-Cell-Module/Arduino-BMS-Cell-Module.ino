@@ -12,7 +12,7 @@
 
   You will need a seperate programmer to program the ATTINY chips - another Arduino can be used
 
-  Settings ATTINY85, 1MHZ INTERNAL CLOCK, LTO enabled, BOD disabled, Timer1=CPU
+  Settings ATTINY85, 8MHZ INTERNAL CLOCK, LTO enabled, BOD disabled, Timer1=CPU
 
 
   Use this board manager for ATTINY85
@@ -45,7 +45,6 @@
 
 #include <EEPROM.h>
 
-//#define DISABLE_ADC_FOR_DEBUG
 
 //#define USE_SERIAL_DEBUG
 //#define SWITCH_OFF_LEDS
@@ -116,17 +115,13 @@ void setup() {
 
   analogValIndex = 0;
 
-#if !defined(DISABLE_ADC_FOR_DEBUG)
   initTimer1();
   initADC();
-#endif
 
   // Enable Global Interrupts
   sei();                     
 
-#if !defined(DISABLE_ADC_FOR_DEBUG)
     wait_for_buffer_ready();
-  #endif
 
   init_i2c();
 }
@@ -163,7 +158,6 @@ void loop() {
 }
 
 
-#if !defined(DISABLE_ADC_FOR_DEBUG)
 void wait_for_buffer_ready() {
   //Just delay here so the buffers are all ready before we service i2c
   uint8_t N = B10100000;
@@ -181,7 +175,6 @@ void wait_for_buffer_ready() {
 
   ledOff();
 }
-#endif
 
 // function that executes whenever data is received from master
 void receiveEvent(int howMany) {
@@ -223,7 +216,6 @@ void receiveEvent(int howMany) {
 
     switch (cmdByte) {
       case read_voltage:
-#if !defined(DISABLE_ADC_FOR_DEBUG)
         //TODO: PERHAPS THIS SHOULD BE IN THE LOOP()
         //Prepare the VCCMillivolts
         //Oversampling and take average of ADC samples use an unsigned integer or the bit shifting goes wonky
@@ -237,7 +229,7 @@ void receiveEvent(int howMany) {
 
         //TODO: Get rid of the need for float variables....
         VCCMillivolts = (int)((float)raw * myConfig.VCCCalibration);
-#endif
+
         break;
     }
   }
@@ -306,22 +298,20 @@ void ledOff() {
 }
 
 
-#if !defined(DISABLE_ADC_FOR_DEBUG)
 ISR(TIMER1_COMPA_vect)
 {
   //trigger ADC reading
   ADCSRA |= (1 << ADSC);
 }
 
-// Interrupt service routine for the ADC completion
 ISR(ADC_vect) {
+// Interrupt service routine for the ADC completion
   unsigned int  value = ADCL | (ADCH << 8);
 
   if (reading_count == TEMP_READING_LOOP_FREQ) {
     //We ignore the first temperature reading
     reading_count++;
   } else   if (reading_count == TEMP_READING_LOOP_FREQ + 1) {
-    //ledRed();
     //Use A0 (RESET PIN) to act as an analogue input
     //note that we cannot take the pin below 1.4V or the CPU resets
     //so we use the top half between 1.6V and 2.56V (voltage reference)
@@ -371,7 +361,6 @@ ISR(ADC_vect) {
     }
   }
 }
-#endif
 
 void initADC()
 {
@@ -395,8 +384,17 @@ void initADC()
              8 MHz   64 (125kHz), 128 (62.5kHz)
             16 MHz   128 (125kHz)
 
-           Below example set prescaler to 128 for mcu running at 8MHz
-           (check the datasheet for the proper bit values to set the prescaler)
+
+ADPS2 ADPS1 ADPS0 Division Factor
+000 2
+001 2
+010 4
+011 8
+100 16
+101 32
+110 64
+111 128           
+
   */
 
   //NOTE The device requries a supply voltage of 3V+ in order to generate 2.56V reference voltage.
@@ -418,7 +416,7 @@ void initADC()
   */
 
 #if (F_CPU == 1000000)
-  //Assume 1MHZ clock so prescaler to 8 (011)
+  //Assume 1MHZ clock so prescaler to 8 (B011)
   ADCSRA =
     (1 << ADEN)  |     // Enable ADC
     (0 << ADPS2) |     // set prescaler bit 2
@@ -427,7 +425,7 @@ void initADC()
 #endif
 
 #if (F_CPU == 8000000)
-  //8MHZ clock so set prescaler to 64
+  //8MHZ clock so set prescaler to 64 (B110)
   ADCSRA =
     (1 << ADEN)  |     // Enable ADC
     (1 << ADPS2) |     // set prescaler bit 2
@@ -442,7 +440,7 @@ static inline void initTimer1(void)
 {
   TCCR1 |= (1 << CTC1);  // clear timer on compare match
   TCCR1 |= (1 << CS13) | (1 << CS12) | (1 << CS11) | (1 << CS10); //clock prescaler 16384
-  OCR1C = F_CPU / 16384 / 4;     //About every quarter second (1000000/16384/4 = 15)
+  OCR1C = 128;  //About quarter second trigger Timer1  (there are 488 counts per second @ 8mhz)
   TIMSK |= (1 << OCIE1A); // enable compare match interrupt
 }
 
