@@ -1,7 +1,7 @@
 /*
-  ____  ____  _  _  ____  __  __  ___
+   ____  ____  _  _  ____  __  __  ___
   (  _ \(_  _)( \/ )(  _ \(  \/  )/ __)
-  )(_) )_)(_  \  /  ) _ < )    ( \__ \
+   )(_) )_)(_  \  /  ) _ < )    ( \__ \
   (____/(____) (__) (____/(_/\/\_)(___/
 
   (c) 2017 Stuart Pittaway
@@ -35,8 +35,6 @@
 #error Written for ATTINY85/V chip
 #endif
 
-
-
 #include <avr/sleep.h>
 #include <avr/power.h>
 #include <avr/wdt.h>
@@ -47,17 +45,13 @@
 
 #include <EEPROM.h>
 
+//#define DISABLE_ADC_FOR_DEBUG
 
-#define USE_SERIAL_DEBUG
+//#define USE_SERIAL_DEBUG
 //#define SWITCH_OFF_LEDS
 
 //Number of voltage readings to take before we take a temperature reading
 #define TEMP_READING_LOOP_FREQ 10
-
-// define the processor speed if it's not been defined at the compiler's command line.
-//#ifndef F_CPU
-//#define F_CPU 1000000UL
-//#endif
 
 // __DATE__
 
@@ -68,7 +62,7 @@ SoftwareSerial mySerial(99, PB4); // RX, TX PIN3 PB4/ADC2
 
 struct cell_module_config {
   // 7 bit slave I2C address
-  uint8_t SLAVE_ADDR = 0x38;
+  uint8_t SLAVE_ADDR = 0x15;
   // Calibration factor for voltage readings
   float VCCCalibration = 1.754;
 };
@@ -88,12 +82,13 @@ static cell_module_config myConfig;
 
 // Value to store analog result
 volatile unsigned int analogVal[OVERSAMPLE_LOOP];
-volatile unsigned int temperature_probe;
-volatile byte analogValIndex;
-volatile byte buffer_ready = 0;
-volatile byte reading_count = 0;
-volatile byte cmdByte = 0;
+volatile unsigned int temperature_probe=0;
+volatile uint8_t analogValIndex;
+volatile uint8_t buffer_ready = 0;
+volatile uint8_t reading_count = 0;
+volatile uint8_t cmdByte = 0;
 volatile unsigned long last_i2c_request = 0;
+volatile uint16_t VCCMillivolts = 0;
 
 uint16_t error_counter = 0;
 
@@ -121,15 +116,17 @@ void setup() {
 
   analogValIndex = 0;
 
+#if !defined(DISABLE_ADC_FOR_DEBUG)
   initTimer1();
-
   initADC();
+#endif
 
+  // Enable Global Interrupts
+  sei();                     
 
-  //Finally enable interupts
-  sei();
-
-  wait_for_buffer_ready();
+#if !defined(DISABLE_ADC_FOR_DEBUG)
+    wait_for_buffer_ready();
+  #endif
 
   init_i2c();
 }
@@ -157,20 +154,16 @@ void loop() {
 #endif
 
     //Try resetting the i2c bus
-    Wire.end();
-    init_i2c();
+    //Wire.end();
+    //init_i2c();
     error_counter++;
   }
 
-
-  //TODO: We should probably go to sleep around here
-  ledGreen();
   delay(100);
-  ledOff();
-  delay(50);
 }
 
 
+#if !defined(DISABLE_ADC_FOR_DEBUG)
 void wait_for_buffer_ready() {
   //Just delay here so the buffers are all ready before we service i2c
   uint8_t N = B10100000;
@@ -188,15 +181,10 @@ void wait_for_buffer_ready() {
 
   ledOff();
 }
+#endif
 
 // function that executes whenever data is received from master
 void receiveEvent(int howMany) {
-  ledRed();
-
-#if defined(USE_SERIAL_DEBUG)
-  mySerial.print("R");
-#endif
-
   if (howMany <= 0) return;
 
   //If cmdByte is not zero then something went wrong in the i2c comms,
@@ -213,49 +201,31 @@ void receiveEvent(int howMany) {
 
     switch (cmdByte) {
       case command_green_led_on:
-        //ledGreen();
+        ledGreen();
         break;
 
       case command_green_led_off:
-        //ledOff();
+        ledOff();
         break;
 
       case command_red_led_on:
-        //ledRed();
+        ledRed();
         break;
 
       case command_red_led_off:
-        //ledOff();
+        ledOff();
         break;
     }
 
     cmdByte = 0;
-  }
+  } else {
+    //Its a READ request
 
-  // clear rx buffer
-  while (Wire.available()) Wire.read();
-}
-
-
-void sendUnsignedInt(uint16_t number) {
-  Wire.write((byte)((number >> 8) & 0xFF));
-  Wire.write((byte)(number & 0xFF));
-}
-
-
-// function that executes whenever data is requested by master (this answers requestFrom command)
-void requestEvent() {
-
-
-  //#if defined(USE_SERIAL_DEBUG)
-  //  mySerial.print("E");
-  //#endif
-
-  if (!buffer_ready) return;
-
-  switch (cmdByte) {
-    case read_voltage:
-      {
+    switch (cmdByte) {
+      case read_voltage:
+#if !defined(DISABLE_ADC_FOR_DEBUG)
+        //TODO: PERHAPS THIS SHOULD BE IN THE LOOP()
+        //Prepare the VCCMillivolts
         //Oversampling and take average of ADC samples use an unsigned integer or the bit shifting goes wonky
         uint32_t extraBits = 0;
         for (int k = 0; k < OVERSAMPLE_LOOP; k++) {
@@ -266,8 +236,32 @@ void requestEvent() {
         unsigned int raw = map((extraBits >> 4), 0, 1023, 0, 2560);
 
         //TODO: Get rid of the need for float variables....
-        uint16_t VCCMillivolts = (int)((float)raw * myConfig.VCCCalibration);
+        VCCMillivolts = (int)((float)raw * myConfig.VCCCalibration);
+#endif
+        break;
+    }
+  }
 
+  // clear rx buffer
+  while (Wire.available()) Wire.read();
+}
+
+void sendUnsignedInt(uint16_t number) {
+  byte ret1 = Wire.write((byte)((number >> 8) & 0xFF));
+  byte ret2 = Wire.write((byte)(number & 0xFF));
+}
+
+// function that executes whenever data is requested by master (this answers requestFrom command)
+void requestEvent() {
+  //#if defined(USE_SERIAL_DEBUG)
+  //  mySerial.print("E");
+  //#endif
+
+  if (!buffer_ready) return;
+
+  switch (cmdByte) {
+    case read_voltage:
+      {
         sendUnsignedInt(VCCMillivolts);
       }
       break;
@@ -277,7 +271,7 @@ void requestEvent() {
       break;
 
     default:
-      sendUnsignedInt(0xFFFF);
+      //Dont do anything - timeout
       break;
   }
 
@@ -287,7 +281,6 @@ void requestEvent() {
   //Record the time we last processed a request
   last_i2c_request = millis();
 }
-
 
 void ledGreen() {
 #if !(defined(SWITCH_OFF_LEDS))
@@ -304,13 +297,16 @@ void ledRed() {
 }
 
 void ledOff() {
+#if !(defined(SWITCH_OFF_LEDS))
   //PB1 as input
   DDRB &= ~(1 << DDB1);
   //PB1 pull up OFF
   PORTB &= ~(1 << PB1);
+#endif
 }
 
 
+#if !defined(DISABLE_ADC_FOR_DEBUG)
 ISR(TIMER1_COMPA_vect)
 {
   //trigger ADC reading
@@ -358,7 +354,6 @@ ISR(ADC_vect) {
 
     reading_count++;
 
-
     if (reading_count == TEMP_READING_LOOP_FREQ) {
       // use ADC0 for temp probe input on next ADC loop
       // this will need to be moved to another pin
@@ -376,6 +371,7 @@ ISR(ADC_vect) {
     }
   }
 }
+#endif
 
 void initADC()
 {
@@ -420,13 +416,26 @@ void initADC()
           (1 << MUX1)  |     // use ADC3 for input (PB4), MUX bit 1
           (1 << MUX0);       // use ADC3 for input (PB4), MUX bit 0
   */
-  //Assume 1MHZ clock so divide by 8 (011)
+
+#if (F_CPU == 1000000)
+  //Assume 1MHZ clock so prescaler to 8 (011)
   ADCSRA =
     (1 << ADEN)  |     // Enable ADC
     (0 << ADPS2) |     // set prescaler bit 2
     (1 << ADPS1) |     // set prescaler bit 1
-    (1 << ADPS0) |      // set prescaler bit 0
-    (1 << ADIE);      //enable the ADC interrupt.
+    (1 << ADPS0);      // set prescaler bit 0
+#endif
+
+#if (F_CPU == 8000000)
+  //8MHZ clock so set prescaler to 64
+  ADCSRA =
+    (1 << ADEN)  |     // Enable ADC
+    (1 << ADPS2) |     // set prescaler bit 2
+    (1 << ADPS1) |     // set prescaler bit 1
+    (0 << ADPS0);       // set prescaler bit 0
+#endif
+
+ADCSRA |=(1 << ADIE);      //enable the ADC interrupt.
 }
 
 static inline void initTimer1(void)

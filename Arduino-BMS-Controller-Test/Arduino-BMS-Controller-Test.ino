@@ -1,7 +1,7 @@
 /*
-  ____  ____  _  _  ____  __  __  ___
+   ____  ____  _  _  ____  __  __  ___
   (  _ \(_  _)( \/ )(  _ \(  \/  )/ __)
-  )(_) )_)(_  \  /  ) _ < )    ( \__ \
+   )(_) )_)(_  \  /  ) _ < )    ( \__ \
   (____/(____) (__) (____/(_/\/\_)(___/
 
   (c) 2017 Stuart Pittaway
@@ -26,7 +26,8 @@
 
 #include <Wire.h>
 
-#define delay_ms 10
+//Inter-packet/request delay on i2c bus
+#define delay_ms 30
 
 //If we send a cmdByte with BIT 5 set its a command byte which instructs the cell to do something (not for reading)
 #define COMMAND_BIT 5
@@ -39,16 +40,18 @@
 #define read_voltage 10
 #define read_temperature 11
 
-byte x = 0;
 
 
-uint8_t  cell_configure(uint8_t new_cell_id) {
+
+
+/*
+  uint8_t  cell_configure(uint8_t new_cell_id) {
   Wire.beginTransmission(0x4); // transmit to device #4
   Wire.write((uint8_t)0x20);  //Command configure device address
   Wire.write((uint8_t)new_cell_id);
   return Wire.endTransmission();    // stop transmitting
-}
-
+  }
+*/
 
 
 uint8_t  send_single_command(uint8_t cell_id, uint8_t cmd) {
@@ -59,6 +62,8 @@ uint8_t  send_single_command(uint8_t cell_id, uint8_t cmd) {
   return ret;
 }
 
+
+//uint8_t buffer[10];
 
 uint8_t cmdByte(uint8_t cmd) {
   bitSet(cmd, COMMAND_BIT);
@@ -81,37 +86,20 @@ uint8_t  cell_red_led_off(uint8_t cell_id) {
   return send_single_command(cell_id, cmdByte( command_red_led_off ));
 }
 
-uint16_t read_uint16_from_cell(uint8_t cell_id) {
-  //Read the 2 byte data from slave
-  //sizeof(uint16_t)
-  uint8_t status = Wire.requestFrom((uint8_t)cell_id, (uint8_t)2,true);
+uint16_t read_uint16_from_cell(uint8_t cell_id, uint8_t cmd) {
+  send_single_command(cell_id, cmd);
 
-  uint8_t attempts = 1000;
+  delay(2);
+  uint8_t status = Wire.requestFrom((uint8_t)cell_id, (uint8_t)2);
 
+  uint8_t buffer[4];
+  buffer[0] = (uint8_t)Wire.read();
+  buffer[1] = (uint8_t)Wire.read();
 
-  //TODO: Need a timeout here and to check status
-  while (Wire.available() != 2 && attempts > 0)
-  {
-    yield();
-    attempts--;
-    delayMicroseconds(20);
-  }
-
-  if (attempts == 0) {
-    clear_buffer();
-    return 0xFFFF;
-  }
-
-
-  uint8_t left = (uint8_t)Wire.read();
-  uint8_t right = (uint8_t)Wire.read();
-
-  clear_buffer();
-
-  //TODO: THIS SHOULDNT BE NEEDED!
-  //Wire.endTransmission(); 
-  return word(left, right);
+  delay(delay_ms);
+  return word(buffer[0], buffer[1]);
 }
+
 
 void clear_buffer() {
   while (Wire.available())  {
@@ -119,22 +107,24 @@ void clear_buffer() {
   }
 }
 
+
+
 /*
   uint32_t read_uint32_from_cell(uint8_t cell_id) {
 
   //Read the 4 byte data from slave
-  uint8_t status=Wire.requestFrom((uint8_t)cell_id,(uint8_t)4);
+  uint8_t status = Wire.requestFrom((uint8_t)cell_id, (uint8_t)4);
 
   //TODO: Need a timeout here and to check status
-  while (Wire.available()!=4)
+  while (Wire.available() != 4)
   {
   }
 
   uint8_t data[4];
-  data[0]=(uint8_t)Wire.read();
-  data[1]=(uint8_t)Wire.read();
-  data[2]=(uint8_t)Wire.read();
-  data[3]=(uint8_t)Wire.read();
+  data[0] = (uint8_t)Wire.read();
+  data[1] = (uint8_t)Wire.read();
+  data[2] = (uint8_t)Wire.read();
+  data[3] = (uint8_t)Wire.read();
 
   clear_buffer();
   return *(unsigned long*)(&data);
@@ -144,18 +134,18 @@ void clear_buffer() {
 
 uint16_t cell_read_voltage(uint8_t cell_id) {
   //Tell slave we are going to request the voltage
-  byte status = send_single_command(cell_id, read_voltage);
-  if (status > 0) return 0xFFFF;
+  //byte status = send_single_command(cell_id, read_voltage);
+  //if (status > 0) return 0xFFFF;
 
-  return read_uint16_from_cell(cell_id);
+  return read_uint16_from_cell(cell_id, read_voltage);
 }
 
 uint16_t cell_read_board_temp(uint8_t cell_id) {
   //Tell slave we are going to request the temperature
-  byte status = send_single_command(cell_id, read_temperature);
-  if (status > 0) return 0xFFFF;
+  //byte status = send_single_command(cell_id, read_temperature);
+  //if (status > 0) return 0xFFFF;
 
-  return read_uint16_from_cell(cell_id);
+  return read_uint16_from_cell(cell_id, read_temperature);
 }
 
 /*
@@ -179,37 +169,40 @@ uint16_t cell_read_board_temp(uint8_t cell_id) {
 */
 
 void setup() {
-  Serial.begin(115200);           // start serial for output
+  Serial.begin(19200);           // start serial for output
 
   //while (!Serial);             // Leonardo: wait for serial monitor
   Serial.println("\n\nI2C Controller");
 
-  Wire.setTimeout(1000);
-  Wire.setClock(100000UL);  //100khz
-  
-  Wire.setClockStretchLimit(255);
+  Wire.setTimeout(1000);  //1000ms timeout
+  Wire.setClock(100000);  //100khz
+  Wire.setClockStretchLimit(1000);
 
   // join i2c bus
-  // SDA=GPIO4/D2   SCL=GPIO5/D1
-  Wire.begin(D2, D1); //SDA/SCL
+  // DATA=GPIO4/D2, CLOCK=GPIO5/D1
+  Wire.begin(4, 5); //SDA/SCL
+
+  pinMode(D4, OUTPUT);
+  digitalWrite(D4, HIGH); //OFF
 }
 
 void print_status(uint8_t status) {
+  Serial.print(' ');
+  Serial.print(status);
   switch (status) {
-    case 0: Serial.print(" * "); break;
-    case 1: Serial.print(" LONG "); break;
-    case 2: Serial.print(" ANACK "); break;
-    case 3: Serial.print(" DNACK "); break;
+    case 0: Serial.print(" * "); break;   
     default: Serial.print(" ERR ");    break;
   }
 
 }
 
 void loop() {
+  digitalWrite(D4, LOW);
+
   Serial.print("Loop... ");
 
   uint8_t status;
-  uint8_t cell_id = 0x38;
+  uint8_t cell_id = 0x15;
   uint16_t data16;
   uint32_t data32;
 
@@ -217,28 +210,31 @@ void loop() {
 
   status = cell_green_led_on(cell_id);
   print_status(status);
-/*
+
   data16 = cell_read_voltage(cell_id);
   Serial.print("V=");
   Serial.print(data16, HEX);
   Serial.print('=');
   Serial.print(data16);
-    
+
   data16 = cell_read_board_temp(cell_id);
   Serial.print("T=");
   Serial.print(data16, HEX);
   Serial.print('=');
   Serial.print(data16);
 
-  status = cell_red_led_on(cell_id);
-  print_status(status);
-*/
+  //status = cell_red_led_on(cell_id);
+  //print_status(status);
+
   status = cell_green_led_off(cell_id);
   print_status(status);
 
-  Serial.println();
+  Serial.println("");
+
+  digitalWrite(D4, HIGH);
 
   for (int i = 0; i < 10; i++) {
+    //ESP8266 function
     yield();
     delay(100);
   }
