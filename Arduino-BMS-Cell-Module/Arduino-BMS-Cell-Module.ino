@@ -38,18 +38,23 @@
 #error Processor speed should be 8Mhz internal
 #endif
 
-
 #include <avr/sleep.h>
 #include <avr/power.h>
 #include <avr/wdt.h>
 #include <USIWire.h>
-
-//https://github.com/lucullusTheOnly/TinyWire
-//#include <TinyWire.h>
-
 #include <EEPROM.h>
+//#include <CRC32.h>
 
 //#define SWITCH_OFF_LEDS
+
+#define GREEN_LED_PATTERN_STANDARD B00000101
+#define GREEN_LED_PATTERN_WAITREADY B00110011
+#define RED_LED_OFF 0
+#define RED_LED_PANIC B01010101
+
+volatile bool skipNextADC = false;
+volatile uint8_t green_pattern = B10100000;
+volatile uint8_t red_pattern = 0;
 
 //Number of voltage readings to take before we take a temperature reading
 #define TEMP_READING_LOOP_FREQ 16
@@ -64,6 +69,54 @@ struct cell_module_config {
 };
 
 static cell_module_config myConfig;
+
+#define EEPROM_CHECKSUM_ADDRESS 0
+#define EEPROM_CONFIG_ADDRESS 20
+
+uint32_t calculateCRC32(const uint8_t *data, size_t length)
+{
+  uint32_t crc = 0xffffffff;
+  while (length--) {
+    uint8_t c = *data++;
+    for (uint32_t i = 0x80; i > 0; i >>= 1) {
+      bool bit = crc & 0x80000000;
+      if (c & i) {
+        bit = !bit;
+      }
+      crc <<= 1;
+      if (bit) {
+        crc ^= 0x04c11db7;
+      }
+    }
+  }
+  return crc;
+}
+
+void WriteConfigToEEPROM() {
+  EEPROM.put(EEPROM_CONFIG_ADDRESS, myConfig);
+  EEPROM.put(EEPROM_CHECKSUM_ADDRESS, calculateCRC32((uint8_t*)&myConfig, sizeof(cell_module_config)));
+}
+
+bool LoadConfigFromEEPROM() {
+  cell_module_config restoredConfig;
+  uint32_t existingChecksum;
+
+  EEPROM.get(EEPROM_CONFIG_ADDRESS, restoredConfig);
+  EEPROM.get(EEPROM_CHECKSUM_ADDRESS, existingChecksum);
+
+  // Calculate the checksum of an entire buffer at once.
+  uint32_t checksum = calculateCRC32((uint8_t*)&restoredConfig, sizeof(cell_module_config));
+
+  if (checksum == existingChecksum) {
+    //Clone the config into our global variable and return all OK
+    memcpy(&myConfig, &restoredConfig, sizeof(cell_module_config));
+    return true;
+  }
+
+  //Config is not configured or gone bad, return FALSE
+  return false;
+}
+
 
 #define OVERSAMPLE_LOOP 16
 //If we receive a cmdByte with BIT 5 set its a command byte so there is another byte waiting for us to process
@@ -103,8 +156,20 @@ void setup() {
 
   ledOff();
 
-  cli();//stop interrupts
 
+  //Load our EEPROM configuration
+  if (!LoadConfigFromEEPROM()) {
+    //If bad configuration, flash RED led for 2 seconds
+
+    for (byte a = 0; a < 6; a++) {
+      ledRed();
+      delay(250);
+      ledOff();
+      delay(250);
+    }
+  }
+
+  cli();//stop interrupts
   analogValIndex = 0;
 
   initTimer1();
@@ -113,54 +178,57 @@ void setup() {
   // Enable Global Interrupts
   sei();
 
+  LEDReset();
   wait_for_buffer_ready();
+  LEDReset();
 
   init_i2c();
 }
 
 void init_i2c() {
   Wire.begin(myConfig.SLAVE_ADDR);
-  //  Wire.setTimeout(500);
   Wire.onRequest(requestEvent);
   Wire.onReceive(receiveEvent);
 }
 
-
-
 void loop() {
 
-  if (last_i2c_request != 0 && (last_i2c_request + 5000 < millis())) {
-    //Panic after 5 seconds of not receiving i2c requests...
+  if (last_i2c_request != 0)
+  {
+    //We have had at least one i2c request and not currently in PANIC mode
+    if (red_pattern == 0 && last_i2c_request + 8000 < millis()) {
+      //Panic after 8 seconds of not receiving i2c requests...
 
-    ledRed();
+      red_pattern = RED_LED_PANIC;
 
+      //Try resetting the i2c bus
+      Wire.end();
+      init_i2c();
+      error_counter++;
+      //Ensure we dont trigger on next pass through
+      last_i2c_request = 0;
 
-    //Try resetting the i2c bus
-    Wire.end();
-    init_i2c();
-    error_counter++;
+    } else if (red_pattern != 0) {
+      //Just come back from a PANIC situation
+      LEDReset();
+
+    }
   }
 
-  delay(100);
+  delay(250);
 }
 
+void LEDReset() {
+  red_pattern = RED_LED_OFF;
+  green_pattern = GREEN_LED_PATTERN_STANDARD;
+}
 
 void wait_for_buffer_ready() {
   //Just delay here so the buffers are all ready before we service i2c
-  uint8_t N = B10100000;
+  green_pattern = GREEN_LED_PATTERN_WAITREADY;
   while (!buffer_ready) {
-    //Rotate N
-    N = (byte)(N << 1) | (N >> 7);
-    //Flash LED in sync with bit pattern
-    if (N & 0x01) {
-      ledGreen();
-    } else {
-      ledOff();
-    }
-    delay(100);
+    delay(250);
   }
-
-  ledOff();
 }
 
 // function that executes whenever data is received from master
@@ -181,19 +249,19 @@ void receiveEvent(int howMany) {
 
     switch (cmdByte) {
       case command_green_led_on:
-        ledGreen();
+        //ledGreen();
         break;
 
       case command_green_led_off:
-        ledOff();
+        //ledOff();
         break;
 
       case command_red_led_on:
-        ledRed();
+        //ledRed();
         break;
 
       case command_red_led_off:
-        ledOff();
+        //ledOff();
         break;
     }
 
@@ -259,21 +327,21 @@ void requestEvent() {
   last_i2c_request = millis();
 }
 
-void ledGreen() {
+inline void ledGreen() {
 #if !(defined(SWITCH_OFF_LEDS))
   DDRB |= (1 << DDB1);
   PORTB |=  (1 << PB1);
 #endif
 }
 
-void ledRed() {
+inline void ledRed() {
 #if !(defined(SWITCH_OFF_LEDS))
   DDRB |= (1 << DDB1);
   PORTB &= ~(1 << PB1);
 #endif
 }
 
-void ledOff() {
+inline void ledOff() {
 #if !(defined(SWITCH_OFF_LEDS))
   //PB1 as input
   DDRB &= ~(1 << DDB1);
@@ -283,10 +351,27 @@ void ledOff() {
 }
 
 
-bool skipNextADC = false;
-
 ISR(TIMER1_COMPA_vect)
 {
+  //Flash LED in sync with bit pattern
+  if (red_pattern == 0) {
+    ///Rotate pattern
+    green_pattern = (byte)(green_pattern << 1) | (green_pattern >> 7);
+    if (green_pattern & 0x01) {
+      ledGreen();
+    } else {
+      ledOff();
+    }
+  } else {
+    red_pattern = (byte)(red_pattern << 1) | (red_pattern >> 7);
+    if (red_pattern & 0x01) {
+      ledRed();
+    } else {
+      ledOff();
+    }
+  }
+
+  //If we skip this ADC reading, quit ISR here
   if (skipNextADC) {
     skipNextADC = false;
     return;
@@ -294,6 +379,7 @@ ISR(TIMER1_COMPA_vect)
 
   //trigger ADC reading
   ADCSRA |= (1 << ADSC);
+
 }
 
 ISR(ADC_vect) {
