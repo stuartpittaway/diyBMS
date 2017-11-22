@@ -43,14 +43,30 @@
 #include <avr/wdt.h>
 #include <USIWire.h>
 #include <EEPROM.h>
-//#include <CRC32.h>
 
 //#define SWITCH_OFF_LEDS
 
+//LED light patterns
 #define GREEN_LED_PATTERN_STANDARD B00000101
-#define GREEN_LED_PATTERN_WAITREADY B00110011
+#define GREEN_LED_PATTERN_WAITREADY B11110011
 #define RED_LED_OFF 0
 #define RED_LED_PANIC B01010101
+
+//Where in EEPROM do we store the configuration
+#define EEPROM_CHECKSUM_ADDRESS 0
+#define EEPROM_CONFIG_ADDRESS 20
+
+//Number of times we sample and average the ADC for voltage
+#define OVERSAMPLE_LOOP 16
+
+//If we receive a cmdByte with BIT 5 set its a command byte so there is another byte waiting for us to process
+#define COMMAND_BIT 5
+#define command_green_led_on   1
+#define command_green_led_off   2
+#define command_red_led_on   3
+#define command_red_led_off   4
+#define read_voltage 10
+#define read_temperature 11
 
 volatile bool skipNextADC = false;
 volatile uint8_t green_pattern = B10100000;
@@ -70,63 +86,6 @@ struct cell_module_config {
 
 static cell_module_config myConfig;
 
-#define EEPROM_CHECKSUM_ADDRESS 0
-#define EEPROM_CONFIG_ADDRESS 20
-
-uint32_t calculateCRC32(const uint8_t *data, size_t length)
-{
-  uint32_t crc = 0xffffffff;
-  while (length--) {
-    uint8_t c = *data++;
-    for (uint32_t i = 0x80; i > 0; i >>= 1) {
-      bool bit = crc & 0x80000000;
-      if (c & i) {
-        bit = !bit;
-      }
-      crc <<= 1;
-      if (bit) {
-        crc ^= 0x04c11db7;
-      }
-    }
-  }
-  return crc;
-}
-
-void WriteConfigToEEPROM() {
-  EEPROM.put(EEPROM_CONFIG_ADDRESS, myConfig);
-  EEPROM.put(EEPROM_CHECKSUM_ADDRESS, calculateCRC32((uint8_t*)&myConfig, sizeof(cell_module_config)));
-}
-
-bool LoadConfigFromEEPROM() {
-  cell_module_config restoredConfig;
-  uint32_t existingChecksum;
-
-  EEPROM.get(EEPROM_CONFIG_ADDRESS, restoredConfig);
-  EEPROM.get(EEPROM_CHECKSUM_ADDRESS, existingChecksum);
-
-  // Calculate the checksum of an entire buffer at once.
-  uint32_t checksum = calculateCRC32((uint8_t*)&restoredConfig, sizeof(cell_module_config));
-
-  if (checksum == existingChecksum) {
-    //Clone the config into our global variable and return all OK
-    memcpy(&myConfig, &restoredConfig, sizeof(cell_module_config));
-    return true;
-  }
-
-  //Config is not configured or gone bad, return FALSE
-  return false;
-}
-
-
-#define OVERSAMPLE_LOOP 16
-//If we receive a cmdByte with BIT 5 set its a command byte so there is another byte waiting for us to process
-#define COMMAND_BIT 5
-#define command_green_led_on   1
-#define command_green_led_off   2
-#define command_red_led_on   3
-#define command_red_led_off   4
-#define read_voltage 10
-#define read_temperature 11
 
 // Value to store analog result
 volatile unsigned int analogVal[OVERSAMPLE_LOOP];
@@ -185,14 +144,8 @@ void setup() {
   init_i2c();
 }
 
-void init_i2c() {
-  Wire.begin(myConfig.SLAVE_ADDR);
-  Wire.onRequest(requestEvent);
-  Wire.onReceive(receiveEvent);
-}
 
 void loop() {
-
   if (last_i2c_request != 0)
   {
     //We have had at least one i2c request and not currently in PANIC mode
@@ -216,6 +169,56 @@ void loop() {
   }
 
   delay(250);
+}
+
+uint32_t calculateCRC32(const uint8_t *data, size_t length)
+{
+  uint32_t crc = 0xffffffff;
+  while (length--) {
+    uint8_t c = *data++;
+    for (uint32_t i = 0x80; i > 0; i >>= 1) {
+      bool bit = crc & 0x80000000;
+      if (c & i) {
+        bit = !bit;
+      }
+      crc <<= 1;
+      if (bit) {
+        crc ^= 0x04c11db7;
+      }
+    }
+  }
+  return crc;
+}
+
+void WriteConfigToEEPROM() {
+  EEPROM.put(EEPROM_CONFIG_ADDRESS, myConfig);
+  EEPROM.put(EEPROM_CHECKSUM_ADDRESS, calculateCRC32((uint8_t*)&myConfig, sizeof(cell_module_config)));
+}
+
+bool LoadConfigFromEEPROM() {
+  cell_module_config restoredConfig;
+  uint32_t existingChecksum;
+
+  EEPROM.get(EEPROM_CONFIG_ADDRESS, restoredConfig);
+  EEPROM.get(EEPROM_CHECKSUM_ADDRESS, existingChecksum);
+
+  // Calculate the checksum of an entire buffer at once.
+  uint32_t checksum = calculateCRC32((uint8_t*)&restoredConfig, sizeof(cell_module_config));
+
+  if (checksum == existingChecksum) {
+    //Clone the config into our global variable and return all OK
+    memcpy(&myConfig, &restoredConfig, sizeof(cell_module_config));
+    return true;
+  }
+
+  //Config is not configured or gone bad, return FALSE
+  return false;
+}
+
+void init_i2c() {
+  Wire.begin(myConfig.SLAVE_ADDR);
+  Wire.onRequest(requestEvent);
+  Wire.onReceive(receiveEvent);
 }
 
 void LEDReset() {
@@ -280,6 +283,8 @@ void receiveEvent(int howMany) {
         }
         //Shift the bits to match OVERSAMPLE_LOOP size (buffer size of 8=3 shifts, 16=4 shifts)
         //Assume perfect reference of 2560mV for reference - we will correct for this with VCCCalibration
+
+        //TODO: DONT THINK WE NEED THIS ANY LONGER!
         unsigned int raw = map((extraBits >> 4), 0, 1023, 0, 2560);
 
         //TODO: Get rid of the need for float variables....
@@ -300,15 +305,11 @@ void sendUnsignedInt(uint16_t number) {
 
 // function that executes whenever data is requested by master (this answers requestFrom command)
 void requestEvent() {
-
-
-  if (!buffer_ready) return;
+//  if (!buffer_ready) return;
 
   switch (cmdByte) {
     case read_voltage:
-      {
-        sendUnsignedInt(VCCMillivolts);
-      }
+      sendUnsignedInt(VCCMillivolts);
       break;
 
     case read_temperature:
@@ -409,14 +410,13 @@ ISR(ADC_vect) {
     //Set skipNextADC to delay the next TIMER1 call to ADC reading to allow the
     //ADC to settle after changing MUX
     skipNextADC = true;
-
   } else {
-
     //Populate the rolling buffer with values from the ADC
 
-    // Must read low first
     analogVal[analogValIndex] = value;
+    
     analogValIndex++;
+
     if (analogValIndex == OVERSAMPLE_LOOP) {
       analogValIndex = 0;
       buffer_ready = 1;
@@ -429,6 +429,7 @@ ISR(ADC_vect) {
 
       //We have to set the registers directly because the ATTINYCORE appears broken for internal 2v56 register without bypass capacitor
       ADMUX = B10010000;
+
       /*
         ADMUX = (INTERNAL2V56 << 4) |
                (0 << ADLAR)  |
