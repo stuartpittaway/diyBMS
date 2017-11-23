@@ -27,26 +27,26 @@
 #include <Wire.h>
 
 //Inter-packet/request delay on i2c bus
-#define delay_ms 30
+#define delay_ms 20
 
 //If we send a cmdByte with BIT 5 set its a command byte which instructs the cell to do something (not for reading)
 #define COMMAND_BIT 5
 
-#define command_green_led_pattern   1
-#define command_led_off   2
-#define command_factory_default 3
+#define COMMAND_green_led_pattern   1
+#define COMMAND_led_off   2
+#define COMMAND_factory_default 3
+#define COMMAND_set_slave_address 4
 
 #define read_voltage 10
 #define read_temperature 11
+#define read_voltage_calibration 12
+#define read_temperature_calibration 13
 
-/*
-  uint8_t  cell_configure(uint8_t new_cell_id) {
-  Wire.beginTransmission(0x4); // transmit to device #4
-  Wire.write((uint8_t)0x20);  //Command configure device address
-  Wire.write((uint8_t)new_cell_id);
-  return Wire.endTransmission();    // stop transmitting
-  }
-*/
+//Default i2c SLAVE address (used for auto provision of address)
+#define DEFAULT_SLAVE_ADDR 0x15
+#define DEFAULT_SLAVE_ADDR_START_RANGE 0x20
+#define DEFAULT_SLAVE_ADDR_END_RANGE DEFAULT_SLAVE_ADDR_START_RANGE + 20
+
 
 uint8_t  send_single_command(uint8_t cell_id, uint8_t cmd) {
   Wire.beginTransmission(cell_id); // transmit to device
@@ -72,15 +72,19 @@ uint8_t cmdByte(uint8_t cmd) {
 }
 
 uint8_t  cell_green_led_pattern(uint8_t cell_id) {
-  return send_single_command(cell_id, cmdByte( command_green_led_pattern ),B11001010);
+  return send_single_command(cell_id, cmdByte( COMMAND_green_led_pattern ),B11001010);
 }
 
 uint8_t  cell_led_off(uint8_t cell_id) {
-  return send_single_command(cell_id, cmdByte( command_led_off ));
+  return send_single_command(cell_id, cmdByte( COMMAND_led_off ));
 }
 
 uint8_t  command_factory_reset(uint8_t cell_id) {
-  return send_single_command(cell_id, cmdByte( command_factory_default ));
+  return send_single_command(cell_id, cmdByte( COMMAND_factory_default ));
+}
+
+uint8_t  command_set_slave_address(uint8_t cell_id, uint8_t newAddress) {
+  return send_single_command(cell_id, cmdByte( COMMAND_set_slave_address ),newAddress);
 }
 
 
@@ -98,6 +102,25 @@ uint16_t read_uint16_from_cell(uint8_t cell_id, uint8_t cmd) {
   return word(buffer[0], buffer[1]);
 }
 
+union {
+float val;
+uint8_t buffer[4];
+} float_to_bytes;
+
+float read_float_from_cell(uint8_t cell_id, uint8_t cmd) {
+  send_single_command(cell_id, cmd);
+
+  delay(2);
+  uint8_t status = Wire.requestFrom((uint8_t)cell_id, (uint8_t)4);
+
+  float_to_bytes.buffer[0] = (uint8_t)Wire.read();
+  float_to_bytes.buffer[1] = (uint8_t)Wire.read();
+  float_to_bytes.buffer[2] = (uint8_t)Wire.read();
+  float_to_bytes.buffer[3] = (uint8_t)Wire.read();
+
+  delay(delay_ms);
+  return float_to_bytes.val;
+}
 
 void clear_buffer() {
   while (Wire.available())  {
@@ -105,66 +128,21 @@ void clear_buffer() {
   }
 }
 
+float cell_read_voltage_calibration(uint8_t cell_id) {
+  return read_float_from_cell(cell_id, read_voltage_calibration);
+}
 
-
-/*
-  uint32_t read_uint32_from_cell(uint8_t cell_id) {
-
-  //Read the 4 byte data from slave
-  uint8_t status = Wire.requestFrom((uint8_t)cell_id, (uint8_t)4);
-
-  //TODO: Need a timeout here and to check status
-  while (Wire.available() != 4)
-  {
-  }
-
-  uint8_t data[4];
-  data[0] = (uint8_t)Wire.read();
-  data[1] = (uint8_t)Wire.read();
-  data[2] = (uint8_t)Wire.read();
-  data[3] = (uint8_t)Wire.read();
-
-  clear_buffer();
-  return *(unsigned long*)(&data);
-  }
-*/
-
+float cell_read_temperature_calibration(uint8_t cell_id) {
+  return read_float_from_cell(cell_id, read_temperature_calibration);
+}
 
 uint16_t cell_read_voltage(uint8_t cell_id) {
-  //Tell slave we are going to request the voltage
-  //byte status = send_single_command(cell_id, read_voltage);
-  //if (status > 0) return 0xFFFF;
-
   return read_uint16_from_cell(cell_id, read_voltage);
 }
 
 uint16_t cell_read_board_temp(uint8_t cell_id) {
-  //Tell slave we are going to request the temperature
-  //byte status = send_single_command(cell_id, read_temperature);
-  //if (status > 0) return 0xFFFF;
-
   return read_uint16_from_cell(cell_id, read_temperature);
 }
-
-/*
-  uint16_t M24LC256::ReadChunk(uint16_t location, uint16_t length, uint8_t* data)
-  {
-    uint16_t bytes_received = 0;
-    uint16_t bytes_requested = min(length,16);
-
-    Wire.requestFrom(i2c_address,bytes_requested);
-    uint16_t remaining = bytes_requested;
-    uint8_t* next = data;
-
-    while (Wire.available() && remaining--)
-    {
-         next++ = Wire.receive();
-        ++bytes_received;
-    }
-
-    return bytes_received;
-  }
-*/
 
 void setup() {
   Serial.begin(19200);           // start serial for output
@@ -200,7 +178,8 @@ void loop() {
   Serial.print("Loop... ");
 
   uint8_t status;
-  uint8_t cell_id = 0x15;
+  //uint8_t cell_id = DEFAULT_SLAVE_ADDR;
+  uint8_t cell_id = DEFAULT_SLAVE_ADDR_START_RANGE;
   uint16_t data16;
   uint32_t data32;
 
@@ -216,13 +195,18 @@ void loop() {
   Serial.print(data16);
 
   data16 = cell_read_board_temp(cell_id);
-  Serial.print("T=");
+  Serial.print(" T=");
   Serial.print(data16, HEX);
   Serial.print('=');
   Serial.print(data16);
 
-  //status = cell_led_off(cell_id);
-  //print_status(status);
+  float f = cell_read_voltage_calibration(cell_id);
+  Serial.print(" VC=");
+  Serial.print(f);
+
+  f = cell_read_temperature_calibration(cell_id);
+  Serial.print(" TC=");
+  Serial.print(f);
 
   Serial.println("");
 
@@ -237,4 +221,5 @@ void loop() {
   //Serial.println("FACTORY RESET:");
   //command_factory_reset(cell_id);
 
+  command_set_slave_address(cell_id,DEFAULT_SLAVE_ADDR_START_RANGE);
 }

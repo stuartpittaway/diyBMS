@@ -50,7 +50,7 @@
 //LED light patterns
 #define GREEN_LED_PATTERN_STANDARD B00000101
 #define GREEN_LED_PATTERN_WAITREADY B11110111
-#define GREEN_LED_PATTERN_UNCONFIGURED B11110000
+#define RED_LED_PATTERN_UNCONFIGURED B00000101
 #define RED_LED_OFF 0
 #define RED_LED_PANIC B01010101
 
@@ -66,19 +66,22 @@
 
 //If we receive a cmdByte with BIT 5 set its a command byte so there is another byte waiting for us to process
 #define COMMAND_BIT 5
-#define command_green_led_pattern   1
-#define command_led_off   2
-#define command_factory_default 3
+#define COMMAND_green_led_pattern   1
+#define COMMAND_led_off   2
+#define COMMAND_factory_default 3
+#define COMMAND_set_slave_address 4
 
 //Read values
 #define read_voltage 10
 #define read_temperature 11
+#define read_voltage_calibration 12
+#define read_temperature_calibration 13
 
-//#define wdt_reset()  __asm__ __volatile__ ("wdr") 
+//#define wdt_reset()  __asm__ __volatile__ ("wdr")
 //#define adc_disable() (ADCSRA &= ~(1<<ADEN)) // disable ADC (before power-off)
 //#define adc_enable()  (ADCSRA |=  (1<<ADEN)) // re-enable ADC
 
-  
+
 volatile bool skipNextADC = false;
 volatile uint8_t green_pattern = B10100000;
 volatile uint8_t red_pattern = 0;
@@ -102,13 +105,15 @@ struct cell_module_config {
   uint8_t SLAVE_ADDR = DEFAULT_SLAVE_ADDR;
   // Calibration factor for voltage readings
   float VCCCalibration = 1.630;
+  // Calibration factor for temp readings
+  float TemperatureCalibration = 1.0;
 };
 
 static cell_module_config myConfig;
 
 void setup() {
   //Must be first line of setup()
-  MCUSR &= ~(1<<WDRF); // reset status flag
+  MCUSR &= ~(1 << WDRF); // reset status flag
   wdt_disable();
 
   //Pins PB0 (SDA) and PB2 (SCLOCK) are for the i2c comms with master
@@ -144,7 +149,7 @@ void setup() {
   initTimer1();
   initADC();
 
-  // WDTCSR configuration:     WDIE = 1: Interrupt Enable     WDE = 1 :Reset Enable 
+  // WDTCSR configuration:     WDIE = 1: Interrupt Enable     WDE = 1 :Reset Enable
   // Enter Watchdog Configuration mode:
   WDTCR |= (1 << WDCE) | (1 << WDE);
   // Set Watchdog settings - 4000ms timeout
@@ -159,14 +164,16 @@ void setup() {
 
   init_i2c();
 
-  if (myConfig.SLAVE_ADDR == DEFAULT_SLAVE_ADDR) {
-    green_pattern = GREEN_LED_PATTERN_UNCONFIGURED;
-  }
 }
 
 
 
 void loop() {
+  //If we are on the default SLAVE address then use RED led
+  if (myConfig.SLAVE_ADDR == DEFAULT_SLAVE_ADDR) {
+    red_pattern = RED_LED_PATTERN_UNCONFIGURED;
+  }
+
   //We have had at least one i2c request and not currently in PANIC mode
   if (red_pattern == 0 && last_i2c_request == 0) {
     //Panic after 8 seconds of not receiving i2c requests...
@@ -248,23 +255,25 @@ void LEDReset() {
   green_pattern = GREEN_LED_PATTERN_STANDARD;
 }
 
-void factory_default() { 
+void factory_default() {
   EEPROM.put(EEPROM_CHECKSUM_ADDRESS, 0);
+}
 
+void Reboot() {
   TCCR1 = 0;
   TIMSK |= (1 << OCIE1A); //Disable timer1
 
   //Now power down loop until the watchdog timer kicks a reset
   ledRed();
 
-/*
-  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-  adc_disable();
-  sleep_enable();
-  sleep_cpu();
-*/
+  /*
+    set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+    adc_disable();
+    sleep_enable();
+    sleep_cpu();
+  */
   //Infinity
-  while(1) {}
+  while (1) {}
 }
 
 void wait_for_buffer_ready() {
@@ -293,19 +302,33 @@ void receiveEvent(int howMany) {
     bitClear(cmdByte, COMMAND_BIT);
 
     switch (cmdByte) {
-      case command_green_led_pattern:
+      case COMMAND_green_led_pattern:
         if (howMany == 1) {
           green_pattern = Wire.read();
         }
         break;
 
-      case command_led_off:
-        //Switch green LED off for a short while
+      case COMMAND_led_off:
+        //Switch green LED off for a short while - GO DARK
         ledOffCount = 100;
         break;
 
-      case command_factory_default:
+      case COMMAND_factory_default:
         factory_default();
+        Reboot();
+        break;
+
+      case COMMAND_set_slave_address:
+      //Set i2c slave address and write to EEPROM, then reboot
+        if (howMany == 1) {
+          uint8_t newAddress = Wire.read();
+          //Only accept if its a different address
+          if (newAddress != myConfig.SLAVE_ADDR) {
+            myConfig.SLAVE_ADDR = newAddress;
+            WriteConfigToEEPROM();
+            Reboot();
+          }
+        }
         break;
 
     }
@@ -341,8 +364,23 @@ void receiveEvent(int howMany) {
 }
 
 void sendUnsignedInt(uint16_t number) {
-  byte ret1 = Wire.write((byte)((number >> 8) & 0xFF));
-  byte ret2 = Wire.write((byte)(number & 0xFF));
+  Wire.write((byte)((number >> 8) & 0xFF));
+  Wire.write((byte)(number & 0xFF));
+}
+
+
+union {
+float val;
+uint8_t b[4];
+} float_to_bytes;
+
+void sendFloat(float number) {
+  float_to_bytes.val=number;
+  
+  Wire.write(float_to_bytes.b[0]);
+  Wire.write(float_to_bytes.b[1]);
+  Wire.write(float_to_bytes.b[2]);
+  Wire.write(float_to_bytes.b[3]);
 }
 
 // function that executes whenever data is requested by master (this answers requestFrom command)
@@ -355,7 +393,14 @@ void requestEvent() {
       break;
 
     case read_temperature:
-      sendUnsignedInt(temperature_probe);
+      sendUnsignedInt((uint16_t)((float)temperature_probe * myConfig.TemperatureCalibration));
+      break;
+
+    case read_voltage_calibration:
+      sendFloat(myConfig.VCCCalibration);
+      break;
+    case read_temperature_calibration:
+      sendFloat(myConfig.TemperatureCalibration);
       break;
 
     default:
@@ -432,7 +477,8 @@ ISR(ADC_vect) {
     //we avoid switching references (VCC vs 2.56V) so the capacitors dont have to keep draining and recharging
     reading_count = 0;
 
-    temperature_probe = value;
+    //We reduce the value by 512 as we have a DC offset we need to remove
+    temperature_probe = value-512;
 
     // use ADC3 for input for next reading (voltage)
     ADMUX = B10010011;
@@ -564,6 +610,4 @@ static inline void initTimer1(void)
   OCR1C = 128;  //About quarter second trigger Timer1  (there are 488 counts per second @ 8mhz)
   TIMSK |= (1 << OCIE1A); // enable compare match interrupt
 }
-
-
 
