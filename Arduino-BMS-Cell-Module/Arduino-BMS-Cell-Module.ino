@@ -38,17 +38,19 @@
 #error Processor speed should be 8Mhz internal
 #endif
 
-#include <avr/sleep.h>
-#include <avr/power.h>
-#include <avr/wdt.h>
 #include <USIWire.h>
 #include <EEPROM.h>
+#include <avr/sleep.h>
+#include <avr/wdt.h>
+
+// __DATE__
 
 //#define SWITCH_OFF_LEDS
 
 //LED light patterns
 #define GREEN_LED_PATTERN_STANDARD B00000101
-#define GREEN_LED_PATTERN_WAITREADY B11110011
+#define GREEN_LED_PATTERN_WAITREADY B11110111
+#define GREEN_LED_PATTERN_UNCONFIGURED B11110000
 #define RED_LED_OFF 0
 #define RED_LED_PANIC B01010101
 
@@ -56,50 +58,58 @@
 #define EEPROM_CHECKSUM_ADDRESS 0
 #define EEPROM_CONFIG_ADDRESS 20
 
+//Default i2c SLAVE address (used for auto provision of address)
+#define DEFAULT_SLAVE_ADDR 0x15
+
 //Number of times we sample and average the ADC for voltage
 #define OVERSAMPLE_LOOP 16
 
 //If we receive a cmdByte with BIT 5 set its a command byte so there is another byte waiting for us to process
 #define COMMAND_BIT 5
-#define command_green_led_on   1
-#define command_green_led_off   2
-#define command_red_led_on   3
-#define command_red_led_off   4
+#define command_green_led_pattern   1
+#define command_led_off   2
+#define command_factory_default 3
+
+//Read values
 #define read_voltage 10
 #define read_temperature 11
 
+//#define wdt_reset()  __asm__ __volatile__ ("wdr") 
+//#define adc_disable() (ADCSRA &= ~(1<<ADEN)) // disable ADC (before power-off)
+//#define adc_enable()  (ADCSRA |=  (1<<ADEN)) // re-enable ADC
+
+  
 volatile bool skipNextADC = false;
 volatile uint8_t green_pattern = B10100000;
 volatile uint8_t red_pattern = 0;
+volatile uint16_t analogVal[OVERSAMPLE_LOOP];
+volatile uint16_t temperature_probe = 0;
+volatile uint8_t analogValIndex;
+volatile uint8_t buffer_ready = 0;
+volatile uint8_t reading_count = 0;
+volatile uint8_t cmdByte = 0;
+volatile uint8_t ledOffCount = 0;
+volatile uint8_t last_i2c_request = 255;
+volatile uint16_t VCCMillivolts = 0;
+
+uint16_t error_counter = 0;
 
 //Number of voltage readings to take before we take a temperature reading
 #define TEMP_READING_LOOP_FREQ 16
 
-// __DATE__
-
 struct cell_module_config {
   // 7 bit slave I2C address
-  uint8_t SLAVE_ADDR = 0x15;
+  uint8_t SLAVE_ADDR = DEFAULT_SLAVE_ADDR;
   // Calibration factor for voltage readings
   float VCCCalibration = 1.630;
 };
 
 static cell_module_config myConfig;
 
-
-// Value to store analog result
-volatile unsigned int analogVal[OVERSAMPLE_LOOP];
-volatile unsigned int temperature_probe = 0;
-volatile uint8_t analogValIndex;
-volatile uint8_t buffer_ready = 0;
-volatile uint8_t reading_count = 0;
-volatile uint8_t cmdByte = 0;
-volatile unsigned long last_i2c_request = 0;
-volatile uint16_t VCCMillivolts = 0;
-
-uint16_t error_counter = 0;
-
 void setup() {
+  //Must be first line of setup()
+  MCUSR &= ~(1<<WDRF); // reset status flag
+  wdt_disable();
 
   //Pins PB0 (SDA) and PB2 (SCLOCK) are for the i2c comms with master
   //PINS https://github.com/SpenceKonde/ATTinyCore/blob/master/avr/extras/ATtiny_x5.md
@@ -115,7 +125,6 @@ void setup() {
 
   ledOff();
 
-
   //Load our EEPROM configuration
   if (!LoadConfigFromEEPROM()) {
     //If bad configuration, flash RED led for 2 seconds
@@ -129,10 +138,17 @@ void setup() {
   }
 
   cli();//stop interrupts
+
   analogValIndex = 0;
 
   initTimer1();
   initADC();
+
+  // WDTCSR configuration:     WDIE = 1: Interrupt Enable     WDE = 1 :Reset Enable 
+  // Enter Watchdog Configuration mode:
+  WDTCR |= (1 << WDCE) | (1 << WDE);
+  // Set Watchdog settings - 4000ms timeout
+  WDTCR = (1 << WDIE) | (1 << WDE) | (1 << WDP3) | (0 << WDP2) | (0 << WDP1) | (0 << WDP0);
 
   // Enable Global Interrupts
   sei();
@@ -142,33 +158,39 @@ void setup() {
   LEDReset();
 
   init_i2c();
+
+  if (myConfig.SLAVE_ADDR == DEFAULT_SLAVE_ADDR) {
+    green_pattern = GREEN_LED_PATTERN_UNCONFIGURED;
+  }
 }
 
 
+
 void loop() {
-  if (last_i2c_request != 0)
-  {
-    //We have had at least one i2c request and not currently in PANIC mode
-    if (red_pattern == 0 && last_i2c_request + 8000 < millis()) {
-      //Panic after 8 seconds of not receiving i2c requests...
+  //We have had at least one i2c request and not currently in PANIC mode
+  if (red_pattern == 0 && last_i2c_request == 0) {
+    //Panic after 8 seconds of not receiving i2c requests...
 
-      red_pattern = RED_LED_PANIC;
+    red_pattern = RED_LED_PANIC;
 
-      //Try resetting the i2c bus
-      Wire.end();
-      init_i2c();
-      error_counter++;
-      //Ensure we dont trigger on next pass through
-      last_i2c_request = 0;
+    //Try resetting the i2c bus
+    Wire.end();
+    init_i2c();
+    error_counter++;
 
-    } else if (red_pattern != 0) {
-      //Just come back from a PANIC situation
-      LEDReset();
-
-    }
+  } else if (red_pattern != 0 && last_i2c_request > 0) {
+    //Just come back from a PANIC situation
+    LEDReset();
   }
 
   delay(250);
+
+  if (last_i2c_request != 0) {
+    //Count down loop for requests to see if i2c bus hangs or controller stops talking
+    last_i2c_request--;
+  }
+
+  wdt_reset();
 }
 
 uint32_t calculateCRC32(const uint8_t *data, size_t length)
@@ -226,11 +248,31 @@ void LEDReset() {
   green_pattern = GREEN_LED_PATTERN_STANDARD;
 }
 
+void factory_default() { 
+  EEPROM.put(EEPROM_CHECKSUM_ADDRESS, 0);
+
+  TCCR1 = 0;
+  TIMSK |= (1 << OCIE1A); //Disable timer1
+
+  //Now power down loop until the watchdog timer kicks a reset
+  ledRed();
+
+/*
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  adc_disable();
+  sleep_enable();
+  sleep_cpu();
+*/
+  //Infinity
+  while(1) {}
+}
+
 void wait_for_buffer_ready() {
   //Just delay here so the buffers are all ready before we service i2c
   green_pattern = GREEN_LED_PATTERN_WAITREADY;
   while (!buffer_ready) {
-    delay(250);
+    delay(100);
+    wdt_reset();
   }
 }
 
@@ -251,21 +293,21 @@ void receiveEvent(int howMany) {
     bitClear(cmdByte, COMMAND_BIT);
 
     switch (cmdByte) {
-      case command_green_led_on:
-        //ledGreen();
+      case command_green_led_pattern:
+        if (howMany == 1) {
+          green_pattern = Wire.read();
+        }
         break;
 
-      case command_green_led_off:
-        //ledOff();
+      case command_led_off:
+        //Switch green LED off for a short while
+        ledOffCount = 100;
         break;
 
-      case command_red_led_on:
-        //ledRed();
+      case command_factory_default:
+        factory_default();
         break;
 
-      case command_red_led_off:
-        //ledOff();
-        break;
     }
 
     cmdByte = 0;
@@ -305,7 +347,7 @@ void sendUnsignedInt(uint16_t number) {
 
 // function that executes whenever data is requested by master (this answers requestFrom command)
 void requestEvent() {
-//  if (!buffer_ready) return;
+  //  if (!buffer_ready) return;
 
   switch (cmdByte) {
     case read_voltage:
@@ -324,38 +366,35 @@ void requestEvent() {
   //Clear cmdByte
   cmdByte = 0;
 
-  //Record the time we last processed a request
-  last_i2c_request = millis();
+  //Reset when we last processed a request
+  last_i2c_request = 60;
 }
 
 inline void ledGreen() {
-#if !(defined(SWITCH_OFF_LEDS))
   DDRB |= (1 << DDB1);
   PORTB |=  (1 << PB1);
-#endif
 }
 
 inline void ledRed() {
-#if !(defined(SWITCH_OFF_LEDS))
   DDRB |= (1 << DDB1);
   PORTB &= ~(1 << PB1);
-#endif
 }
 
 inline void ledOff() {
-#if !(defined(SWITCH_OFF_LEDS))
   //PB1 as input
   DDRB &= ~(1 << DDB1);
   //PB1 pull up OFF
   PORTB &= ~(1 << PB1);
-#endif
 }
 
 
 ISR(TIMER1_COMPA_vect)
 {
   //Flash LED in sync with bit pattern
-  if (red_pattern == 0) {
+  if (ledOffCount > 0) {
+    ledOffCount--;
+    ledOff();
+  } else if (red_pattern == 0 ) {
     ///Rotate pattern
     green_pattern = (byte)(green_pattern << 1) | (green_pattern >> 7);
     if (green_pattern & 0x01) {
@@ -372,15 +411,14 @@ ISR(TIMER1_COMPA_vect)
     }
   }
 
+
   //If we skip this ADC reading, quit ISR here
   if (skipNextADC) {
     skipNextADC = false;
-    return;
+  } else {
+    //trigger ADC reading
+    ADCSRA |= (1 << ADSC);
   }
-
-  //trigger ADC reading
-  ADCSRA |= (1 << ADSC);
-
 }
 
 ISR(ADC_vect) {
@@ -414,7 +452,7 @@ ISR(ADC_vect) {
     //Populate the rolling buffer with values from the ADC
 
     analogVal[analogValIndex] = value;
-    
+
     analogValIndex++;
 
     if (analogValIndex == OVERSAMPLE_LOOP) {
@@ -526,4 +564,6 @@ static inline void initTimer1(void)
   OCR1C = 128;  //About quarter second trigger Timer1  (there are 488 counts per second @ 8mhz)
   TIMSK |= (1 << OCIE1A); // enable compare match interrupt
 }
+
+
 

@@ -32,17 +32,12 @@
 //If we send a cmdByte with BIT 5 set its a command byte which instructs the cell to do something (not for reading)
 #define COMMAND_BIT 5
 
-#define command_green_led_on   1
-#define command_green_led_off   2
-#define command_red_led_on   3
-#define command_red_led_off   4
+#define command_green_led_pattern   1
+#define command_led_off   2
+#define command_factory_default 3
 
 #define read_voltage 10
 #define read_temperature 11
-
-
-
-
 
 /*
   uint8_t  cell_configure(uint8_t new_cell_id) {
@@ -53,7 +48,6 @@
   }
 */
 
-
 uint8_t  send_single_command(uint8_t cell_id, uint8_t cmd) {
   Wire.beginTransmission(cell_id); // transmit to device
   Wire.write(cmd);  //Command configure device address
@@ -62,29 +56,33 @@ uint8_t  send_single_command(uint8_t cell_id, uint8_t cmd) {
   return ret;
 }
 
+uint8_t  send_single_command(uint8_t cell_id, uint8_t cmd, uint8_t byteValue) {
+  Wire.beginTransmission(cell_id); // transmit to device
+  Wire.write(cmd);  //Command configure device address
+  Wire.write(byteValue);  //Value
+  uint8_t ret = Wire.endTransmission();  // stop transmitting
+  delay(delay_ms);
+  return ret;
+}
 
-//uint8_t buffer[10];
 
 uint8_t cmdByte(uint8_t cmd) {
   bitSet(cmd, COMMAND_BIT);
   return cmd;
 }
 
-uint8_t  cell_green_led_on(uint8_t cell_id) {
-  return send_single_command(cell_id, cmdByte( command_green_led_on ));
+uint8_t  cell_green_led_pattern(uint8_t cell_id) {
+  return send_single_command(cell_id, cmdByte( command_green_led_pattern ),B11001010);
 }
 
-uint8_t  cell_green_led_off(uint8_t cell_id) {
-  return send_single_command(cell_id, cmdByte( command_green_led_off ));
+uint8_t  cell_led_off(uint8_t cell_id) {
+  return send_single_command(cell_id, cmdByte( command_led_off ));
 }
 
-uint8_t  cell_red_led_on(uint8_t cell_id) {
-  return send_single_command(cell_id, cmdByte( command_red_led_on ));
+uint8_t  command_factory_reset(uint8_t cell_id) {
+  return send_single_command(cell_id, cmdByte( command_factory_default ));
 }
 
-uint8_t  cell_red_led_off(uint8_t cell_id) {
-  return send_single_command(cell_id, cmdByte( command_red_led_off ));
-}
 
 uint16_t read_uint16_from_cell(uint8_t cell_id, uint8_t cmd) {
   send_single_command(cell_id, cmd);
@@ -208,8 +206,8 @@ void loop() {
 
   //cell_configure(cell_id);
 
-  status = cell_green_led_on(cell_id);
-  print_status(status);
+  //status = cell_green_led_pattern(cell_id);
+  //print_status(status);
 
   data16 = cell_read_voltage(cell_id);
   Serial.print("V=");
@@ -223,11 +221,8 @@ void loop() {
   Serial.print('=');
   Serial.print(data16);
 
-  //status = cell_red_led_on(cell_id);
+  //status = cell_led_off(cell_id);
   //print_status(status);
-
-  status = cell_green_led_off(cell_id);
-  print_status(status);
 
   Serial.println("");
 
@@ -236,6 +231,10 @@ void loop() {
   for (int i = 0; i < 10; i++) {
     //ESP8266 function
     yield();
-    delay(100);
+    delay(250);
   }
+
+  //Serial.println("FACTORY RESET:");
+  //command_factory_reset(cell_id);
+
 }
