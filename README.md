@@ -66,7 +66,7 @@ Building upon my existing skill set and knowledge, and also building something t
 
 # Bill Of Materials
 
-Typical bill of materials for each cell module, costs and part numbers provided from Farnell (UK) so other suppliers may be able to provide better costs or similar products.  The ADUM1250 unit is particularly expensive from Farnell and can be purchased for less than 1 USD if you shop around.
+Typical bill of materials for each cell module, costs and part numbers provided from Farnell (UK) so other suppliers may be able to provide better costs or similar products.  The ADUM1250 unit is particularly expensive from Farnell and can be purchased for less than 1 USD if you shop around.  Excluding the ADUM1250 chip the component cost is around £5.50 GBP.
 
 |	Quantity	|	Board Marking	|	Farnel (cost per single unit)	|	Make Model	|	Farnell URL	|
 |	---	|	---	|	---	|	---	|	---	|
@@ -95,4 +95,6 @@ Typical bill of materials for each cell module, costs and part numbers provided 
 |	1	|	R9 47K Resistor 1206 SMT	|		|		|		|
 |	1	|	47R Resistor 1206 SMT	|		|		|		|
 |	2	|	J2/J2 JST_PH_S4B-PH-SM4-TB_04x2.00mm_Angled	|	0.553	|	JST S4B-PH-SM4-TB(LF)(SN)	|	http://uk.farnell.com/jst-japan-solderless-terminals/s4b-ph-sm4-tb-lf-sn/header-smt-right-angle-2mm-4way/dp/9492631	|
-|	1	|	J1 JST_SFH_SM02B-SFHRS-TF_02x1.80mm_Angled  	|	JST SM02B-SFHRS-TF(LF)(SN)	|	http://uk.farnell.com/jst-japan-solderless-terminals/sm02b-sfhrs-tf-lf-sn/header-2pos-1row-1-8mm-red/dp/2399345	|		|
+|	1	|	J1 JST_SFH_SM02B-SFHRS-TF_02x1.80mm_Angled  	|		|	JST SM02B-SFHRS-TF(LF)(SN)	|	http://uk.farnell.com/jst-japan-solderless-terminals/sm02b-sfhrs-tf-lf-sn/header-2pos-1row-1-8mm-red/dp/2399345	|
+
+
