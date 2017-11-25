@@ -70,6 +70,9 @@
 #define COMMAND_led_off   2
 #define COMMAND_factory_default 3
 #define COMMAND_set_slave_address 4
+#define COMMAND_green_led_default 5
+#define COMMAND_set_voltage_calibration 6
+#define COMMAND_set_temperature_calibration 7
 
 //Read values
 #define read_voltage 10
@@ -81,17 +84,16 @@
 //#define adc_disable() (ADCSRA &= ~(1<<ADEN)) // disable ADC (before power-off)
 //#define adc_enable()  (ADCSRA |=  (1<<ADEN)) // re-enable ADC
 
-
 volatile bool skipNextADC = false;
-volatile uint8_t green_pattern = B10100000;
-volatile uint8_t red_pattern = 0;
+volatile uint8_t green_pattern = GREEN_LED_PATTERN_STANDARD;
+volatile uint8_t red_pattern = RED_LED_OFF;
 volatile uint16_t analogVal[OVERSAMPLE_LOOP];
 volatile uint16_t temperature_probe = 0;
 volatile uint8_t analogValIndex;
 volatile uint8_t buffer_ready = 0;
 volatile uint8_t reading_count = 0;
 volatile uint8_t cmdByte = 0;
-volatile uint8_t ledOffCount = 0;
+volatile uint8_t goDarkCount = 0;
 volatile uint8_t last_i2c_request = 255;
 volatile uint16_t VCCMillivolts = 0;
 
@@ -133,13 +135,14 @@ void setup() {
   //Load our EEPROM configuration
   if (!LoadConfigFromEEPROM()) {
     //If bad configuration, flash RED led for 2 seconds
-
-    for (byte a = 0; a < 6; a++) {
-      ledRed();
-      delay(250);
-      ledOff();
-      delay(250);
-    }
+    /*
+        for (byte a = 0; a < 6; a++) {
+          ledRed();
+          delay(250);
+          ledOff();
+          delay(250);
+        }
+    */
   }
 
   cli();//stop interrupts
@@ -163,33 +166,30 @@ void setup() {
   LEDReset();
 
   init_i2c();
-
 }
-
 
 
 void loop() {
   //If we are on the default SLAVE address then use RED led
   if (myConfig.SLAVE_ADDR == DEFAULT_SLAVE_ADDR) {
     red_pattern = RED_LED_PATTERN_UNCONFIGURED;
+  } else {
+    //We have had at least one i2c request and not currently in PANIC mode
+    if (red_pattern == 0 && last_i2c_request == 0) {
+      //Panic after 8 seconds of not receiving i2c requests...
+
+      red_pattern = RED_LED_PANIC;
+
+      //Try resetting the i2c bus
+      Wire.end();
+      init_i2c();
+      error_counter++;
+
+    } else if (red_pattern != 0 && last_i2c_request > 0) {
+      //Just come back from a PANIC situation
+      LEDReset();
+    }
   }
-
-  //We have had at least one i2c request and not currently in PANIC mode
-  if (red_pattern == 0 && last_i2c_request == 0) {
-    //Panic after 8 seconds of not receiving i2c requests...
-
-    red_pattern = RED_LED_PANIC;
-
-    //Try resetting the i2c bus
-    Wire.end();
-    init_i2c();
-    error_counter++;
-
-  } else if (red_pattern != 0 && last_i2c_request > 0) {
-    //Just come back from a PANIC situation
-    LEDReset();
-  }
-
   delay(250);
 
   if (last_i2c_request != 0) {
@@ -285,6 +285,36 @@ void wait_for_buffer_ready() {
   }
 }
 
+
+void sendUnsignedInt(uint16_t number) {
+  Wire.write((byte)((number >> 8) & 0xFF));
+  Wire.write((byte)(number & 0xFF));
+}
+
+
+union {
+  float val;
+  uint8_t b[4];
+} float_to_bytes;
+
+void sendFloat(float number) {
+  float_to_bytes.val = number;
+
+  Wire.write(float_to_bytes.b[0]);
+  Wire.write(float_to_bytes.b[1]);
+  Wire.write(float_to_bytes.b[2]);
+  Wire.write(float_to_bytes.b[3]);
+}
+
+float readFloat() {
+  float_to_bytes.b[0] = Wire.read();
+  float_to_bytes.b[1] = Wire.read();
+  float_to_bytes.b[2] = Wire.read();
+  float_to_bytes.b[3] = Wire.read();
+
+  return float_to_bytes.val;
+}
+
 // function that executes whenever data is received from master
 void receiveEvent(int howMany) {
   if (howMany <= 0) return;
@@ -308,9 +338,13 @@ void receiveEvent(int howMany) {
         }
         break;
 
+      case COMMAND_green_led_default:
+        green_pattern = GREEN_LED_PATTERN_STANDARD;
+        break;
+
       case COMMAND_led_off:
         //Switch green LED off for a short while - GO DARK
-        ledOffCount = 100;
+        goDarkCount = 100;
         break;
 
       case COMMAND_factory_default:
@@ -318,9 +352,34 @@ void receiveEvent(int howMany) {
         Reboot();
         break;
 
+      case COMMAND_set_voltage_calibration:
+        //Set i2c slave address and write to EEPROM, then reboot
+        if (howMany == sizeof(float)) {
+
+          float newValue = readFloat();
+          //Only accept if its different
+          if (newValue != myConfig.VCCCalibration) {
+            myConfig.VCCCalibration = newValue;
+            WriteConfigToEEPROM();
+          }
+        }
+        break;
+
+      case COMMAND_set_temperature_calibration:
+        //Set i2c slave address and write to EEPROM, then reboot
+        if (howMany == sizeof(float)) {
+          float newValue = readFloat();
+          //Only accept if its different
+          if (newValue != myConfig.TemperatureCalibration) {
+            myConfig.TemperatureCalibration = newValue;
+            WriteConfigToEEPROM();
+          }
+        }
+        break;
+
       case COMMAND_set_slave_address:
-      //Set i2c slave address and write to EEPROM, then reboot
-        if (howMany == 1) {
+        //Set i2c slave address and write to EEPROM, then reboot
+        if (howMany == 1 ) {
           uint8_t newAddress = Wire.read();
           //Only accept if its a different address
           if (newAddress != myConfig.SLAVE_ADDR) {
@@ -363,25 +422,6 @@ void receiveEvent(int howMany) {
   while (Wire.available()) Wire.read();
 }
 
-void sendUnsignedInt(uint16_t number) {
-  Wire.write((byte)((number >> 8) & 0xFF));
-  Wire.write((byte)(number & 0xFF));
-}
-
-
-union {
-float val;
-uint8_t b[4];
-} float_to_bytes;
-
-void sendFloat(float number) {
-  float_to_bytes.val=number;
-  
-  Wire.write(float_to_bytes.b[0]);
-  Wire.write(float_to_bytes.b[1]);
-  Wire.write(float_to_bytes.b[2]);
-  Wire.write(float_to_bytes.b[3]);
-}
 
 // function that executes whenever data is requested by master (this answers requestFrom command)
 void requestEvent() {
@@ -436,8 +476,8 @@ inline void ledOff() {
 ISR(TIMER1_COMPA_vect)
 {
   //Flash LED in sync with bit pattern
-  if (ledOffCount > 0) {
-    ledOffCount--;
+  if (goDarkCount > 0) {
+    goDarkCount--;
     ledOff();
   } else if (red_pattern == 0 ) {
     ///Rotate pattern
@@ -478,7 +518,7 @@ ISR(ADC_vect) {
     reading_count = 0;
 
     //We reduce the value by 512 as we have a DC offset we need to remove
-    temperature_probe = value-512;
+    temperature_probe = value - 512;
 
     // use ADC3 for input for next reading (voltage)
     ADMUX = B10010011;
