@@ -44,6 +44,7 @@
 #define read_temperature 11
 #define read_voltage_calibration 12
 #define read_temperature_calibration 13
+#define read_raw_voltage 14
 
 //Default i2c SLAVE address (used for auto provision of address)
 #define DEFAULT_SLAVE_ADDR 0x15
@@ -171,6 +172,12 @@ uint16_t cell_read_voltage(uint8_t cell_id) {
   return read_uint16_from_cell(cell_id, read_voltage);
 }
 
+
+uint16_t cell_read_raw_voltage(uint8_t cell_id) {
+  return read_uint16_from_cell(cell_id, read_raw_voltage);
+}
+
+
 uint16_t cell_read_board_temp(uint8_t cell_id) {
   return read_uint16_from_cell(cell_id, read_temperature);
 }
@@ -208,13 +215,18 @@ void print_status(uint8_t status) {
 uint8_t cell_id = DEFAULT_SLAVE_ADDR;
 
 void loop() {
+  uint8_t status;
+  uint16_t data16;
+  uint32_t data32;
+
   yield();
   delay(500);
+  float v1;
 
   digitalWrite(D4, LOW);
 
   if (Serial.available()) {
-    char c = Serial.read();  //gets one byte from serial buffer  
+    char c = Serial.read();  //gets one byte from serial buffer
 
     //Upper case
     switch (c) {
@@ -231,12 +243,16 @@ void loop() {
 
       case 'V':
         Serial.println("Volt calib");
-        command_set_voltage_calibration(cell_id, 1.635F);
+        v1 = Serial.parseFloat();
+        Serial.println(v1);
+        command_set_voltage_calibration(cell_id, v1);
         break;
 
       case 'T':
         Serial.println("Temp calib");
-        command_set_temperature_calibration(cell_id, 1.00F);
+        v1 = Serial.parseFloat();
+        Serial.println(v1);
+        command_set_temperature_calibration(cell_id, v1);
         break;
 
       case 'A':
@@ -244,15 +260,30 @@ void loop() {
         command_set_slave_address(cell_id, DEFAULT_SLAVE_ADDR_START_RANGE);
         break;
 
-      case 'R':
-        for (int i=0; i < 5; i++) {
 
+      case 'L':
+        Serial.println("Default green led pattern");
+        cell_green_led_default(cell_id);
+        break;
+
+      case 'D':
+        Serial.println("Go dark");
+        cell_led_off(cell_id);
+        break;
+
+      case 'Q':
+        Serial.println("Raw voltage ADC");
+        data16 = cell_read_raw_voltage(cell_id);
+        Serial.print("  V=");
+        Serial.print(data16, HEX);
+        Serial.print('=');
+        Serial.println(data16);
+        break;
+
+      case 'R':
+        for (int i = 0; i < 5; i++) {
           Serial.print("Reading ");
           Serial.print(i);
-
-          uint8_t status;
-          uint16_t data16;
-          uint32_t data32;
 
           data16 = cell_read_voltage(cell_id);
           Serial.print("  V=");
@@ -282,6 +313,10 @@ void loop() {
           yield();
           delay(500);
         }
+        break;
+
+      default:
+        Serial.print('*');
         break;
     }
   }

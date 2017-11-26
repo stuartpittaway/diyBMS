@@ -78,6 +78,7 @@
 #define read_temperature 11
 #define read_voltage_calibration 12
 #define read_temperature_calibration 13
+#define read_raw_voltage 14
 
 //#define wdt_reset()  __asm__ __volatile__ ("wdr")
 //#define adc_disable() (ADCSRA &= ~(1<<ADEN)) // disable ADC (before power-off)
@@ -94,6 +95,7 @@ volatile uint8_t cmdByte = 0;
 volatile uint8_t goDarkCount = 0;
 volatile uint8_t last_i2c_request = 255;
 volatile uint16_t VCCMillivolts = 0;
+volatile uint16_t last_raw_adc = 0;
 
 uint16_t error_counter = 0;
 
@@ -160,36 +162,47 @@ void setup() {
   init_i2c();
 }
 
+void panic() {
+  goDarkCount = 0;
+  green_pattern = GREEN_LED_PANIC;
+}
+
 
 void loop() {
+  wdt_reset();
+
+  if (last_i2c_request > 0) {
+    //Count down loop for requests to see if i2c bus hangs or controller stops talking
+    last_i2c_request--;
+  }
+
   //If we are on the default SLAVE address then use different LED pattern to indicate this
   if (myConfig.SLAVE_ADDR == DEFAULT_SLAVE_ADDR) {
     green_pattern = GREEN_LED_PATTERN_UNCONFIGURED;
   } else {
     //We have had at least one i2c request and not currently in PANIC mode
     if (last_i2c_request == 0) {
-      //Panic after 8 seconds of not receiving i2c requests...
-      green_pattern = GREEN_LED_PANIC;
+
+      //Panic after a few seconds of not receiving i2c requests...
+      panic();
 
       //Try resetting the i2c bus
       Wire.end();
       init_i2c();
-      error_counter++;
 
-    } else if (last_i2c_request > 0) {
+      error_counter++;
+    }
+    /*
+      else if (last_i2c_request > 0) {
       //TODO: FIX THIS
       //Just come back from a PANIC situation
       //LEDReset();
-    }
+      }
+    */
   }
+
+  //Dont make this very large or watchdog will reset
   delay(250);
-
-  if (last_i2c_request != 0) {
-    //Count down loop for requests to see if i2c bus hangs or controller stops talking
-    last_i2c_request--;
-  }
-
-  wdt_reset();
 }
 
 uint32_t calculateCRC32(const uint8_t *data, size_t length)
@@ -389,8 +402,6 @@ void receiveEvent(int howMany) {
 
     switch (cmdByte) {
       case read_voltage:
-        //TODO: PERHAPS THIS SHOULD BE IN THE LOOP()
-        //Prepare the VCCMillivolts
         //Oversampling and take average of ADC samples use an unsigned integer or the bit shifting goes wonky
         uint32_t extraBits = 0;
         for (int k = 0; k < OVERSAMPLE_LOOP; k++) {
@@ -399,8 +410,9 @@ void receiveEvent(int howMany) {
         //Shift the bits to match OVERSAMPLE_LOOP size (buffer size of 8=3 shifts, 16=4 shifts)
         //Assume perfect reference of 2560mV for reference - we will correct for this with VCCCalibration
 
+        uint16_t raw = (extraBits >> 4);
         //TODO: DONT THINK WE NEED THIS ANY LONGER!
-        unsigned int raw = map((extraBits >> 4), 0, 1023, 0, 2560);
+        //unsigned int raw = map((extraBits >> 4), 0, 1023, 0, 2560);
 
         //TODO: Get rid of the need for float variables....
         VCCMillivolts = (int)((float)raw * myConfig.VCCCalibration);
@@ -416,11 +428,13 @@ void receiveEvent(int howMany) {
 
 // function that executes whenever data is requested by master (this answers requestFrom command)
 void requestEvent() {
-  //  if (!buffer_ready) return;
-
   switch (cmdByte) {
     case read_voltage:
       sendUnsignedInt(VCCMillivolts);
+      break;
+
+    case read_raw_voltage:
+      sendUnsignedInt(last_raw_adc);
       break;
 
     case read_temperature:
@@ -430,6 +444,7 @@ void requestEvent() {
     case read_voltage_calibration:
       sendFloat(myConfig.VCCCalibration);
       break;
+
     case read_temperature_calibration:
       sendFloat(myConfig.TemperatureCalibration);
       break;
@@ -442,8 +457,8 @@ void requestEvent() {
   //Clear cmdByte
   cmdByte = 0;
 
-  //Reset when we last processed a request
-  last_i2c_request = 60;
+  //Reset when we last processed a request, if this times out master has stopped communicating with module
+  last_i2c_request = 100;
 }
 
 inline void ledGreen() {
@@ -452,35 +467,35 @@ inline void ledGreen() {
 }
 
 /*
-inline void ledRed() {
+  inline void ledRed() {
   DDRB |= (1 << DDB1);
   PORTB &= ~(1 << PB1);
-}
+  }
 */
 inline void ledOff() {
   //Low
   DDRB |= (1 << DDB1);
   PORTB &= ~(1 << PB1);
-/*
-  //PB1 as input
-  DDRB &= ~(1 << DDB1);
-  //PB1 pull up OFF
-  PORTB &= ~(1 << PB1);
-*/
+  /*
+    //PB1 as input
+    DDRB &= ~(1 << DDB1);
+    //PB1 pull up OFF
+    PORTB &= ~(1 << PB1);
+  */
 }
 
 
 ISR(TIMER1_COMPA_vect)
 {
-  //ledRed();
-
   //Flash LED in sync with bit pattern
   if (goDarkCount > 0) {
     goDarkCount--;
     ledOff();
   } else {
+
     ///Rotate pattern
     green_pattern = (byte)(green_pattern << 1) | (green_pattern >> 7);
+
     if (green_pattern & 0x01) {
       ledGreen();
     } else {
@@ -502,7 +517,9 @@ ISR(ADC_vect) {
   //ledGreen();
 
   // Interrupt service routine for the ADC completion
-  unsigned int  value = ADCL | (ADCH << 8);
+  uint8_t adcl = ADCL;
+  uint16_t value = ADCH << 8 | adcl;
+
 
   if (reading_count == TEMP_READING_LOOP_FREQ ) {
     //Use A0 (RESET PIN) to act as an analogue input
@@ -530,7 +547,7 @@ ISR(ADC_vect) {
     skipNextADC = true;
   } else {
     //Populate the rolling buffer with values from the ADC
-
+    last_raw_adc = value;
     analogVal[analogValIndex] = value;
 
     analogValIndex++;
@@ -603,7 +620,7 @@ void initADC()
 
   //REFS1 REFS0 ADLAR REFS2 MUX3 MUX2 MUX1 MUX0
   //Internal 2.56V Voltage Reference without external bypass capacitor, disconnected from PB0 (AREF)
-  //ADLAR =0 and PB3 for INPUT (A3)
+  //ADLAR =0 and PB3 (B0011) for INPUT (A3)
   //We have to set the registers directly because the ATTINYCORE appears broken for internal 2v56 register without bypass capacitor
   ADMUX = B10010011;
 
@@ -616,6 +633,7 @@ void initADC()
           (1 << MUX0);       // use ADC3 for input (PB4), MUX bit 0
   */
 
+/*
 #if (F_CPU == 1000000)
   //Assume 1MHZ clock so prescaler to 8 (B011)
   ADCSRA =
@@ -624,7 +642,7 @@ void initADC()
     (1 << ADPS1) |     // set prescaler bit 1
     (1 << ADPS0);      // set prescaler bit 0
 #endif
-
+*/
 #if (F_CPU == 8000000)
   //8MHZ clock so set prescaler to 64 (B110)
   ADCSRA =
@@ -634,7 +652,7 @@ void initADC()
     (0 << ADPS0);       // set prescaler bit 0
 #endif
 
-  ADCSRA |= (1 << ADIE);     //enable the ADC interrupt.
+  ADCSRA |= (1 << ADIE);     //enable the ADC interrupt. 
 }
 
 static inline void initTimer1(void)
