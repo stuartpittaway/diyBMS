@@ -204,58 +204,92 @@ void print_status(uint8_t status) {
 
 }
 
+//uint8_t cell_id = DEFAULT_SLAVE_ADDR;
+uint8_t cell_id = DEFAULT_SLAVE_ADDR;
+
 void loop() {
+  yield();
+  delay(500);
+
   digitalWrite(D4, LOW);
 
-  Serial.print("Loop... ");
+  if (Serial.available()) {
+    char c = Serial.read();  //gets one byte from serial buffer  
 
-  uint8_t status;
-  //uint8_t cell_id = DEFAULT_SLAVE_ADDR;
-  uint8_t cell_id = DEFAULT_SLAVE_ADDR_START_RANGE;
-  uint16_t data16;
-  uint32_t data32;
+    //Upper case
+    switch (c) {
 
-  data16 = cell_read_voltage(cell_id);
-  Serial.print("V=");
-  Serial.print(data16, HEX);
-  Serial.print('=');
-  Serial.print(data16);
+      case 'S':
+        Serial.println("Switch Cell Id");
+        cell_id = DEFAULT_SLAVE_ADDR_START_RANGE;
+        break;
 
-  data16 = cell_read_board_temp(cell_id);
-  Serial.print(" T=");
-  Serial.print(data16, HEX);
-  Serial.print('=');
-  Serial.print(data16);
+      case 'F':
+        Serial.println("Factory reset");
+        command_factory_reset(cell_id);
+        break;
 
-  float f = cell_read_voltage_calibration(cell_id);
+      case 'V':
+        Serial.println("Volt calib");
+        command_set_voltage_calibration(cell_id, 1.635F);
+        break;
 
-  char buffer[16];  
-  dtostrf(f,5,2,buffer);
-      
-  Serial.print(" VC=");
-  Serial.print(buffer);
+      case 'T':
+        Serial.println("Temp calib");
+        command_set_temperature_calibration(cell_id, 1.00F);
+        break;
 
-  f = cell_read_temperature_calibration(cell_id);
-  dtostrf(f,5,2,buffer);
-  Serial.print(" TC=");
-  Serial.print(buffer);
+      case 'A':
+        Serial.println("Set module address");
+        command_set_slave_address(cell_id, DEFAULT_SLAVE_ADDR_START_RANGE);
+        break;
 
-  Serial.println("");
+      case 'R':
+        for (int i=0; i < 5; i++) {
+
+          Serial.print("Reading ");
+          Serial.print(i);
+
+          uint8_t status;
+          uint16_t data16;
+          uint32_t data32;
+
+          data16 = cell_read_voltage(cell_id);
+          Serial.print("  V=");
+          Serial.print(data16, HEX);
+          Serial.print('=');
+          Serial.print(data16);
+
+          data16 = cell_read_board_temp(cell_id);
+          Serial.print(" T=");
+          Serial.print(data16, HEX);
+          Serial.print('=');
+          Serial.print(data16);
+
+          float f = cell_read_voltage_calibration(cell_id);
+
+          char buffer[16];
+          dtostrf(f, 5, 2, buffer);
+
+          Serial.print(" VC=");
+          Serial.print(buffer);
+
+          f = cell_read_temperature_calibration(cell_id);
+          dtostrf(f, 5, 2, buffer);
+          Serial.print(" TC=");
+          Serial.print(buffer);
+          Serial.println("");
+          yield();
+          delay(500);
+        }
+        break;
+    }
+  }
+
+
 
   digitalWrite(D4, HIGH);
 
-  for (int i = 0; i < 10; i++) {
-    //ESP8266 function
-    yield();
-    delay(250);
-  }
-
-  //Serial.println("FACTORY RESET:");
-  //command_factory_reset(cell_id);
-
-  //command_set_slave_address(cell_id,DEFAULT_SLAVE_ADDR_START_RANGE);
-  command_set_voltage_calibration(cell_id, 1.635F);
-  command_set_temperature_calibration(cell_id, 1.00F);
-}
+}//end of loop
 
 

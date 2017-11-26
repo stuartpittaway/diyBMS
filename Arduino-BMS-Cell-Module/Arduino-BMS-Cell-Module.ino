@@ -49,10 +49,9 @@
 
 //LED light patterns
 #define GREEN_LED_PATTERN_STANDARD B00000101
-#define GREEN_LED_PATTERN_WAITREADY B11110111
-#define RED_LED_PATTERN_UNCONFIGURED B00000101
-#define RED_LED_OFF 0
-#define RED_LED_PANIC B01010101
+#define GREEN_LED_PATTERN_WAITREADY B11111111
+#define GREEN_LED_PANIC B01010101
+#define GREEN_LED_PATTERN_UNCONFIGURED B11101110
 
 //Where in EEPROM do we store the configuration
 #define EEPROM_CHECKSUM_ADDRESS 0
@@ -86,7 +85,6 @@
 
 volatile bool skipNextADC = false;
 volatile uint8_t green_pattern = GREEN_LED_PATTERN_STANDARD;
-volatile uint8_t red_pattern = RED_LED_OFF;
 volatile uint16_t analogVal[OVERSAMPLE_LOOP];
 volatile uint16_t temperature_probe = 0;
 volatile uint8_t analogValIndex;
@@ -130,19 +128,13 @@ void setup() {
   DDRB &= ~(1 << DDB5);
   PORTB &= ~(1 << PB5);
 
+  ledGreen();
+  delay(1000);
   ledOff();
 
   //Load our EEPROM configuration
   if (!LoadConfigFromEEPROM()) {
-    //If bad configuration, flash RED led for 2 seconds
-    /*
-        for (byte a = 0; a < 6; a++) {
-          ledRed();
-          delay(250);
-          ledOff();
-          delay(250);
-        }
-    */
+    //Do something here for bad configuration??
   }
 
   cli();//stop interrupts
@@ -170,24 +162,24 @@ void setup() {
 
 
 void loop() {
-  //If we are on the default SLAVE address then use RED led
+  //If we are on the default SLAVE address then use different LED pattern to indicate this
   if (myConfig.SLAVE_ADDR == DEFAULT_SLAVE_ADDR) {
-    red_pattern = RED_LED_PATTERN_UNCONFIGURED;
+    green_pattern = GREEN_LED_PATTERN_UNCONFIGURED;
   } else {
     //We have had at least one i2c request and not currently in PANIC mode
-    if (red_pattern == 0 && last_i2c_request == 0) {
+    if (last_i2c_request == 0) {
       //Panic after 8 seconds of not receiving i2c requests...
-
-      red_pattern = RED_LED_PANIC;
+      green_pattern = GREEN_LED_PANIC;
 
       //Try resetting the i2c bus
       Wire.end();
       init_i2c();
       error_counter++;
 
-    } else if (red_pattern != 0 && last_i2c_request > 0) {
+    } else if (last_i2c_request > 0) {
+      //TODO: FIX THIS
       //Just come back from a PANIC situation
-      LEDReset();
+      //LEDReset();
     }
   }
   delay(250);
@@ -251,7 +243,6 @@ void init_i2c() {
 }
 
 void LEDReset() {
-  red_pattern = RED_LED_OFF;
   green_pattern = GREEN_LED_PATTERN_STANDARD;
 }
 
@@ -264,7 +255,7 @@ void Reboot() {
   TIMSK |= (1 << OCIE1A); //Disable timer1
 
   //Now power down loop until the watchdog timer kicks a reset
-  ledRed();
+  ledGreen();
 
   /*
     set_sleep_mode(SLEEP_MODE_PWR_DOWN);
@@ -460,37 +451,38 @@ inline void ledGreen() {
   PORTB |=  (1 << PB1);
 }
 
+/*
 inline void ledRed() {
   DDRB |= (1 << DDB1);
   PORTB &= ~(1 << PB1);
 }
-
+*/
 inline void ledOff() {
+  //Low
+  DDRB |= (1 << DDB1);
+  PORTB &= ~(1 << PB1);
+/*
   //PB1 as input
   DDRB &= ~(1 << DDB1);
   //PB1 pull up OFF
   PORTB &= ~(1 << PB1);
+*/
 }
 
 
 ISR(TIMER1_COMPA_vect)
 {
+  //ledRed();
+
   //Flash LED in sync with bit pattern
   if (goDarkCount > 0) {
     goDarkCount--;
     ledOff();
-  } else if (red_pattern == 0 ) {
+  } else {
     ///Rotate pattern
     green_pattern = (byte)(green_pattern << 1) | (green_pattern >> 7);
     if (green_pattern & 0x01) {
       ledGreen();
-    } else {
-      ledOff();
-    }
-  } else {
-    red_pattern = (byte)(red_pattern << 1) | (red_pattern >> 7);
-    if (red_pattern & 0x01) {
-      ledRed();
     } else {
       ledOff();
     }
@@ -507,6 +499,8 @@ ISR(TIMER1_COMPA_vect)
 }
 
 ISR(ADC_vect) {
+  //ledGreen();
+
   // Interrupt service routine for the ADC completion
   unsigned int  value = ADCL | (ADCH << 8);
 
