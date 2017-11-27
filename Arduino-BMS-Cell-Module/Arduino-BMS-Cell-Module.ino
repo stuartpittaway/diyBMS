@@ -44,10 +44,9 @@
 
 // __DATE__
 
-//#define SWITCH_OFF_LEDS
-
 //LED light patterns
 #define GREEN_LED_PATTERN_STANDARD B00010000
+#define GREEN_LED_PATTERN_BYPASS B01110100
 #define GREEN_LED_PATTERN_WAITREADY B11100011
 #define GREEN_LED_PANIC B01010101
 #define GREEN_LED_PATTERN_UNCONFIGURED B11111111
@@ -55,6 +54,12 @@
 //Where in EEPROM do we store the configuration
 #define EEPROM_CHECKSUM_ADDRESS 0
 #define EEPROM_CONFIG_ADDRESS 20
+
+#define MIN_BYPASS_VOLTAGE 3000U
+#define MAX_BYPASS_VOLTAGE 4200U
+
+//Number of TIMER1 cycles between voltage reading checks (240 = approx 30 seconds)
+#define BYPASS_COUNTER_MAX 240
 
 //Default i2c SLAVE address (used for auto provision of address)
 #define DEFAULT_SLAVE_ADDR 21
@@ -66,8 +71,8 @@
 //Number of times we sample and average the ADC for voltage
 #define OVERSAMPLE_LOOP 16
 
-//If we receive a cmdByte with BIT 5 set its a command byte so there is another byte waiting for us to process
-#define COMMAND_BIT 5
+//If we receive a cmdByte with BIT 6 set its a command byte so there is another byte waiting for us to process
+#define COMMAND_BIT 6
 #define COMMAND_green_led_pattern   1
 #define COMMAND_led_off   2
 #define COMMAND_factory_default 3
@@ -75,6 +80,7 @@
 #define COMMAND_green_led_default 5
 #define COMMAND_set_voltage_calibration 6
 #define COMMAND_set_temperature_calibration 7
+#define COMMAND_set_bypass_voltage 8
 
 //Read values
 #define read_voltage 10
@@ -83,6 +89,8 @@
 #define read_temperature_calibration 13
 #define read_raw_voltage 14
 #define read_error_counter 15
+#define read_bypass_enabled_state 16
+#define read_bypass_voltage_measurement 17
 
 volatile bool skipNextADC = false;
 volatile uint8_t green_pattern = GREEN_LED_PATTERN_STANDARD;
@@ -95,13 +103,18 @@ volatile uint8_t cmdByte = 0;
 volatile uint8_t goDarkCount = 0;
 volatile uint8_t last_i2c_request = 255;
 volatile uint16_t VCCMillivolts = 0;
+volatile uint16_t ByPassVCCMillivolts = 0;
 volatile uint16_t last_raw_adc = 0;
+volatile uint16_t targetByPassVoltage = 0;
+volatile uint8_t ByPassCounter = 0;
+volatile boolean ByPassEnabled = false;
 
 uint16_t error_counter = 0;
 
 //Number of voltage readings to take before we take a temperature reading
 #define TEMP_READING_LOOP_FREQ 16
 
+//Default values
 struct cell_module_config {
   // 7 bit slave I2C address
   uint8_t SLAVE_ADDR = DEFAULT_SLAVE_ADDR;
@@ -124,13 +137,16 @@ void setup() {
   //pinMode(A3, INPUT);  //A3 pin 3 (PB3)
   //pinMode(A0, INPUT);  //reset pin A0 pin 5 (PB5)
 
-/*
-  DDRB &= ~(1 << DDB3);
-  PORTB &= ~(1 << PB3);
+  /*
+    DDRB &= ~(1 << DDB3);
+    PORTB &= ~(1 << PB3);
 
-  DDRB &= ~(1 << DDB5);
-  PORTB &= ~(1 << PB5);
-*/
+    DDRB &= ~(1 << DDB5);
+    PORTB &= ~(1 << PB5);
+  */
+
+  pinMode(PB4, OUTPUT); //PB4 = PIN 3
+  digitalWrite(PB4, LOW);
 
   ledGreen();
   delay(1000);
@@ -151,6 +167,7 @@ void setup() {
   // WDTCSR configuration:     WDIE = 1: Interrupt Enable     WDE = 1 :Reset Enable
   // Enter Watchdog Configuration mode:
   WDTCR |= (1 << WDCE) | (1 << WDE);
+
   // Set Watchdog settings - 4000ms timeout
   WDTCR = (1 << WDIE) | (1 << WDE) | (1 << WDP3) | (0 << WDP2) | (0 << WDP1) | (0 << WDP0);
 
@@ -164,14 +181,15 @@ void setup() {
   init_i2c();
 }
 
-boolean inPanicMode=false;
+boolean inPanicMode = false;
 
 void panic() {
   goDarkCount = 0;
   green_pattern = GREEN_LED_PANIC;
-  inPanicMode=true;
+  inPanicMode = true;
 }
 
+uint8_t previousLedState=0;
 void loop() {
   wdt_reset();
 
@@ -185,7 +203,9 @@ void loop() {
     green_pattern = GREEN_LED_PATTERN_UNCONFIGURED;
   } else {
     //We have had at least one i2c request and not currently in PANIC mode
-    if (last_i2c_request == 0 && inPanicMode==false) {
+    if (last_i2c_request == 0 && inPanicMode == false) {
+
+      previousLedState=green_pattern ;
 
       //Panic after a few seconds of not receiving i2c requests...
       panic();
@@ -196,13 +216,14 @@ void loop() {
 
       error_counter++;
     }
-    
-    if (last_i2c_request > 0 && inPanicMode==true) {
+
+    if (last_i2c_request > 0 && inPanicMode == true) {
       //Just come back from a PANIC situation
       LEDReset();
-      inPanicMode=false;
-      }
-    
+      green_pattern=previousLedState;
+      inPanicMode = false;
+    }
+
   }
 
   //Dont make this very large or watchdog will reset
@@ -299,6 +320,10 @@ void sendUnsignedInt(uint16_t number) {
   Wire.write((byte)(number & 0xFF));
 }
 
+void sendByte(uint8_t number) {
+  Wire.write(number);
+}
+
 
 union {
   float val;
@@ -321,6 +346,24 @@ float readFloat() {
   float_to_bytes.b[3] = Wire.read();
 
   return float_to_bytes.val;
+}
+
+void bypass_off() {
+  targetByPassVoltage = 0;
+  ByPassCounter = 0;
+  ByPassEnabled = false;
+  green_pattern = GREEN_LED_PATTERN_STANDARD;
+}
+
+union {
+  uint16_t val;
+  uint8_t b[2];
+} uint16_t_to_bytes;
+
+uint16_t readUINT16() {
+  uint16_t_to_bytes.b[0] = Wire.read();
+  uint16_t_to_bytes.b[1] = Wire.read();
+  return uint16_t_to_bytes.val;
 }
 
 // function that executes whenever data is received from master
@@ -385,12 +428,31 @@ void receiveEvent(int howMany) {
         }
         break;
 
+      case COMMAND_set_bypass_voltage:
+        //Set i2c slave address and write to EEPROM, then reboot
+        if (howMany == sizeof(uint16_t)) {
+          uint16_t newValue = readUINT16();
+          //Only accept if its a realistic value and the value is LESS than the last voltage reading
+          if (newValue >= MIN_BYPASS_VOLTAGE && newValue <= MAX_BYPASS_VOLTAGE && newValue < VCCMillivolts) {
+            //TODO: Are we sure we really need all these variables??
+            targetByPassVoltage = newValue;
+            ByPassVCCMillivolts = VCCMillivolts;
+            ByPassCounter = BYPASS_COUNTER_MAX;
+            green_pattern = GREEN_LED_PATTERN_BYPASS;
+            ByPassEnabled = true;
+          } else {
+            //Disable
+            bypass_off();
+          }
+        }
+        break;
+
       case COMMAND_set_slave_address:
         //Set i2c slave address and write to EEPROM, then reboot
         if (howMany == 1 ) {
           uint8_t newAddress = Wire.read();
           //Only accept if its a different address
-          if (newAddress != myConfig.SLAVE_ADDR && newAddress>=DEFAULT_SLAVE_ADDR_START_RANGE && newAddress<=DEFAULT_SLAVE_ADDR_END_RANGE) {           
+          if (newAddress != myConfig.SLAVE_ADDR && newAddress >= DEFAULT_SLAVE_ADDR_START_RANGE && newAddress <= DEFAULT_SLAVE_ADDR_END_RANGE) {
             myConfig.SLAVE_ADDR = newAddress;
             WriteConfigToEEPROM();
             Reboot();
@@ -406,21 +468,7 @@ void receiveEvent(int howMany) {
 
     switch (cmdByte) {
       case read_voltage:
-        //Oversampling and take average of ADC samples use an unsigned integer or the bit shifting goes wonky
-        uint32_t extraBits = 0;
-        for (int k = 0; k < OVERSAMPLE_LOOP; k++) {
-          extraBits = extraBits + analogVal[k];
-        }
-        //Shift the bits to match OVERSAMPLE_LOOP size (buffer size of 8=3 shifts, 16=4 shifts)
-        //Assume perfect reference of 2560mV for reference - we will correct for this with VCCCalibration
-
-        uint16_t raw = (extraBits >> 4);
-        //TODO: DONT THINK WE NEED THIS ANY LONGER!
-        //unsigned int raw = map((extraBits >> 4), 0, 1023, 0, 2560);
-
-        //TODO: Get rid of the need for float variables....
-        VCCMillivolts = (int)((float)raw * myConfig.VCCCalibration);
-
+        VCCMillivolts = Update_VCCMillivolts();
         break;
     }
   }
@@ -429,6 +477,23 @@ void receiveEvent(int howMany) {
   while (Wire.available()) Wire.read();
 }
 
+
+float Update_VCCMillivolts() {
+  //Oversampling and take average of ADC samples use an unsigned integer or the bit shifting goes wonky
+  uint32_t extraBits = 0;
+  for (int k = 0; k < OVERSAMPLE_LOOP; k++) {
+    extraBits = extraBits + analogVal[k];
+  }
+  //Shift the bits to match OVERSAMPLE_LOOP size (buffer size of 8=3 shifts, 16=4 shifts)
+  //Assume perfect reference of 2560mV for reference - we will correct for this with VCCCalibration
+
+  uint16_t raw = (extraBits >> 4);
+  //TODO: DONT THINK WE NEED THIS ANY LONGER!
+  //unsigned int raw = map((extraBits >> 4), 0, 1023, 0, 2560);
+
+  //TODO: Get rid of the need for float variables....
+  return (int)((float)raw * myConfig.VCCCalibration);
+}
 
 // function that executes whenever data is requested by master (this answers requestFrom command)
 void requestEvent() {
@@ -440,9 +505,17 @@ void requestEvent() {
     case read_raw_voltage:
       sendUnsignedInt(last_raw_adc);
       break;
-      
+
     case read_error_counter:
       sendUnsignedInt(error_counter);
+      break;
+
+    case read_bypass_voltage_measurement:
+      sendUnsignedInt(ByPassVCCMillivolts);
+      break;
+
+    case read_bypass_enabled_state:
+      sendByte(ByPassEnabled);
       break;
 
     case read_temperature:
@@ -492,7 +565,6 @@ inline void ledOff() {
   */
 }
 
-
 ISR(TIMER1_COMPA_vect)
 {
   //Flash LED in sync with bit pattern
@@ -511,8 +583,46 @@ ISR(TIMER1_COMPA_vect)
     }
   }
 
-    //trigger ADC reading
-    ADCSRA |= (1 << ADSC);
+  if (ByPassEnabled) {
+
+    //This must go above the following "if (ByPassCounter > 0)" statement...
+    if (ByPassCounter == 0 && analogValIndex == 0) {
+      //We are in bypass and just finished an in-cycle voltage measurement
+      ByPassVCCMillivolts = Update_VCCMillivolts();
+
+      if (targetByPassVoltage >= ByPassVCCMillivolts) {
+        //We reached the goal
+        bypass_off();
+      } else {
+        //Try again
+        ByPassCounter = BYPASS_COUNTER_MAX;
+      }
+    }
+
+    if (ByPassCounter > 0)
+    {
+      //We are in ACTIVE BYPASS mode - the RESISTOR will be ACTIVE + BURNING ENERGY
+      ByPassCounter--;
+      digitalWrite(PB4, HIGH);
+
+      if (ByPassCounter == 0)
+      {
+        //We have just finished this timed ACTIVE BYPASS mode, disable resistor
+        //and measure resting voltage now before possible re-enable.
+        digitalWrite(PB4, LOW);
+
+        //Reset voltage ADC buffer
+        analogValIndex = 0;
+      }
+    }
+
+  } else {
+    //Safety check we ensure bypass is always off if not enabled
+    digitalWrite(PB4, LOW);
+  }
+
+  //trigger ADC reading
+  ADCSRA |= (1 << ADSC);
 }
 
 ISR(ADC_vect) {
@@ -559,16 +669,15 @@ ISR(ADC_vect) {
 
     reading_count++;
 
-
     if (reading_count == TEMP_READING_LOOP_FREQ) {
-      // use ADC0 for temp probe input on next ADC loop
+      //use ADC0 for temp probe input on next ADC loop
 
       //We have to set the registers directly because the ATTINYCORE appears broken for internal 2v56 register without bypass capacitor
       ADMUX = B10010000;
-      
+
       //Set skipNextADC to delay the next TIMER1 call to ADC reading to allow the ADC to settle after changing MUX
       skipNextADC = true;
-    }    
+    }
   }
 
 }
@@ -626,33 +735,32 @@ void initADC()
           (1 << MUX0);       // use ADC3 for input (PB4), MUX bit 0
   */
 
-/*
-#if (F_CPU == 1000000)
-  //Assume 1MHZ clock so prescaler to 8 (B011)
-  ADCSRA =
-    (1 << ADEN)  |     // Enable ADC
-    (0 << ADPS2) |     // set prescaler bit 2
-    (1 << ADPS1) |     // set prescaler bit 1
-    (1 << ADPS0);      // set prescaler bit 0
-#endif
-*/
-//#if (F_CPU == 8000000)
+  /*
+    #if (F_CPU == 1000000)
+    //Assume 1MHZ clock so prescaler to 8 (B011)
+    ADCSRA =
+      (1 << ADEN)  |     // Enable ADC
+      (0 << ADPS2) |     // set prescaler bit 2
+      (1 << ADPS1) |     // set prescaler bit 1
+      (1 << ADPS0);      // set prescaler bit 0
+    #endif
+  */
+  //#if (F_CPU == 8000000)
   //8MHZ clock so set prescaler to 64 (B110)
   ADCSRA =
     (1 << ADEN)  |     // Enable ADC
     (1 << ADPS2) |     // set prescaler bit 2
     (1 << ADPS1) |     // set prescaler bit 1
     (0 << ADPS0) |       // set prescaler bit 0
-    (1 << ADIE);     //enable the ADC interrupt. 
-//#endif
-  
+    (1 << ADIE);     //enable the ADC interrupt.
+  //#endif
 }
 
 static inline void initTimer1(void)
 {
   TCCR1 |= (1 << CTC1);  // clear timer on compare match
   TCCR1 |= (1 << CS13) | (1 << CS12) | (1 << CS11) | (1 << CS10); //clock prescaler 16384
-  OCR1C = 128;  //About quarter second trigger Timer1  (there are 488 counts per second @ 8mhz)
+  OCR1C = 64;  //About eighth of a second trigger Timer1  (there are 488 counts per second @ 8mhz)
   TIMSK |= (1 << OCIE1A); // enable compare match interrupt
 }
 

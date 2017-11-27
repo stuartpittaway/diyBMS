@@ -29,8 +29,8 @@
 //Inter-packet/request delay on i2c bus
 #define delay_ms 20
 
-//If we send a cmdByte with BIT 5 set its a command byte which instructs the cell to do something (not for reading)
-#define COMMAND_BIT 5
+//If we send a cmdByte with BIT 6 set its a command byte which instructs the cell to do something (not for reading)
+#define COMMAND_BIT 6
 
 #define COMMAND_green_led_pattern   1
 #define COMMAND_led_off   2
@@ -39,6 +39,7 @@
 #define COMMAND_green_led_default 5
 #define COMMAND_set_voltage_calibration 6
 #define COMMAND_set_temperature_calibration 7
+#define COMMAND_set_bypass_voltage 8
 
 #define read_voltage 10
 #define read_temperature 11
@@ -46,6 +47,8 @@
 #define read_temperature_calibration 13
 #define read_raw_voltage 14
 #define read_error_counter 15
+#define read_bypass_enabled_state 16
+#define read_bypass_voltage_measurement 17
 
 //Default i2c SLAVE address (used for auto provision of address)
 #define DEFAULT_SLAVE_ADDR 21
@@ -59,6 +62,12 @@ union {
   float val;
   uint8_t buffer[4];
 } float_to_bytes;
+
+union {
+  uint16_t val;
+  uint8_t buffer[2];
+} uint16_t_to_bytes;
+
 
 uint8_t  send_command(uint8_t cell_id, uint8_t cmd) {
   Wire.beginTransmission(cell_id); // transmit to device
@@ -90,6 +99,16 @@ uint8_t  send_command(uint8_t cell_id, uint8_t cmd, float floatValue) {
   return ret;
 }
 
+uint8_t send_command(uint8_t cell_id, uint8_t cmd, uint16_t Value) {
+  uint16_t_to_bytes.val = Value;
+  Wire.beginTransmission(cell_id); // transmit to device
+  Wire.write(cmd);  //Command configure device address
+  Wire.write(uint16_t_to_bytes.buffer[0]);
+  Wire.write(uint16_t_to_bytes.buffer[1]);
+  uint8_t ret = Wire.endTransmission();  // stop transmitting
+  delay(delay_ms);
+  return ret;
+}
 
 uint8_t cmdByte(uint8_t cmd) {
   bitSet(cmd, COMMAND_BIT);
@@ -99,30 +118,30 @@ uint8_t cmdByte(uint8_t cmd) {
 
 uint16_t read_uint16_from_cell(uint8_t cell_id, uint8_t cmd) {
   send_command(cell_id, cmd);
-
-  delay(2);
   uint8_t status = Wire.requestFrom((uint8_t)cell_id, (uint8_t)2);
-
   uint8_t buffer[4];
   buffer[0] = (uint8_t)Wire.read();
   buffer[1] = (uint8_t)Wire.read();
-
   delay(delay_ms);
   return word(buffer[0], buffer[1]);
+}
+
+uint8_t read_uint8_t_from_cell(uint8_t cell_id, uint8_t cmd) {
+  send_command(cell_id, cmd);
+  uint8_t status = Wire.requestFrom((uint8_t)cell_id, (uint8_t)1);
+  uint8_t buffer = (uint8_t)Wire.read();
+  delay(delay_ms);
+  return buffer;
 }
 
 
 float read_float_from_cell(uint8_t cell_id, uint8_t cmd) {
   send_command(cell_id, cmd);
-
-  delay(2);
   uint8_t status = Wire.requestFrom((uint8_t)cell_id, (uint8_t)4);
-
   float_to_bytes.buffer[0] = (uint8_t)Wire.read();
   float_to_bytes.buffer[1] = (uint8_t)Wire.read();
   float_to_bytes.buffer[2] = (uint8_t)Wire.read();
   float_to_bytes.buffer[3] = (uint8_t)Wire.read();
-
   delay(delay_ms);
   return float_to_bytes.val;
 }
@@ -154,15 +173,13 @@ uint8_t command_set_slave_address(uint8_t cell_id, uint8_t newAddress) {
 }
 
 uint8_t command_set_voltage_calibration(uint8_t cell_id, float value) {
-  return send_command(cell_id, cmdByte( COMMAND_set_voltage_calibration ), value);
+  return send_command(cell_id, cmdByte(COMMAND_set_voltage_calibration ), value);
 
 }
 uint8_t command_set_temperature_calibration(uint8_t cell_id, float value) {
-  return send_command(cell_id, cmdByte( COMMAND_set_temperature_calibration ), value);
+  return send_command(cell_id, cmdByte(COMMAND_set_temperature_calibration ), value);
 
 }
-
-
 
 float cell_read_voltage_calibration(uint8_t cell_id) {
   return read_float_from_cell(cell_id, read_voltage_calibration);
@@ -174,6 +191,10 @@ float cell_read_temperature_calibration(uint8_t cell_id) {
 
 uint16_t cell_read_voltage(uint8_t cell_id) {
   return read_uint16_from_cell(cell_id, read_voltage);
+}
+
+uint16_t cell_read_bypass_enabled_state(uint8_t cell_id) {
+  return read_uint8_t_from_cell(cell_id, read_bypass_enabled_state);
 }
 
 
@@ -189,6 +210,14 @@ uint16_t cell_read_error_counter(uint8_t cell_id) {
 uint16_t cell_read_board_temp(uint8_t cell_id) {
   return read_uint16_from_cell(cell_id, read_temperature);
 }
+uint16_t cell_read_bypass_voltage_measurement(uint8_t cell_id) {
+  return read_uint16_from_cell(cell_id, read_bypass_voltage_measurement);
+}
+
+uint8_t command_set_bypass_voltage(uint8_t cell_id, uint16_t  value) {
+  return send_command(cell_id, cmdByte(COMMAND_set_bypass_voltage), value);
+}
+
 
 void setup() {
   Serial.begin(19200);           // start serial for output
@@ -211,7 +240,9 @@ void setup() {
 
   Serial.println("Commands: 'S<ADDR>' select module i2c address, 'F' factory reset selected module");
   Serial.println("Commands: 'A<ADDR>' set module i2c address, 'D' Go dark (light out)");
+  Serial.println("Commands: 'B<VOLT>' set bypass voltage to VOLT, 'Y' query bypass enabled status");
   Serial.println("Commands: 'Q' Raw ADC voltage reading, 'L' Set default LED pattern");
+  Serial.println("Commands: 'M' Read bypass voltage measurement");
   Serial.println("Commands: 'X' Scan for modules, 'P' Provision new module (one at a time)");
   Serial.println("Commands: 'V<MULT>' voltage multiplier (float), 'T<MULT>' Temperature multiplier (float)");
   Serial.println("Commands: 'R' Take voltage and temp readings");
@@ -261,33 +292,32 @@ void loop() {
         break;
 
       case 'P': {
-        Serial.print("i2c Provision: ");
-        Wire.beginTransmission(DEFAULT_SLAVE_ADDR);
-        byte error2 = Wire.endTransmission();
-        if (error2 == 0)
-        {
-          Serial.print("Found module");
-
-          for (uint8_t address = DEFAULT_SLAVE_ADDR_START_RANGE; address <= DEFAULT_SLAVE_ADDR_END_RANGE; address++ )
+          Serial.print("i2c Provision: ");
+          Wire.beginTransmission(DEFAULT_SLAVE_ADDR);
+          byte error2 = Wire.endTransmission();
+          if (error2 == 0)
           {
-            Wire.beginTransmission(address);
-            byte error1 = Wire.endTransmission();
-            if (error1 != 0) {
+            Serial.print("Found module");
+
+            for (uint8_t address = DEFAULT_SLAVE_ADDR_START_RANGE; address <= DEFAULT_SLAVE_ADDR_END_RANGE; address++ )
+            {
+              Wire.beginTransmission(address);
+              byte error1 = Wire.endTransmission();
+              if (error1 != 0) {
                 //We have found a gap
-                command_set_slave_address(cell_id, address);
+                command_set_slave_address(DEFAULT_SLAVE_ADDR, (uint8_t)address);
                 Serial.print("new address=");
                 Serial.println(address);
-                cell_id=address;
+                cell_id = address;
                 break;
+              }
             }
+          } else {
+            Serial.println("No module");
           }
-        } else {
-           Serial.println("No module");
         }
-      }
         break;
-      
-      break;
+
 
       case 'S':
         Serial.print("Select module Id ");
@@ -321,7 +351,7 @@ void loop() {
         v2 = Serial.parseInt();
         Serial.println(v2);
         if (v2 >= DEFAULT_SLAVE_ADDR_START_RANGE && v2 <= DEFAULT_SLAVE_ADDR_END_RANGE) {
-          command_set_slave_address(cell_id, v2);
+          command_set_slave_address(cell_id, (uint8_t)v2);
         }
         break;
 
@@ -351,6 +381,24 @@ void loop() {
         Serial.print(data16, HEX);
         Serial.print('=');
         Serial.println(data16);
+        break;
+
+      case 'B': {
+          Serial.println("Set bypass voltage ");
+          uint16_t v5 = Serial.parseInt();
+          Serial.println(v5);
+          command_set_bypass_voltage(cell_id, v5);
+        }
+        break;
+
+      case 'Y':
+        Serial.println("Bypass state ");
+        Serial.println(cell_read_bypass_enabled_state(cell_id));
+        break;
+
+      case 'M':
+        Serial.println("Bypass volt measurement ");
+        Serial.println(cell_read_bypass_voltage_measurement(cell_id));
         break;
 
       case 'R':
