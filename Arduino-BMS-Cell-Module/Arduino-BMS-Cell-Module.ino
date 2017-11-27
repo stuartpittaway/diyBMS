@@ -19,9 +19,8 @@
   http://drazzy.com/package_drazzy.com_index.json
   not this one https://raw.githubusercontent.com/damellis/attiny/ide-1.6.x-boards-manager/package_damellis_attiny_index.json
 
-  ATTINY data sheet
+  ATTINY85/V-10PU data sheet
   http://www.atmel.com/images/atmel-2586-avr-8-bit-microcontroller-attiny25-attiny45-attiny85_datasheet.pdf
-
 
   To manually configure ATTINY fuses use the command....
   .\bin\avrdude -p attiny85 -C etc\avrdude.conf -c avrisp -P COM5 -b 19200 -B2 -e -Uefuse:w:0xff:m -Uhfuse:w:0xdf:m -Ulfuse:w:0xe2:m
@@ -58,7 +57,11 @@
 #define EEPROM_CONFIG_ADDRESS 20
 
 //Default i2c SLAVE address (used for auto provision of address)
-#define DEFAULT_SLAVE_ADDR 0x15
+#define DEFAULT_SLAVE_ADDR 21
+
+//Configured cell modules use i2c addresses 24 to 48 (24S)
+#define DEFAULT_SLAVE_ADDR_START_RANGE 24
+#define DEFAULT_SLAVE_ADDR_END_RANGE DEFAULT_SLAVE_ADDR_START_RANGE + 24
 
 //Number of times we sample and average the ADC for voltage
 #define OVERSAMPLE_LOOP 16
@@ -79,10 +82,7 @@
 #define read_voltage_calibration 12
 #define read_temperature_calibration 13
 #define read_raw_voltage 14
-
-//#define wdt_reset()  __asm__ __volatile__ ("wdr")
-//#define adc_disable() (ADCSRA &= ~(1<<ADEN)) // disable ADC (before power-off)
-//#define adc_enable()  (ADCSRA |=  (1<<ADEN)) // re-enable ADC
+#define read_error_counter 15
 
 volatile bool skipNextADC = false;
 volatile uint8_t green_pattern = GREEN_LED_PATTERN_STANDARD;
@@ -387,7 +387,7 @@ void receiveEvent(int howMany) {
         if (howMany == 1 ) {
           uint8_t newAddress = Wire.read();
           //Only accept if its a different address
-          if (newAddress != myConfig.SLAVE_ADDR) {
+          if (newAddress != myConfig.SLAVE_ADDR && newAddress>=DEFAULT_SLAVE_ADDR_START_RANGE && newAddress<=DEFAULT_SLAVE_ADDR_END_RANGE) {           
             myConfig.SLAVE_ADDR = newAddress;
             WriteConfigToEEPROM();
             Reboot();
@@ -436,6 +436,10 @@ void requestEvent() {
 
     case read_raw_voltage:
       sendUnsignedInt(last_raw_adc);
+      break;
+      
+    case read_error_counter:
+      sendUnsignedInt(error_counter);
       break;
 
     case read_temperature:

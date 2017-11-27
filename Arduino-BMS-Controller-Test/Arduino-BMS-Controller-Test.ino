@@ -45,11 +45,15 @@
 #define read_voltage_calibration 12
 #define read_temperature_calibration 13
 #define read_raw_voltage 14
+#define read_error_counter 15
 
 //Default i2c SLAVE address (used for auto provision of address)
-#define DEFAULT_SLAVE_ADDR 0x15
-#define DEFAULT_SLAVE_ADDR_START_RANGE 0x20
-#define DEFAULT_SLAVE_ADDR_END_RANGE DEFAULT_SLAVE_ADDR_START_RANGE + 20
+#define DEFAULT_SLAVE_ADDR 21
+
+//Configured cell modules use i2c addresses 24 to 48 (24S)
+//See http://www.i2c-bus.org/addressing/
+#define DEFAULT_SLAVE_ADDR_START_RANGE 24
+#define DEFAULT_SLAVE_ADDR_END_RANGE DEFAULT_SLAVE_ADDR_START_RANGE + 24
 
 union {
   float val;
@@ -178,15 +182,16 @@ uint16_t cell_read_raw_voltage(uint8_t cell_id) {
 }
 
 
+uint16_t cell_read_error_counter(uint8_t cell_id) {
+  return read_uint16_from_cell(cell_id, read_error_counter);
+}
+
 uint16_t cell_read_board_temp(uint8_t cell_id) {
   return read_uint16_from_cell(cell_id, read_temperature);
 }
 
 void setup() {
   Serial.begin(19200);           // start serial for output
-
-  //while (!Serial);             // Leonardo: wait for serial monitor
-  Serial.println("\n\nDIYBMS Controller");
 
   Wire.setTimeout(1000);  //1000ms timeout
   Wire.setClock(100000);  //100khz
@@ -199,6 +204,17 @@ void setup() {
   //D4 is LED
   pinMode(D4, OUTPUT);
   digitalWrite(D4, HIGH); //OFF
+
+
+  while (!Serial);             // Leonardo: wait for serial monitor
+  Serial.println("\n\nDIYBMS Test Controller\n\n");
+
+  Serial.println("Commands: 'S<ADDR>' select module i2c address, 'F' factory reset selected module");
+  Serial.println("Commands: 'A<ADDR>' set module i2c address, 'D' Go dark (light out)");
+  Serial.println("Commands: 'Q' Raw ADC voltage reading, 'L' Set default LED pattern");
+  Serial.println("Commands: 'X' Scan for modules, 'P' Provision new module (one at a time)");
+  Serial.println("Commands: 'V<MULT>' voltage multiplier (float), 'T<MULT>' Temperature multiplier (float)");
+  Serial.println("Commands: 'R' Take voltage and temp readings");
 }
 
 void print_status(uint8_t status) {
@@ -211,38 +227,83 @@ void print_status(uint8_t status) {
 
 }
 
-//uint8_t cell_id = DEFAULT_SLAVE_ADDR;
 uint8_t cell_id = DEFAULT_SLAVE_ADDR;
 
 void loop() {
   uint8_t status;
+  uint8_t v2;
   uint16_t data16;
   uint32_t data32;
 
-  yield();
-  delay(500);
-  float v1;
-
   digitalWrite(D4, LOW);
+  yield();
+  delay(250);
+  float v1;
 
   if (Serial.available()) {
     char c = Serial.read();  //gets one byte from serial buffer
 
     //Upper case
     switch (c) {
+      case 'X':
+        Serial.print("i2c SCAN: ");
+        for (uint8_t address = DEFAULT_SLAVE_ADDR_START_RANGE; address <= DEFAULT_SLAVE_ADDR_END_RANGE; address++ )
+        {
+          Wire.beginTransmission(address);
+          byte error = Wire.endTransmission();
+          if (error == 0)
+          {
+            Serial.print(address);
+            Serial.print(' ');
+          }
+        }
+        Serial.println(".");
+        break;
+
+      case 'P': {
+        Serial.print("i2c Provision: ");
+        Wire.beginTransmission(DEFAULT_SLAVE_ADDR);
+        byte error2 = Wire.endTransmission();
+        if (error2 == 0)
+        {
+          Serial.print("Found module");
+
+          for (uint8_t address = DEFAULT_SLAVE_ADDR_START_RANGE; address <= DEFAULT_SLAVE_ADDR_END_RANGE; address++ )
+          {
+            Wire.beginTransmission(address);
+            byte error1 = Wire.endTransmission();
+            if (error1 != 0) {
+                //We have found a gap
+                command_set_slave_address(cell_id, address);
+                Serial.print("new address=");
+                Serial.println(address);
+                cell_id=address;
+                break;
+            }
+          }
+        } else {
+           Serial.println("No module");
+        }
+      }
+        break;
+      
+      break;
 
       case 'S':
-        Serial.println("Switch Cell Id");
-        cell_id = DEFAULT_SLAVE_ADDR_START_RANGE;
+        Serial.print("Select module Id ");
+        cell_id = Serial.parseInt();
+        Serial.println(cell_id);
+        //cell_id = DEFAULT_SLAVE_ADDR_START_RANGE;
         break;
 
       case 'F':
-        Serial.println("Factory reset");
+        Serial.print("Factory reset ");
+        Serial.println(cell_id);
         command_factory_reset(cell_id);
         break;
 
       case 'V':
-        Serial.println("Volt calib");
+        Serial.print("Volt calib ");
         v1 = Serial.parseFloat();
         Serial.println(v1);
         command_set_voltage_calibration(cell_id, v1);
@@ -256,8 +317,12 @@ void loop() {
         break;
 
       case 'A':
-        Serial.println("Set module address");
-        command_set_slave_address(cell_id, DEFAULT_SLAVE_ADDR_START_RANGE);
+        Serial.print("Set module address ");
+        v2 = Serial.parseInt();
+        Serial.println(v2);
+        if (v2 >= DEFAULT_SLAVE_ADDR_START_RANGE && v2 <= DEFAULT_SLAVE_ADDR_END_RANGE) {
+          command_set_slave_address(cell_id, v2);
+        }
         break;
 
 
@@ -275,6 +340,14 @@ void loop() {
         Serial.println("Raw voltage ADC");
         data16 = cell_read_raw_voltage(cell_id);
         Serial.print("  V=");
+        Serial.print(data16, HEX);
+        Serial.print('=');
+        Serial.println(data16);
+        break;
+
+      case 'E':
+        Serial.println("read_error_counter=");
+        data16 = cell_read_error_counter(cell_id);
         Serial.print(data16, HEX);
         Serial.print('=');
         Serial.println(data16);
@@ -324,6 +397,7 @@ void loop() {
 
 
   digitalWrite(D4, HIGH);
+  delay(250);
 
 }//end of loop
 
