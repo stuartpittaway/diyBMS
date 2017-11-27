@@ -106,9 +106,9 @@ struct cell_module_config {
   // 7 bit slave I2C address
   uint8_t SLAVE_ADDR = DEFAULT_SLAVE_ADDR;
   // Calibration factor for voltage readings
-  float VCCCalibration = 1.630;
+  float VCCCalibration = 4.250;
   // Calibration factor for temp readings
-  float TemperatureCalibration = 1.0;
+  float TemperatureCalibration = 1.000;
 };
 
 static cell_module_config myConfig;
@@ -124,11 +124,13 @@ void setup() {
   //pinMode(A3, INPUT);  //A3 pin 3 (PB3)
   //pinMode(A0, INPUT);  //reset pin A0 pin 5 (PB5)
 
+/*
   DDRB &= ~(1 << DDB3);
   PORTB &= ~(1 << PB3);
 
   DDRB &= ~(1 << DDB5);
   PORTB &= ~(1 << PB5);
+*/
 
   ledGreen();
   delay(1000);
@@ -166,7 +168,6 @@ void panic() {
   goDarkCount = 0;
   green_pattern = GREEN_LED_PANIC;
 }
-
 
 void loop() {
   wdt_reset();
@@ -503,23 +504,22 @@ ISR(TIMER1_COMPA_vect)
     }
   }
 
+    //trigger ADC reading
+    ADCSRA |= (1 << ADSC);
+}
+
+ISR(ADC_vect) {
+  // Interrupt service routine for the ADC completion
+  //uint8_t adcl = ADCL;
+  //uint16_t value = ADCH << 8 | adcl;
+
+  uint16_t value = ADCW;
 
   //If we skip this ADC reading, quit ISR here
   if (skipNextADC) {
     skipNextADC = false;
-  } else {
-    //trigger ADC reading
-    ADCSRA |= (1 << ADSC);
+    return;
   }
-}
-
-ISR(ADC_vect) {
-  //ledGreen();
-
-  // Interrupt service routine for the ADC completion
-  uint8_t adcl = ADCL;
-  uint16_t value = ADCH << 8 | adcl;
-
 
   if (reading_count == TEMP_READING_LOOP_FREQ ) {
     //Use A0 (RESET PIN) to act as an analogue input
@@ -529,23 +529,16 @@ ISR(ADC_vect) {
     reading_count = 0;
 
     //We reduce the value by 512 as we have a DC offset we need to remove
-    temperature_probe = value - 512;
+    temperature_probe = value;
 
     // use ADC3 for input for next reading (voltage)
     ADMUX = B10010011;
-    /*
-      ADMUX = (INTERNAL2V56 << 4) |
-             (0 << ADLAR)  |
-             (0 << MUX3)  |
-             (0 << MUX2)  |
-             (1 << MUX1)  |
-             (1 << MUX0);
-    */
 
-    //Set skipNextADC to delay the next TIMER1 call to ADC reading to allow the
-    //ADC to settle after changing MUX
+    //Set skipNextADC to delay the next TIMER1 call to ADC reading to allow the ADC to settle after changing MUX
     skipNextADC = true;
+
   } else {
+
     //Populate the rolling buffer with values from the ADC
     last_raw_adc = value;
     analogVal[analogValIndex] = value;
@@ -559,25 +552,18 @@ ISR(ADC_vect) {
 
     reading_count++;
 
+
     if (reading_count == TEMP_READING_LOOP_FREQ) {
       // use ADC0 for temp probe input on next ADC loop
 
       //We have to set the registers directly because the ATTINYCORE appears broken for internal 2v56 register without bypass capacitor
       ADMUX = B10010000;
-
-      /*
-        ADMUX = (INTERNAL2V56 << 4) |
-               (0 << ADLAR)  |
-               (0 << MUX3)  |
-               (0 << MUX2)  |
-               (0 << MUX1)  |
-               (0 << MUX0);
-      */
-
+      
       //Set skipNextADC to delay the next TIMER1 call to ADC reading to allow the ADC to settle after changing MUX
       skipNextADC = true;
-    }
+    }    
   }
+
 }
 
 void initADC()
@@ -643,16 +629,16 @@ void initADC()
     (1 << ADPS0);      // set prescaler bit 0
 #endif
 */
-#if (F_CPU == 8000000)
+//#if (F_CPU == 8000000)
   //8MHZ clock so set prescaler to 64 (B110)
   ADCSRA =
     (1 << ADEN)  |     // Enable ADC
     (1 << ADPS2) |     // set prescaler bit 2
     (1 << ADPS1) |     // set prescaler bit 1
-    (0 << ADPS0);       // set prescaler bit 0
-#endif
-
-  ADCSRA |= (1 << ADIE);     //enable the ADC interrupt. 
+    (0 << ADPS0) |       // set prescaler bit 0
+    (1 << ADIE);     //enable the ADC interrupt. 
+//#endif
+  
 }
 
 static inline void initTimer1(void)
