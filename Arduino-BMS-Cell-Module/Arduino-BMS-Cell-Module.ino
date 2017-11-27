@@ -47,10 +47,10 @@
 //#define SWITCH_OFF_LEDS
 
 //LED light patterns
-#define GREEN_LED_PATTERN_STANDARD B00000101
-#define GREEN_LED_PATTERN_WAITREADY B11111111
+#define GREEN_LED_PATTERN_STANDARD B00010000
+#define GREEN_LED_PATTERN_WAITREADY B11100011
 #define GREEN_LED_PANIC B01010101
-#define GREEN_LED_PATTERN_UNCONFIGURED B11101110
+#define GREEN_LED_PATTERN_UNCONFIGURED B11111111
 
 //Where in EEPROM do we store the configuration
 #define EEPROM_CHECKSUM_ADDRESS 0
@@ -164,9 +164,12 @@ void setup() {
   init_i2c();
 }
 
+boolean inPanicMode=false;
+
 void panic() {
   goDarkCount = 0;
   green_pattern = GREEN_LED_PANIC;
+  inPanicMode=true;
 }
 
 void loop() {
@@ -182,7 +185,7 @@ void loop() {
     green_pattern = GREEN_LED_PATTERN_UNCONFIGURED;
   } else {
     //We have had at least one i2c request and not currently in PANIC mode
-    if (last_i2c_request == 0) {
+    if (last_i2c_request == 0 && inPanicMode==false) {
 
       //Panic after a few seconds of not receiving i2c requests...
       panic();
@@ -193,13 +196,13 @@ void loop() {
 
       error_counter++;
     }
-    /*
-      else if (last_i2c_request > 0) {
-      //TODO: FIX THIS
+    
+    if (last_i2c_request > 0 && inPanicMode==true) {
       //Just come back from a PANIC situation
-      //LEDReset();
+      LEDReset();
+      inPanicMode=false;
       }
-    */
+    
   }
 
   //Dont make this very large or watchdog will reset
