@@ -81,17 +81,6 @@ F 3 "" H 3350 3350 50  0001 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L LED D3
-U 1 1 59FF3E05
-P 10300 4000
-F 0 "D3" H 10300 4100 50  0000 C CNN
-F 1 "LED RED" H 10300 3850 50  0000 C CNN
-F 2 "LEDs:LED_1206_HandSoldering" H 10300 4000 50  0001 C CNN
-F 3 "" H 10300 4000 50  0001 C CNN
-	1    10300 4000
-	0    1    -1   0   
-$EndComp
-$Comp
 L LED D4
 U 1 1 59FF3E62
 P 10300 4550
@@ -108,7 +97,7 @@ U 1 1 59FF4558
 P 9600 5050
 F 0 "C5" H 9625 5150 50  0000 L CNN
 F 1 "0.1uF" H 9625 4950 50  0000 L CNN
-F 2 "Capacitors_SMD:C_1210_HandSoldering" H 9638 4900 50  0001 C CNN
+F 2 "Capacitors_SMD:C_1206_HandSoldering" H 9638 4900 50  0001 C CNN
 F 3 "" H 9600 5050 50  0001 C CNN
 	1    9600 5050
 	1    0    0    -1  
@@ -129,8 +118,8 @@ L C C2
 U 1 1 5A00BF06
 P 3800 3250
 F 0 "C2" H 3825 3350 50  0000 L CNN
-F 1 "1uF" H 3650 3350 50  0000 L CNN
-F 2 "Capacitors_SMD:C_1210_HandSoldering" H 3838 3100 50  0001 C CNN
+F 1 "1uF Ceramic" H 3900 3250 50  0000 L CNN
+F 2 "Capacitors_SMD:C_1206_HandSoldering" H 3838 3100 50  0001 C CNN
 F 3 "" H 3800 3250 50  0001 C CNN
 	1    3800 3250
 	1    0    0    -1  
@@ -140,8 +129,8 @@ L C C1
 U 1 1 5A00C037
 P 2900 3250
 F 0 "C1" H 2925 3350 50  0000 L CNN
-F 1 "1uF" H 2750 3350 50  0000 L CNN
-F 2 "Capacitors_SMD:C_1210_HandSoldering" H 2938 3100 50  0001 C CNN
+F 1 "1uF Ceramic" H 2300 3250 50  0000 L CNN
+F 2 "Capacitors_SMD:C_1206_HandSoldering" H 2938 3100 50  0001 C CNN
 F 3 "" H 2900 3250 50  0001 C CNN
 	1    2900 3250
 	1    0    0    -1  
@@ -185,7 +174,7 @@ U 1 1 5A00D03A
 P 5750 3250
 F 0 "C4" H 5700 3050 50  0000 L CNN
 F 1 "0.1uF" V 5600 3200 50  0000 L CNN
-F 2 "Capacitors_SMD:C_1210_HandSoldering" H 5788 3100 50  0001 C CNN
+F 2 "Capacitors_SMD:C_1206_HandSoldering" H 5788 3100 50  0001 C CNN
 F 3 "" H 5750 3250 50  0001 C CNN
 	1    5750 3250
 	0    1    1    0   
@@ -196,7 +185,7 @@ U 1 1 5A00FCB1
 P 5700 5600
 F 0 "C3" H 5725 5700 50  0000 L CNN
 F 1 "0.1uF" H 5725 5500 50  0000 L CNN
-F 2 "Capacitors_SMD:C_1210_HandSoldering" H 5738 5450 50  0001 C CNN
+F 2 "Capacitors_SMD:C_1206_HandSoldering" H 5738 5450 50  0001 C CNN
 F 3 "" H 5700 5600 50  0001 C CNN
 	1    5700 5600
 	1    0    0    -1  
@@ -225,13 +214,13 @@ F 3 "" H 5450 4900 50  0001 C CNN
 $EndComp
 Text GLabel 4050 3550 3    60   Input ~ 12
 3V3
-Text GLabel 2600 3050 1    60   Input ~ 12
-GND2
+Text GLabel 2150 3050 1    60   Input ~ 12
+GND
 Text GLabel 9800 4900 2    60   Input ~ 12
 3V3
 Text GLabel 10400 5400 2    60   Input ~ 12
-GND2
-Text Notes 5750 4450 2    60   ~ 0
+GND
+Text Notes 5850 4150 2    60   ~ 0
 Input battery voltage resistor \ndivider 517K vs 680K\n4.5V maps to 2.55V
 Text Notes 1150 5350 0    60   ~ 0
 LiOn Battery measuring \nvoltage range 2.7V to 4.35V
@@ -262,34 +251,12 @@ Thermistor into ADC0 \n(RESET PIN) must not go \nbelow VCC/2 or reset is forced
 $Comp
 L R R12
 U 1 1 5A017EFB
-P 10300 4900
-F 0 "R12" V 10380 4900 50  0000 C CNN
-F 1 "510R" V 10200 4900 50  0000 C CNN
-F 2 "Resistors_SMD:R_1206_HandSoldering" V 10230 4900 50  0001 C CNN
-F 3 "" H 10300 4900 50  0001 C CNN
-	1    10300 4900
-	1    0    0    -1  
-$EndComp
-$Comp
-L R R11
-U 1 1 5A017F96
-P 10300 3600
-F 0 "R11" V 10380 3600 50  0000 C CNN
-F 1 "510R" V 10200 3600 50  0000 C CNN
-F 2 "Resistors_SMD:R_1206_HandSoldering" V 10230 3600 50  0001 C CNN
-F 3 "" H 10300 3600 50  0001 C CNN
-	1    10300 3600
-	1    0    0    -1  
-$EndComp
-$Comp
-L R R13
-U 1 1 5A018699
-P 10550 4350
-F 0 "R13" V 10630 4350 50  0000 C CNN
-F 1 "2K2" V 10450 4350 50  0000 C CNN
-F 2 "Resistors_SMD:R_1206_HandSoldering" V 10480 4350 50  0001 C CNN
-F 3 "" H 10550 4350 50  0001 C CNN
-	1    10550 4350
+P 10300 5050
+F 0 "R12" V 10380 5050 50  0000 C CNN
+F 1 "2K2" V 10200 5050 50  0000 C CNN
+F 2 "Resistors_SMD:R_1206_HandSoldering" V 10230 5050 50  0001 C CNN
+F 3 "" H 10300 5050 50  0001 C CNN
+	1    10300 5050
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -298,7 +265,7 @@ U 1 1 5A01FF38
 P 6150 1100
 F 0 "J2" H 6150 1300 50  0000 C CNN
 F 1 "Conn_01x04_Female" V 6250 1050 50  0000 C CNN
-F 2 "Connectors_JST:JST_PH_S4B-PH-SM4-TB_04x2.00mm_Angled" H 6150 1100 50  0001 C CNN
+F 2 "Connectors_JST:JST_PH_S4B-PH-K_04x2.00mm_Angled" H 6150 1100 50  0001 C CNN
 F 3 "" H 6150 1100 50  0001 C CNN
 	1    6150 1100
 	0    1    -1   0   
@@ -309,7 +276,7 @@ U 1 1 5A021351
 P 6950 1100
 F 0 "J3" H 6950 1300 50  0000 C CNN
 F 1 "Conn_01x04_Female" V 7050 1050 50  0000 C CNN
-F 2 "Connectors_JST:JST_PH_S4B-PH-SM4-TB_04x2.00mm_Angled" H 6950 1100 50  0001 C CNN
+F 2 "Connectors_JST:JST_PH_S4B-PH-K_04x2.00mm_Angled" H 6950 1100 50  0001 C CNN
 F 3 "" H 6950 1100 50  0001 C CNN
 	1    6950 1100
 	0    1    -1   0   
@@ -413,8 +380,6 @@ F 3 "" H 3800 6350 60  0001 C CNN
 	1    3800 6350
 	1    0    0    -1  
 $EndComp
-Text GLabel 1550 6850 0    60   Input ~ 12
-BATT+
 $Comp
 L LED D2
 U 1 1 5A03BFC9
@@ -431,7 +396,7 @@ L R R2
 U 1 1 5A03CB73
 P 2550 7250
 F 0 "R2" V 2630 7250 50  0000 C CNN
-F 1 "47R 1/4W" V 2450 7250 50  0000 C CNN
+F 1 "47R" V 2450 7250 50  0000 C CNN
 F 2 "Resistors_SMD:R_1206_HandSoldering" V 2480 7250 50  0001 C CNN
 F 3 "" H 2550 7250 50  0001 C CNN
 	1    2550 7250
@@ -450,7 +415,7 @@ L D D1
 U 1 1 5A0412D1
 P 1250 5550
 F 0 "D1" H 1250 5650 50  0000 C CNN
-F 1 "SE30AFG-M3/6A" V 1150 5900 50  0000 C CNN
+F 1 "SE30AFG-M3/6A" V 1250 6050 50  0000 C CNN
 F 2 "Diodes_SMD:D_SMA" H 1250 5550 50  0001 C CNN
 F 3 "http://uk.farnell.com/vishay/se30afg-m3-6a/rectifier-esd-400v-3a-do-221ac/dp/2313878" H 1250 5550 50  0001 C CNN
 	1    1250 5550
@@ -472,7 +437,7 @@ L Fuse F1
 U 1 1 5A047495
 P 1650 5550
 F 0 "F1" V 1730 5550 50  0000 C CNN
-F 1 "MC36232 1.5A 24V" V 1850 6150 50  0000 C CNN
+F 1 "MC36232 1.5A 24V" V 1550 5650 50  0000 C CNN
 F 2 "Resistors_SMD:R_1812_HandSoldering" V 1580 5550 50  0001 C CNN
 F 3 "http://uk.farnell.com/multicomp/mc36232/fuse-ptc-reset-smd-24v-1-5a/dp/1861171" H 1650 5550 50  0001 C CNN
 	1    1650 5550
@@ -489,30 +454,6 @@ F 3 "http://uk.rs-online.com/web/p/panel-mount-fixed-resistors/0160916/" H 2300 
 	1    2300 6850
 	0    1    1    0   
 $EndComp
-$Comp
-L Conn_01x10_Male J5
-U 1 1 5A08E265
-P 5600 6650
-F 0 "J5" H 5600 6950 50  0000 C CNN
-F 1 "Conn Male" H 5700 6200 50  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Angled_1x10_Pitch2.54mm" H 5600 6650 50  0001 C CNN
-F 3 "" H 5600 6650 50  0001 C CNN
-	1    5600 6650
-	1    0    0    -1  
-$EndComp
-$Comp
-L Conn_01x10_Female J4
-U 1 1 5A08F09E
-P 5250 6650
-F 0 "J4" H 5250 6950 50  0000 C CNN
-F 1 "Conn Female" H 5200 7050 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Angled_1x10_Pitch2.54mm" H 5250 6650 50  0001 C CNN
-F 3 "" H 5250 6650 50  0001 C CNN
-	1    5250 6650
-	1    0    0    -1  
-$EndComp
-Text GLabel 5800 7400 2    60   Input ~ 0
-GND2
 Text GLabel 1400 5050 1    60   Input ~ 12
 GND
 Wire Wire Line
@@ -520,10 +461,6 @@ Wire Wire Line
 Connection ~ 2900 3400
 Connection ~ 2900 3050
 Connection ~ 3800 3400
-Wire Wire Line
-	6200 2550 6200 6750
-Wire Wire Line
-	6050 2550 6050 6950
 Connection ~ 6350 3500
 Connection ~ 6050 3500
 Connection ~ 6350 3400
@@ -576,41 +513,26 @@ Wire Wire Line
 	4200 5400 6650 5400
 Connection ~ 4200 5400
 Wire Wire Line
-	10300 4150 10300 4400
+	10300 4250 10300 4400
 Wire Wire Line
-	10300 3850 10300 3750
-Wire Wire Line
-	10300 3850 10550 3850
-Wire Wire Line
-	10550 3850 10550 4200
-Wire Wire Line
-	10550 4700 10550 4500
-Wire Wire Line
-	10300 4700 10550 4700
-Wire Wire Line
-	10300 4700 10300 4750
+	10300 4700 10300 4900
 Wire Wire Line
 	9350 5400 10400 5400
 Connection ~ 10300 5400
-Wire Wire Line
-	10300 3450 9400 3450
-Wire Wire Line
-	9400 3450 9400 4900
 Connection ~ 9400 4900
 Wire Wire Line
-	6150 4250 10300 4250
+	6550 4250 10300 4250
 Wire Wire Line
-	6150 4250 6150 5000
+	6550 4250 6550 6050
 Wire Wire Line
-	6100 5000 6650 5000
+	6550 5000 6650 5000
 Connection ~ 10300 4250
 Wire Wire Line
 	6200 3100 6750 3100
 Wire Wire Line
 	6750 3100 6750 3400
-Connection ~ 10300 3850
 Wire Wire Line
-	10300 5050 10300 5400
+	10300 5200 10300 5400
 Wire Wire Line
 	3800 3050 3800 3100
 Connection ~ 3800 3050
@@ -656,7 +578,7 @@ Wire Wire Line
 	6750 1550 6750 1300
 Connection ~ 5900 1550
 Wire Wire Line
-	900  5050 1150 5050
+	900  5050 1400 5050
 Connection ~ 1050 5550
 Connection ~ 1150 5050
 Wire Wire Line
@@ -668,11 +590,8 @@ Wire Wire Line
 	1000 850  1000 1100
 Wire Wire Line
 	3450 6950 3450 6550
-Connection ~ 5850 5850
 Wire Wire Line
 	1700 6100 1700 7250
-Wire Wire Line
-	1550 6850 2150 6850
 Wire Wire Line
 	3050 6850 3050 7250
 Connection ~ 1700 6850
@@ -684,110 +603,57 @@ Wire Wire Line
 	3900 7100 3900 6550
 Connection ~ 3050 7100
 Wire Wire Line
-	800  5550 800  5800
-Wire Wire Line
 	800  5550 1100 5550
 Wire Wire Line
 	1400 5550 1500 5550
 Wire Wire Line
 	3050 6850 2450 6850
 Wire Wire Line
-	4550 6550 5050 6550
-Wire Wire Line
 	3450 6950 4550 6950
 Wire Wire Line
 	4550 6550 4550 7000
 Wire Wire Line
-	3700 7450 5050 7450
+	3700 7450 5150 7450
 Wire Wire Line
-	5050 7150 5050 7550
+	6650 5300 6350 5300
 Wire Wire Line
-	6650 5300 6150 5300
+	6350 5300 6350 6550
 Wire Wire Line
-	6150 5300 6150 6550
-Wire Wire Line
-	6150 6550 5800 6550
+	6350 6550 4550 6550
 Wire Wire Line
 	4200 5850 9700 5850
 Connection ~ 1950 5550
-Wire Wire Line
-	2750 3400 3050 3400
 Wire Wire Line
 	4050 3400 4050 3550
 Connection ~ 4050 3400
 Wire Wire Line
 	3650 3400 6450 3400
 Wire Wire Line
-	2600 3050 5900 3050
+	2150 3050 5900 3050
 Wire Wire Line
 	5150 5200 6650 5200
 Wire Wire Line
 	1150 5050 1150 4800
 Wire Wire Line
-	1800 5550 1950 5550
+	1800 5550 2550 5550
 Wire Wire Line
 	1700 6100 1950 6100
 Wire Wire Line
 	1950 6100 1950 5550
-Text GLabel 5050 7550 2    60   Input ~ 0
+Text GLabel 5150 7450 2    60   Input ~ 0
 GND
 Connection ~ 5050 7450
 Wire Wire Line
 	3700 6550 3700 7450
 Connection ~ 4550 6950
 Wire Wire Line
-	6200 6750 5800 6750
+	6200 4900 6650 4900
 Wire Wire Line
-	5050 6650 5050 6750
-Wire Wire Line
-	6650 4900 6250 4900
-Wire Wire Line
-	6250 4900 6250 6650
-Wire Wire Line
-	6250 6650 5800 6650
-Wire Wire Line
-	6650 5100 6300 5100
-Wire Wire Line
-	6300 5100 6300 6850
-Wire Wire Line
-	6300 6850 5800 6850
-Wire Wire Line
-	6050 6950 5800 6950
-Wire Wire Line
-	5050 6850 5050 6950
-Connection ~ 3050 6850
-Wire Wire Line
-	5450 4300 5950 4300
-Wire Wire Line
-	5950 4300 5950 6450
-Wire Wire Line
-	5950 6450 5800 6450
-Text GLabel 4950 6450 0    60   Input ~ 12
+	6050 5100 6650 5100
+Text GLabel 5250 4300 0    60   Input ~ 12
 BATT+RAW
-Wire Wire Line
-	2750 3400 2750 5950
-Wire Wire Line
-	2750 5950 5800 5950
-Wire Wire Line
-	5800 7150 5800 7400
-Wire Wire Line
-	5800 7050 6450 7050
-Wire Wire Line
-	6450 7050 6450 5400
-Connection ~ 6450 5400
-NoConn ~ 5050 7050
-Wire Wire Line
-	5800 5950 5800 6250
-Wire Wire Line
-	6100 5000 6100 6350
-Wire Wire Line
-	6100 6350 5800 6350
-Connection ~ 6150 5000
-NoConn ~ 5050 6350
-Text GLabel 4750 6250 0    60   Input ~ 12
-BATT+
-Wire Wire Line
-	4750 6250 5050 6250
+Connection ~ 5950 5400
+Connection ~ 6550 5000
 Wire Wire Line
 	3050 7250 2700 7250
 Wire Wire Line
@@ -808,6 +674,67 @@ Wire Wire Line
 	900  5150 1050 5250
 Wire Wire Line
 	1050 5250 1050 5800
+$Comp
+L Conn_02x03_Odd_Even ISP1
+U 1 1 5A1C9119
+P 6950 6150
+F 0 "ISP1" H 7000 6350 50  0000 C CNN
+F 1 "Conn_02x03_Odd_Even" H 7000 5950 50  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Angled_2x03_Pitch2.54mm" H 6950 6150 50  0001 C CNN
+F 3 "" H 6950 6150 50  0001 C CNN
+	1    6950 6150
+	1    0    0    -1  
+$EndComp
 Wire Wire Line
-	5050 6450 4950 6450
+	6550 6050 6750 6050
+Connection ~ 6050 5100
+Wire Wire Line
+	6050 2550 6050 6150
+Wire Wire Line
+	6050 6150 6750 6150
+Wire Wire Line
+	6200 2550 6200 4900
+Wire Wire Line
+	6450 4900 6450 5650
+Wire Wire Line
+	6450 5650 7750 5650
+Wire Wire Line
+	7750 5650 7750 6150
+Wire Wire Line
+	7750 6150 7250 6150
+Connection ~ 6450 4900
+Wire Wire Line
+	7250 6050 7350 6050
+Text GLabel 7350 6050 2    60   Input ~ 0
+3V3
+Text GLabel 7350 6250 2    60   Input ~ 0
+GND
+Wire Wire Line
+	7250 6250 7350 6250
+Wire Wire Line
+	5950 5400 5950 6250
+Wire Wire Line
+	5950 6250 6750 6250
+Wire Wire Line
+	5250 4300 5450 4300
+Wire Wire Line
+	2550 5550 2550 3400
+Wire Wire Line
+	2550 3400 3050 3400
+Wire Wire Line
+	2150 6850 1700 6850
+$Comp
+L +BATT #PWR08
+U 1 1 5A1CB7B8
+P 800 5450
+F 0 "#PWR08" H 800 5300 50  0001 C CNN
+F 1 "+BATT" H 800 5590 50  0000 C CNN
+F 2 "" H 800 5450 50  0001 C CNN
+F 3 "" H 800 5450 50  0001 C CNN
+	1    800  5450
+	1    0    0    -1  
+$EndComp
+Connection ~ 800  5550
+Wire Wire Line
+	800  5450 800  5800
 $EndSCHEMATC
