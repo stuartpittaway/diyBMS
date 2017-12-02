@@ -32,6 +32,7 @@ LIBS:atmel
 LIBS:contrib
 LIBS:valves
 LIBS:adum1250arz
+LIBS:reg710
 LIBS:BMS_Cell_Module-cache
 EELAYER 25 0
 EELAYER END
@@ -63,22 +64,11 @@ L ATTINY85-20SU U3
 U 1 1 59FF3B15
 P 8000 5150
 F 0 "U3" H 6850 5550 50  0000 C CNN
-F 1 "ATTINY85-20SU" H 9000 4750 50  0000 C CNN
-F 2 "Housings_SOIC:SOIC-8_3.9x4.9mm_Pitch1.27mm" H 8950 5150 50  0001 C CIN
+F 1 "ATTINY85V-10SU 8S2 EIAJ SOIC" H 8590 4730 50  0000 C CNN
+F 2 "ATTINY:ATTINY85V" H 8950 5150 50  0001 C CIN
 F 3 "" H 8000 5150 50  0001 C CNN
 	1    8000 5150
 	1    0    0    -1  
-$EndComp
-$Comp
-L MCP1703A-3302_SOT223 U1
-U 1 1 59FF3BBA
-P 3350 3400
-F 0 "U1" H 3200 3525 50  0000 C CNN
-F 1 "MCP1703A-3302_SOT223" H 2800 3600 50  0000 L CNN
-F 2 "TO_SOT_Packages_SMD:SOT-223-3_TabPin2" H 3350 3600 50  0001 C CNN
-F 3 "" H 3350 3350 50  0001 C CNN
-	1    3350 3400
-	1    0    0    1   
 $EndComp
 $Comp
 L LED D4
@@ -108,7 +98,7 @@ U 1 1 5A00B074
 P 6150 2200
 F 0 "U2" H 6150 2500 60  0000 C CNN
 F 1 "ADUM1250ARZ" H 6150 2150 60  0000 C CNN
-F 2 "SMD_Packages:SOIC-8-N" H 6200 2100 60  0001 C CNN
+F 2 "adum1250:ADUM1250" H 6200 2100 60  0001 C CNN
 F 3 "" H 6200 2100 60  0001 C CNN
 	1    6150 2200
 	0    1    1    0   
@@ -116,23 +106,23 @@ $EndComp
 $Comp
 L C C2
 U 1 1 5A00BF06
-P 3800 3250
-F 0 "C2" H 3825 3350 50  0000 L CNN
-F 1 "1uF Ceramic" H 3900 3250 50  0000 L CNN
-F 2 "Capacitors_SMD:C_1206_HandSoldering" H 3838 3100 50  0001 C CNN
-F 3 "" H 3800 3250 50  0001 C CNN
-	1    3800 3250
+P 1540 3700
+F 0 "C2" H 1565 3800 50  0000 L CNN
+F 1 "2.2uF Ceramic X7R" H 1640 3700 50  0000 L CNN
+F 2 "Capacitors_SMD:C_1206_HandSoldering" H 1578 3550 50  0001 C CNN
+F 3 "http://uk.farnell.com/kemet/c1206x224k5ractu/cap-mlcc-x7r-220nf-50v-1206/dp/1414056" H 1540 3700 50  0001 C CNN
+	1    1540 3700
 	1    0    0    -1  
 $EndComp
 $Comp
 L C C1
 U 1 1 5A00C037
-P 2900 3250
-F 0 "C1" H 2925 3350 50  0000 L CNN
-F 1 "1uF Ceramic" H 2300 3250 50  0000 L CNN
-F 2 "Capacitors_SMD:C_1206_HandSoldering" H 2938 3100 50  0001 C CNN
-F 3 "" H 2900 3250 50  0001 C CNN
-	1    2900 3250
+P 3230 4490
+F 0 "C1" H 3255 4590 50  0000 L CNN
+F 1 "2.2uF Ceramic X7R" H 3360 4500 50  0000 L CNN
+F 2 "Capacitors_SMD:C_1206_HandSoldering" H 3268 4340 50  0001 C CNN
+F 3 "http://uk.farnell.com/kemet/c1206x224k5ractu/cap-mlcc-x7r-220nf-50v-1206/dp/1414056" H 3230 4490 50  0001 C CNN
+	1    3230 4490
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -214,8 +204,6 @@ F 3 "" H 5450 4900 50  0001 C CNN
 $EndComp
 Text GLabel 4050 3550 3    60   Input ~ 12
 3V3
-Text GLabel 2150 3050 1    60   Input ~ 12
-GND
 Text GLabel 9800 4900 2    60   Input ~ 12
 3V3
 Text GLabel 10400 5400 2    60   Input ~ 12
@@ -287,7 +275,7 @@ U 1 1 5A0226E7
 P 700 5150
 F 0 "J1" H 700 5250 50  0000 C CNN
 F 1 "Conn_01x02_Female" V 800 5050 50  0000 C CNN
-F 2 "Connectors_JST:JST_SFH_SM02B-SFHRS-TF_02x1.80mm_Angled" H 700 5150 50  0001 C CNN
+F 2 "Connectors_JST:JST_PH_S2B-PH-K_02x2.00mm_Angled" H 700 5150 50  0001 C CNN
 F 3 "" H 700 5150 50  0001 C CNN
 	1    700  5150
 	-1   0    0    1   
@@ -385,9 +373,9 @@ L LED D2
 U 1 1 5A03BFC9
 P 1850 7250
 F 0 "D2" H 1850 7350 50  0000 C CNN
-F 1 "LED BLUE KPL-3015QBC-D" H 1850 7450 50  0000 C CNN
+F 1 "LED BLUE" H 1850 7450 50  0000 C CNN
 F 2 "LEDs:LED_1206_HandSoldering" H 1850 7250 50  0001 C CNN
-F 3 "http://www.farnell.com/datasheets/2046216.pdf" H 1850 7250 50  0001 C CNN
+F 3 "" H 1850 7250 50  0001 C CNN
 	1    1850 7250
 	-1   0    0    1   
 $EndComp
@@ -416,7 +404,7 @@ U 1 1 5A0412D1
 P 1250 5550
 F 0 "D1" H 1250 5650 50  0000 C CNN
 F 1 "SE30AFG-M3/6A" V 1250 6050 50  0000 C CNN
-F 2 "Diodes_SMD:D_SMA" H 1250 5550 50  0001 C CNN
+F 2 "ATTINY:DO-221AC" H 1250 5550 50  0001 C CNN
 F 3 "http://uk.farnell.com/vishay/se30afg-m3-6a/rectifier-esd-400v-3a-do-221ac/dp/2313878" H 1250 5550 50  0001 C CNN
 	1    1250 5550
 	-1   0    0    1   
@@ -437,7 +425,7 @@ L Fuse F1
 U 1 1 5A047495
 P 1650 5550
 F 0 "F1" V 1730 5550 50  0000 C CNN
-F 1 "MC36232 1.5A 24V" V 1550 5650 50  0000 C CNN
+F 1 "MC36228 1.5A 8V" V 1550 5650 50  0000 C CNN
 F 2 "Resistors_SMD:R_1812_HandSoldering" V 1580 5550 50  0001 C CNN
 F 3 "http://uk.farnell.com/multicomp/mc36232/fuse-ptc-reset-smd-24v-1-5a/dp/1861171" H 1650 5550 50  0001 C CNN
 	1    1650 5550
@@ -454,19 +442,20 @@ F 3 "http://uk.rs-online.com/web/p/panel-mount-fixed-resistors/0160916/" H 2300 
 	1    2300 6850
 	0    1    1    0   
 $EndComp
-Text GLabel 1400 5050 1    60   Input ~ 12
+Text GLabel 1400 5050 2    60   Input ~ 12
 GND
 Wire Wire Line
 	5900 3050 5900 2550
-Connection ~ 2900 3400
-Connection ~ 2900 3050
-Connection ~ 3800 3400
 Connection ~ 6350 3500
 Connection ~ 6050 3500
 Connection ~ 6350 3400
 Connection ~ 6200 3100
 Wire Wire Line
-	6350 2550 6350 3500
+	6350 2550 6350 3250
+Wire Wire Line
+	6350 3250 6350 3400
+Wire Wire Line
+	6350 3400 6350 3500
 Wire Wire Line
 	6350 3400 6350 3250
 Wire Wire Line
@@ -479,7 +468,11 @@ Wire Wire Line
 	9600 5400 9600 5200
 Connection ~ 9600 5400
 Wire Wire Line
-	9350 4900 9800 4900
+	9350 4900 9400 4900
+Wire Wire Line
+	9400 4900 9600 4900
+Wire Wire Line
+	9600 4900 9800 4900
 Connection ~ 9600 4900
 Wire Wire Line
 	5700 5200 5700 5450
@@ -490,7 +483,9 @@ Wire Wire Line
 	9700 5850 9700 5400
 Connection ~ 9700 5400
 Wire Wire Line
-	5450 5050 5450 5450
+	5450 5050 5450 5200
+Wire Wire Line
+	5450 5200 5450 5450
 Wire Wire Line
 	5450 5750 5450 5850
 Connection ~ 5700 5850
@@ -502,7 +497,9 @@ Wire Wire Line
 Wire Wire Line
 	4200 5150 4600 5150
 Wire Wire Line
-	4200 5150 4200 5450
+	4200 5150 4200 5400
+Wire Wire Line
+	4200 5400 4200 5450
 Wire Wire Line
 	4200 3400 4200 4850
 Connection ~ 4200 3400
@@ -510,20 +507,30 @@ Wire Wire Line
 	4200 5850 4200 5750
 Connection ~ 5450 5850
 Wire Wire Line
-	4200 5400 6650 5400
+	4200 5400 5950 5400
+Wire Wire Line
+	5950 5400 6650 5400
 Connection ~ 4200 5400
 Wire Wire Line
 	10300 4250 10300 4400
 Wire Wire Line
 	10300 4700 10300 4900
 Wire Wire Line
-	9350 5400 10400 5400
+	9350 5400 9600 5400
+Wire Wire Line
+	9600 5400 9700 5400
+Wire Wire Line
+	9700 5400 10300 5400
+Wire Wire Line
+	10300 5400 10400 5400
 Connection ~ 10300 5400
 Connection ~ 9400 4900
 Wire Wire Line
 	6550 4250 10300 4250
 Wire Wire Line
-	6550 4250 6550 6050
+	6550 4250 6550 5000
+Wire Wire Line
+	6550 5000 6550 6050
 Wire Wire Line
 	6550 5000 6650 5000
 Connection ~ 10300 4250
@@ -534,29 +541,29 @@ Wire Wire Line
 Wire Wire Line
 	10300 5200 10300 5400
 Wire Wire Line
-	3800 3050 3800 3100
-Connection ~ 3800 3050
-Wire Wire Line
-	3350 3050 3350 3100
-Connection ~ 3350 3050
-Wire Wire Line
-	2900 3050 2900 3100
-Wire Wire Line
 	5450 4300 5450 4350
 Wire Wire Line
 	5950 1300 5900 1400
 Wire Wire Line
-	5900 1400 5900 1850
+	5900 1400 5900 1550
 Wire Wire Line
-	6050 1300 6050 1850
+	5900 1550 5900 1850
 Wire Wire Line
-	6200 1400 6200 1850
+	6050 1300 6050 1600
+Wire Wire Line
+	6050 1600 6050 1850
+Wire Wire Line
+	6200 1400 6200 1650
+Wire Wire Line
+	6200 1650 6200 1850
 Wire Wire Line
 	6200 1400 6150 1300
 Wire Wire Line
 	6250 1300 6350 1400
 Wire Wire Line
-	6350 1400 6350 1850
+	6350 1400 6350 1700
+Wire Wire Line
+	6350 1700 6350 1850
 Wire Wire Line
 	6350 1700 7050 1700
 Wire Wire Line
@@ -578,7 +585,11 @@ Wire Wire Line
 	6750 1550 6750 1300
 Connection ~ 5900 1550
 Wire Wire Line
-	900  5050 1400 5050
+	900  5050 1150 5050
+Wire Wire Line
+	1150 5050 1300 5050
+Wire Wire Line
+	1300 5050 1400 5050
 Connection ~ 1050 5550
 Connection ~ 1150 5050
 Wire Wire Line
@@ -591,9 +602,13 @@ Wire Wire Line
 Wire Wire Line
 	3450 6950 3450 6550
 Wire Wire Line
-	1700 6100 1700 7250
+	1700 6100 1700 6850
 Wire Wire Line
-	3050 6850 3050 7250
+	1700 6850 1700 7250
+Wire Wire Line
+	3050 6850 3050 7100
+Wire Wire Line
+	3050 7100 3050 7250
 Connection ~ 1700 6850
 Wire Wire Line
 	3050 7100 3900 7100
@@ -603,7 +618,9 @@ Wire Wire Line
 	3900 7100 3900 6550
 Connection ~ 3050 7100
 Wire Wire Line
-	800  5550 1100 5550
+	800  5550 1050 5550
+Wire Wire Line
+	1050 5550 1100 5550
 Wire Wire Line
 	1400 5550 1500 5550
 Wire Wire Line
@@ -611,9 +628,13 @@ Wire Wire Line
 Wire Wire Line
 	3450 6950 4550 6950
 Wire Wire Line
-	4550 6550 4550 7000
+	4550 6550 4550 6950
 Wire Wire Line
-	3700 7450 5150 7450
+	4550 6950 4550 7000
+Wire Wire Line
+	3700 7450 4550 7450
+Wire Wire Line
+	4550 7450 5150 7450
 Wire Wire Line
 	6650 5300 6350 5300
 Wire Wire Line
@@ -621,33 +642,45 @@ Wire Wire Line
 Wire Wire Line
 	6350 6550 4550 6550
 Wire Wire Line
-	4200 5850 9700 5850
-Connection ~ 1950 5550
+	4200 5850 5450 5850
+Wire Wire Line
+	5450 5850 5700 5850
+Wire Wire Line
+	5700 5850 9700 5850
 Wire Wire Line
 	4050 3400 4050 3550
 Connection ~ 4050 3400
 Wire Wire Line
-	3650 3400 6450 3400
+	1540 3400 2130 3400
 Wire Wire Line
-	2150 3050 5900 3050
+	2130 3400 3900 3400
 Wire Wire Line
-	5150 5200 6650 5200
+	3900 3400 4050 3400
+Wire Wire Line
+	4050 3400 4200 3400
+Wire Wire Line
+	4200 3400 6350 3400
+Wire Wire Line
+	6350 3400 6450 3400
+Wire Wire Line
+	5150 5200 5450 5200
+Wire Wire Line
+	5450 5200 5700 5200
+Wire Wire Line
+	5700 5200 6650 5200
 Wire Wire Line
 	1150 5050 1150 4800
 Wire Wire Line
-	1800 5550 2550 5550
-Wire Wire Line
 	1700 6100 1950 6100
-Wire Wire Line
-	1950 6100 1950 5550
 Text GLabel 5150 7450 2    60   Input ~ 0
 GND
-Connection ~ 5050 7450
 Wire Wire Line
 	3700 6550 3700 7450
 Connection ~ 4550 6950
 Wire Wire Line
-	6200 4900 6650 4900
+	6200 4900 6450 4900
+Wire Wire Line
+	6450 4900 6650 4900
 Wire Wire Line
 	6050 5100 6650 5100
 Text GLabel 5250 4300 0    60   Input ~ 12
@@ -673,7 +706,9 @@ $EndComp
 Wire Wire Line
 	900  5150 1050 5250
 Wire Wire Line
-	1050 5250 1050 5800
+	1050 5250 1050 5550
+Wire Wire Line
+	1050 5550 1050 5800
 $Comp
 L Conn_02x03_Odd_Even ISP1
 U 1 1 5A1C9119
@@ -689,11 +724,17 @@ Wire Wire Line
 	6550 6050 6750 6050
 Connection ~ 6050 5100
 Wire Wire Line
-	6050 2550 6050 6150
+	6050 2550 6050 3500
+Wire Wire Line
+	6050 3500 6050 5100
+Wire Wire Line
+	6050 5100 6050 6150
 Wire Wire Line
 	6050 6150 6750 6150
 Wire Wire Line
-	6200 2550 6200 4900
+	6200 2550 6200 3100
+Wire Wire Line
+	6200 3100 6200 4900
 Wire Wire Line
 	6450 4900 6450 5650
 Wire Wire Line
@@ -718,10 +759,6 @@ Wire Wire Line
 Wire Wire Line
 	5250 4300 5450 4300
 Wire Wire Line
-	2550 5550 2550 3400
-Wire Wire Line
-	2550 3400 3050 3400
-Wire Wire Line
 	2150 6850 1700 6850
 $Comp
 L +BATT #PWR08
@@ -736,5 +773,102 @@ F 3 "" H 800 5450 50  0001 C CNN
 $EndComp
 Connection ~ 800  5550
 Wire Wire Line
-	800  5450 800  5800
+	800  5450 800  5550
+Wire Wire Line
+	800  5550 800  5800
+Connection ~ 1300 5050
+Text Label 7750 6150 0    60   ~ 0
+SDA
+Text Label 6550 6000 0    60   ~ 0
+MISO
+Text Label 6050 6100 0    60   ~ 0
+SCK
+Text Label 6400 6250 0    60   ~ 0
+RESET
+Text Label 4600 6550 0    60   ~ 0
+PB4BYPASS
+Wire Wire Line
+	5400 3050 5600 3050
+Wire Wire Line
+	5600 3050 5900 3050
+Text GLabel 5400 2850 2    60   Input ~ 12
+GND
+Wire Wire Line
+	5400 2850 5400 3050
+$Comp
+L REG710 R11
+U 1 1 5A22A5C9
+P 2560 3850
+F 0 "R11" H 2380 4130 60  0000 C CNN
+F 1 "REG710NA-3.3" H 2500 3220 60  0000 C CNN
+F 2 "TO_SOT_Packages_SMD:SOT-23-6_Handsoldering" H 2560 3850 60  0001 C CNN
+F 3 "" H 2560 3850 60  0001 C CNN
+	1    2560 3850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3030 3920 3090 3920
+Wire Wire Line
+	3090 3920 3090 4120
+Wire Wire Line
+	3090 4120 3090 4200
+Wire Wire Line
+	3090 4200 3090 5550
+Wire Wire Line
+	2130 3690 2130 3400
+Wire Wire Line
+	3090 5550 1950 5550
+Wire Wire Line
+	1950 5550 1800 5550
+Wire Wire Line
+	1950 6100 1950 5550
+Connection ~ 1950 5550
+Wire Wire Line
+	1300 5050 1300 3920
+Wire Wire Line
+	1300 3920 1540 3920
+Wire Wire Line
+	1540 3920 2050 3920
+Wire Wire Line
+	2050 3920 2130 3920
+$Comp
+L C C6
+U 1 1 5A22BFBC
+P 3280 3900
+F 0 "C6" H 3305 4000 50  0000 L CNN
+F 1 "0.22uF Ceramic X7R" H 3320 3810 50  0000 L CNN
+F 2 "Capacitors_SMD:C_1206_HandSoldering" H 3318 3750 50  0001 C CNN
+F 3 "http://uk.farnell.com/kemet/c1206x224k5ractu/cap-mlcc-x7r-220nf-50v-1206/dp/1414056" H 3280 3900 50  0001 C CNN
+	1    3280 3900
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3030 4050 3280 4050
+Wire Wire Line
+	3280 3750 3140 3750
+Wire Wire Line
+	3140 3750 3140 3780
+Wire Wire Line
+	3140 3780 3020 3780
+Wire Wire Line
+	2050 3920 2050 4640
+Wire Wire Line
+	2050 4640 3230 4640
+Connection ~ 2050 3920
+Wire Wire Line
+	3230 4120 3090 4120
+Connection ~ 3090 4120
+Wire Wire Line
+	3230 4120 3230 4340
+Wire Wire Line
+	1540 3550 1540 3400
+Connection ~ 2130 3400
+Wire Wire Line
+	1540 3850 1540 3920
+Connection ~ 1540 3920
+Wire Wire Line
+	3030 4200 3090 4200
+Connection ~ 3090 4200
+Text Notes 1760 3280 0    60   ~ 0
+For C1/C2/C6 Surface-mount ceramic types. \nIn all cases, X7R or X5R dielectric are recommended.
 $EndSCHEMATC

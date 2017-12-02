@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name adum1250)(type KiCad)(uri "$(KIPRJMOD)/adum1250.pretty")(options "")(descr ""))
+  (lib (name ATTINY)(type KiCad)(uri "$(KIPRJMOD)/ATTINY.pretty")(options "")(descr ""))
+)
