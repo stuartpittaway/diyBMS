@@ -202,7 +202,6 @@ uint16_t cell_read_raw_voltage(uint8_t cell_id) {
   return read_uint16_from_cell(cell_id, read_raw_voltage);
 }
 
-
 uint16_t cell_read_error_counter(uint8_t cell_id) {
   return read_uint16_from_cell(cell_id, read_error_counter);
 }
@@ -233,7 +232,6 @@ void setup() {
   //D4 is LED
   pinMode(D4, OUTPUT);
   digitalWrite(D4, HIGH); //OFF
-
 
   while (!Serial);             // Leonardo: wait for serial monitor
   Serial.println("\n\nDIYBMS Test Controller\n\n");

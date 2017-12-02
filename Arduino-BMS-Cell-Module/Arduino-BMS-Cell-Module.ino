@@ -585,6 +585,8 @@ ISR(TIMER1_COMPA_vect)
 
   if (ByPassEnabled) {
 
+    //TODO: We need to add in code here to check we don't overheat
+
     //This must go above the following "if (ByPassCounter > 0)" statement...
     if (ByPassCounter == 0 && analogValIndex == 0) {
       //We are in bypass and just finished an in-cycle voltage measurement
