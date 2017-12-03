@@ -96,7 +96,7 @@
       (mirror false)
       (drillshape 0)
       (scaleselection 1)
-      (outputdirectory Gerber/))
+      (outputdirectory SVG/))
   )
 
   (net 0 "")
