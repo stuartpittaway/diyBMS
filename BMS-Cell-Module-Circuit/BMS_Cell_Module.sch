@@ -39,9 +39,9 @@ EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
-Title ""
-Date ""
-Rev ""
+Title "DIYBMS CELL MODULE"
+Date "2017-12-03"
+Rev "2"
 Comp ""
 Comment1 ""
 Comment2 ""
@@ -392,10 +392,6 @@ F 3 "" H 2550 7250 50  0001 C CNN
 $EndComp
 Text Notes 7100 7000 0    60   ~ 0
 BMS Cell Module for Lithium Cells\nStuart Pittaway\n\nInspired by LyteFyba BMS by weber and Coulomb
-Text Notes 7450 7500 0    60   ~ 0
-BMS Cell Module for Lithium Cells
-Text Notes 8300 7650 0    60   ~ 0
-8 November 2017
 Text GLabel 1050 5800 3    60   Input ~ 12
 BATT+RAW
 $Comp
