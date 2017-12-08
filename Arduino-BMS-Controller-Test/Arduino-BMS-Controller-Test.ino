@@ -24,6 +24,11 @@
   https://github.com/esp8266/Arduino/issues/698
 */
 
+extern "C"
+{
+  #include "user_interface.h"
+}
+
 #include <Wire.h>
 
 //Inter-packet/request delay on i2c bus
@@ -217,6 +222,18 @@ uint8_t command_set_bypass_voltage(uint8_t cell_id, uint16_t  value) {
   return send_command(cell_id, cmdByte(COMMAND_set_bypass_voltage), value);
 }
 
+os_timer_t myTimer;
+
+bool x=true;
+void timerCallback(void *pArg) {
+  if (x) {
+  digitalWrite(D4, LOW);
+  } else {digitalWrite(D4, HIGH); }
+
+  x=!x;
+  
+} // End of timerCallback
+
 
 void setup() {
   Serial.begin(19200);           // start serial for output
@@ -244,6 +261,9 @@ void setup() {
   Serial.println("Commands: 'X' Scan for modules, 'P' Provision new module (one at a time)");
   Serial.println("Commands: 'V<MULT>' voltage multiplier (float), 'T<MULT>' Temperature multiplier (float)");
   Serial.println("Commands: 'R' Take voltage and temp readings");
+
+  os_timer_setfn(&myTimer, timerCallback, NULL);
+  os_timer_arm(&myTimer, 1000, true);
 }
 
 void print_status(uint8_t status) {
@@ -264,9 +284,7 @@ void loop() {
   uint16_t data16;
   uint32_t data32;
 
-  digitalWrite(D4, LOW);
   yield();
-  delay(250);
   float v1;
 
   if (Serial.available()) {
@@ -440,11 +458,7 @@ void loop() {
     }
   }
 
-
-
-  digitalWrite(D4, HIGH);
-  delay(250);
-
+  //digitalWrite(D4, HIGH);
+  delay(150);
 }//end of loop
-
 
