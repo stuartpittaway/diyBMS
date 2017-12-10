@@ -39,11 +39,6 @@ extern "C"
 
 ESP8266WebServer server(80);
 
-//WiFiServer server(80);
-
-//Inter-packet/request delay on i2c bus
-#define delay_ms 20
-
 //If we send a cmdByte with BIT 6 set its a command byte which instructs the cell to do something (not for reading)
 #define COMMAND_BIT 6
 
@@ -78,6 +73,8 @@ ESP8266WebServer server(80);
 #define LED_OFF digitalWrite(D4, HIGH)
 
 os_timer_t myTimer;
+
+uint8_t i2cstatus;
 
 union {
   float val;
@@ -132,7 +129,6 @@ uint8_t cmdByte(uint8_t cmd) {
   return cmd;
 }
 
-uint8_t i2cstatus;
 
 uint16_t read_uint16_from_cell(uint8_t cell_id, uint8_t cmd) {
   send_command(cell_id, cmd);
@@ -243,13 +239,12 @@ cell_module cell_array[20];
 int cell_array_index = -1;
 int cell_array_max = 0;
 
-
-struct eeprom_settings {
+struct wifi_eeprom_settings {
   char wifi_ssid[32 + 1];
   char wifi_passphrase[63 + 1];
 };
 
-eeprom_settings myConfig;
+wifi_eeprom_settings myConfig_WIFI;
 
 uint32_t calculateCRC32(const uint8_t *data, size_t length)
 {
@@ -270,9 +265,21 @@ uint32_t calculateCRC32(const uint8_t *data, size_t length)
   return crc;
 }
 
+
+struct eeprom_settings {
+  int a;
+  int b;
+};
+
+eeprom_settings myConfig;
+
 //Where in EEPROM do we store the configuration
-#define EEPROM_CHECKSUM_ADDRESS 0
-#define EEPROM_CONFIG_ADDRESS 20
+#define EEPROM_WIFI_CHECKSUM_ADDRESS 0
+#define EEPROM_WIFI_CONFIG_ADDRESS EEPROM_WIFI_CHECKSUM_ADDRESS+sizeof(uint32_t)
+
+#define EEPROM_CHECKSUM_ADDRESS EEPROM_WIFI_CONFIG_ADDRESS+sizeof(wifi_eeprom_settings)
+#define EEPROM_CONFIG_ADDRESS EEPROM_CHECKSUM_ADDRESS+sizeof(uint32_t)
+
 
 void WriteConfigToEEPROM() {
   EEPROM.put(EEPROM_CONFIG_ADDRESS, myConfig);
@@ -299,6 +306,31 @@ bool LoadConfigFromEEPROM() {
   return false;
 }
 
+void WriteWIFIConfigToEEPROM() {
+  EEPROM.put(EEPROM_WIFI_CONFIG_ADDRESS, myConfig_WIFI);
+  EEPROM.put(EEPROM_WIFI_CHECKSUM_ADDRESS, calculateCRC32((uint8_t*)&myConfig_WIFI, sizeof(wifi_eeprom_settings)));
+}
+
+bool LoadWIFIConfigFromEEPROM() {
+  wifi_eeprom_settings restoredConfig;
+  uint32_t existingChecksum;
+
+  EEPROM.get(EEPROM_WIFI_CONFIG_ADDRESS, restoredConfig);
+  EEPROM.get(EEPROM_WIFI_CHECKSUM_ADDRESS, existingChecksum);
+
+  // Calculate the checksum of an entire buffer at once.
+  uint32_t checksum = calculateCRC32((uint8_t*)&restoredConfig, sizeof(wifi_eeprom_settings));
+
+  if (checksum == existingChecksum) {
+    //Clone the config into our global variable and return all OK
+    memcpy(&myConfig_WIFI, &restoredConfig, sizeof(wifi_eeprom_settings));
+    return true;
+  }
+
+  //Config is not configured or gone bad, return FALSE
+  return false;
+}
+
 const char* ssid = "DIY_BMS_CONTROLLER";
 
 void handleNotFound()
@@ -309,21 +341,48 @@ void handleNotFound()
 }
 
 String networks;
-  
-void handleRoot()
+
+void sendHeaders()
 {
+  server.sendHeader("Connection", "close");
+  server.sendHeader("Cache-Control", "private");
+}
+
+String htmlHeader() {
+  return String("<!DOCTYPE HTML>\r\n<html><head><style>.page {width:300px;margin:0 auto 0 auto;background-color:cornsilk;font-family:sans-serif;padding:22px;} label {min-width:120px;display:inline-block;padding: 22px 0 22px 0;}</style></head><body><div class=\"page\"><h1>DIY BMS</h1>");
+}
+
+String htmlFooter() {
+  return String("</div></body></html>\r\n\r\n");
+}
+
+void handleRoot()
+{ 
   String s;
-  s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE HTML>\r\n<html><h1>DIY BMS<h1><h2>WiFi Setup</h2>";
-  s += "<form autocomplete=\"off\" method=\"get\" action=\"\\save\">";
-  s += "SSID: <select name=\"ssid\">";
+  s = htmlHeader()+"<h2>WiFi Setup</h2><p>Select local WIFI to connect to:</p>";
+  s += "<form autocomplete=\"off\" method=\"post\" enctype=\"application/x-www-form-urlencoded\" action=\"\\save\">";
+  s += "<label for=\"ssid\">SSID:</label><select id=\"ssid\" name=\"ssid\">";
   s += networks;
   s += "</select>";
-  s += "<br/>Password: <input type=\"password\" name=\"pass\"><br/>";
-  s += "<input maxlength=32 type=\"submit\" value=\"Submit\"></form>";
-  s += "</html>\r\n\r\n";
+  s += "<label for=\"pass\">Password:</label><input type=\"password\" id=\"id\" name=\"pass\"><br/>";
+  s += "<input minlength=\"8\" maxlength=\"32\" type=\"submit\" value=\"Submit\"></form>";
+  s += htmlFooter();
 
+  sendHeaders();
+  server.send(200, "text/html", s);
+}
+
+void handleSave() {
+
+  String ssid = server.arg("ssid");
+  String password = server.arg("pass");
+  
+  String s;
+  s = htmlHeader()+"<p>WIFI settings saved, will reboot in a few seconds.</p><p>"+ssid+"</p><p>"+password+"</p>"+htmlFooter();  
+  sendHeaders();
   server.send(200, "text/html", s);
 
+  //ESP.restart()
 }
 
 void setupAccessPoint(void) {
@@ -361,7 +420,8 @@ void setupAccessPoint(void) {
   }
   Serial.println("mDNS responder started");
 
-  server.on("/", handleRoot);
+  server.on("/", HTTP_GET, handleRoot);
+  server.on("/save", HTTP_POST, handleSave);
   server.onNotFound(handleNotFound);
 
   server.begin();
@@ -370,8 +430,6 @@ void setupAccessPoint(void) {
   while (1) {
     server.handleClient();
   }
-
-
 }
 
 
@@ -394,7 +452,13 @@ void setup() {
     Serial.println("Settings loaded from EEPROM");
   } else {
     //We are in initial power on mode (factory reset)
+  }
+  
 
+  if (LoadWIFIConfigFromEEPROM()) {
+    Serial.println("WIFI Settings loaded from EEPROM");
+  } else {
+    //We are in initial power on mode (factory reset)
     setupAccessPoint();
   }
 
