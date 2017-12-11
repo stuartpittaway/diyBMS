@@ -3,6 +3,14 @@
 #include "i2c_cmds.h"
 #include "Arduino.h"
 
+//Default i2c SLAVE address (used for auto provision of address)
+uint8_t DEFAULT_SLAVE_ADDR= 21;
+
+//Configured cell modules use i2c addresses 24 to 48 (24S)
+//See http://www.i2c-bus.org/addressing/
+uint8_t DEFAULT_SLAVE_ADDR_START_RANGE =24;
+uint8_t DEFAULT_SLAVE_ADDR_END_RANGE= DEFAULT_SLAVE_ADDR_START_RANGE + 24;
+
 
 union {
   float val;
