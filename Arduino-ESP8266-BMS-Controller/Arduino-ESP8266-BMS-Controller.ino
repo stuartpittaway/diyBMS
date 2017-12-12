@@ -39,17 +39,12 @@ extern "C"
 #include "i2c_cmds.h"
 #include "settings.h"
 #include "softap.h"
+#include "WebServiceSubmit.h"
 
 
 os_timer_t myTimer;
 
-//Default values
-struct cell_module {
-  // 7 bit slave I2C address
-  uint8_t address = DEFAULT_SLAVE_ADDR;
-  uint16_t voltage;
-  uint16_t temperature;
-};
+
 
 //Allow up to 24 modules
 cell_module cell_array[24];
@@ -66,25 +61,28 @@ void setup() {
   pinMode(D4, OUTPUT);
   LED_OFF;
 
-  Serial.println("DIY BMS Startup");
+  Serial.println(F("DIY BMS Controller Startup"));
 
   initWire();
 
   if (LoadConfigFromEEPROM()) {
-    Serial.println("Settings loaded from EEPROM");
+    Serial.println(F("Settings loaded from EEPROM"));
   } else {
     //We are in initial power on mode (factory reset)
   }
 
   if (LoadWIFIConfigFromEEPROM()) {
-    Serial.println("WIFI Settings loaded from EEPROM");
+    Serial.println(F("Connect to WIFI AP"));
+    /* Explicitly set the ESP8266 to be a WiFi-client, otherwise, it by default,
+      would try to act as both a client and an access-point and could cause
+      network-issues with your other WiFi-devices on your WiFi-network. */
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(myConfig_WIFI.wifi_ssid, myConfig_WIFI.wifi_passphrase);
   } else {
     //We are in initial power on mode (factory reset)
     setupAccessPoint();
   }
 
-  //while (!Serial);             // Leonardo: wait for serial monitor
-  //Serial.println("\n\nDIYBMS Test Controller\n\n");
 
   cell_module m1;
   m1.address = DEFAULT_SLAVE_ADDR_START_RANGE;
@@ -94,10 +92,27 @@ void setup() {
   //We have 1 module
   cell_array_max = 1;
 
+  //Ensure we service the cell modules every 1 second
   os_timer_setfn(&myTimer, timerCallback, NULL);
   os_timer_arm(&myTimer, 1000, true);
+
+
+  //Check WIFI is working and connected
+  Serial.print(F("WIFI Connecting"));
+  //TODO: We need a timeout here!
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(250);
+    Serial.print( WiFi.status() );
+  }
+  Serial.print(F(". Connected IP:"));
+  Serial.println(WiFi.localIP());
 }
 
+
+unsigned long next_submit;
+
+EmonCMS emoncms;
 
 void loop() {
   yield();
@@ -106,8 +121,11 @@ void loop() {
   delay(250);
   yield();
   delay(250);
+  yield();
+  delay(250);
 
   if (cell_array_max > 0) {
+
     for ( int a = 0; a < cell_array_max; a++) {
       Serial.print(cell_array[a].address);
       Serial.print(':');
@@ -116,12 +134,16 @@ void loop() {
       Serial.print(cell_array[a].temperature);
       Serial.print(' ');
     }
-
     Serial.println();
+
+    if (millis() > next_submit) {
+      emoncms.postData(cell_array, cell_array_max);
+      //Update emoncms every 4 seconds
+      next_submit = millis() + 4000;
+    }
   }
 
-  yield();
-  delay(250);
+
 }//end of loop
 
 

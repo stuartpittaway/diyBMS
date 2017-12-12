@@ -22,6 +22,8 @@ struct eeprom_settings {
   uint8_t address_list[24];
 };
 
+
+
 extern wifi_eeprom_settings myConfig_WIFI;
 extern eeprom_settings myConfig;
 

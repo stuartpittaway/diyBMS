@@ -1,4 +1,6 @@
 
+#include "Arduino.h"
+
 //If we send a cmdByte with BIT 6 set its a command byte which instructs the cell to do something (not for reading)
 #define COMMAND_BIT 6
 
@@ -20,4 +22,10 @@
 #define read_bypass_enabled_state 16
 #define read_bypass_voltage_measurement 17
 
-
+//Default values
+struct cell_module {
+  // 7 bit slave I2C address
+  uint8_t address;
+  uint16_t voltage;
+  uint16_t temperature;
+};
