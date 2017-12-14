@@ -4,5 +4,9 @@
 
 void setupAccessPoint(void);
 
+void SetupManagementRedirect(void);
+
+void HandleWifiClient(void);
+
 #endif
 

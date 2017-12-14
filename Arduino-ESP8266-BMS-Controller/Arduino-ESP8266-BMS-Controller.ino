@@ -1,3 +1,4 @@
+
 /* ____  ____  _  _  ____  __  __  ___
   (  _ \(_  _)( \/ )(  _ \(  \/  )/ __)
    )(_) )_)(_  \  /  ) _ < )    ( \__ \
@@ -42,9 +43,11 @@ extern "C"
 #include "WebServiceSubmit.h"
 
 
+unsigned long next_submit;
+
+EmonCMS emoncms;
+
 os_timer_t myTimer;
-
-
 
 //Allow up to 24 modules
 cell_module cell_array[24];
@@ -52,6 +55,27 @@ int cell_array_index = -1;
 int cell_array_max = 0;
 
 
+void check_module_quick(struct  cell_module *module) {
+  module->voltage = cell_read_voltage(module->address);
+  module->temperature = cell_read_board_temp(module->address);
+}
+
+void timerCallback(void *pArg) {
+  LED_ON;
+
+  //Ensure we have some cell modules to check
+  if (cell_array_max > 0 && cell_array_index >= 0) {
+
+    check_module_quick( &cell_array[cell_array_index] );
+
+    cell_array_index++;
+    if (cell_array_index >= cell_array_max) {
+      cell_array_index = 0;
+    }
+  }
+
+  LED_OFF;
+} // End of timerCallback
 
 
 void setup() {
@@ -89,6 +113,7 @@ void setup() {
 
   cell_array[0] = m1;
   cell_array_index = 0;
+
   //We have 1 module
   cell_array_max = 1;
 
@@ -99,7 +124,8 @@ void setup() {
 
   //Check WIFI is working and connected
   Serial.print(F("WIFI Connecting"));
-  //TODO: We need a timeout here!
+  
+  //TODO: We need a timeout here in case the AP is dead!
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(250);
@@ -107,20 +133,23 @@ void setup() {
   }
   Serial.print(F(". Connected IP:"));
   Serial.println(WiFi.localIP());
+
+  SetupManagementRedirect();
 }
 
 
-unsigned long next_submit;
-
-EmonCMS emoncms;
-
 void loop() {
+  
+  HandleWifiClient();
   yield();
   delay(250);
+  HandleWifiClient();
   yield();
   delay(250);
+  HandleWifiClient();
   yield();
   delay(250);
+  HandleWifiClient();
   yield();
   delay(250);
 
@@ -138,34 +167,11 @@ void loop() {
 
     if (millis() > next_submit) {
       emoncms.postData(cell_array, cell_array_max);
-      //Update emoncms every 4 seconds
-      next_submit = millis() + 4000;
+      //Update emoncms every 10 seconds
+      next_submit = millis() + 10000;
     }
   }
-
-
+  
 }//end of loop
 
-
-void check_module_quick(struct  cell_module *module) {
-  module->voltage = cell_read_voltage(module->address);
-  module->temperature = cell_read_board_temp(module->address);
-}
-
-void timerCallback(void *pArg) {
-  LED_ON;
-
-  //Ensure we have some cell modules to check
-  if (cell_array_max > 0 && cell_array_index >= 0) {
-
-    check_module_quick( &cell_array[cell_array_index] );
-
-    cell_array_index++;
-    if (cell_array_index >= cell_array_max) {
-      cell_array_index = 0;
-    }
-  }
-
-  LED_OFF;
-} // End of timerCallback
 
