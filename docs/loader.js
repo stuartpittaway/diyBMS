@@ -30,16 +30,13 @@ script.onload = function(){
 
 	$( document ).on( "mobileinit", function() {	
 		console.log('mobileinit');
-		
-
-	
-		
+				
 		//apply overrides here			
 		$('body').load('https://stuartpittaway.github.io/diyBMS/homePage.html', function () {
 			
 			console.log('after load');
 			
-			$(this).trigger('create');
+			$('#main').trigger('create');
 			
 			$('#main').on( 'pageshow',function(event){
 				console.log('pageshow');
@@ -57,9 +54,6 @@ script.onload = function(){
 				
 				console.log(plot1);
 			});		
-			
-			
-
 		}); // end load
 	});
 
