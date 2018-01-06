@@ -430,7 +430,7 @@
     )
   )
 
-  (module Resistors_SMD:R_1206_HandSoldering placed (layer F.Cu) (tedit 5A241B5B) (tstamp 5A0216FE)
+  (module Resistors_SMD:R_1206_HandSoldering placed (layer F.Cu) (tedit 5A4E7517) (tstamp 5A0216FE)
     (at 157.3276 85.9536)
     (descr "Resistor SMD 1206, hand soldering")
     (tags "resistor 1206")
@@ -439,7 +439,7 @@
     (fp_text reference R3 (at 4.1656 0.0508) (layer F.SilkS)
       (effects (font (size 1 1) (thickness 0.15)))
     )
-    (fp_text value 20K (at 0.1143 1.7907) (layer F.Fab)
+    (fp_text value 68K (at 0.1143 1.7907) (layer F.Fab)
       (effects (font (size 1 1) (thickness 0.15)))
     )
     (fp_text user %R (at 0 0) (layer F.Fab)

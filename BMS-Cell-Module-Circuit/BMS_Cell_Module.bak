@@ -399,9 +399,9 @@ L D D1
 U 1 1 5A0412D1
 P 1250 5550
 F 0 "D1" H 1250 5650 50  0000 C CNN
-F 1 "SS34 Schottky Rectifier, 40 V, 3 A" V 1250 6050 50  0000 C CNN
+F 1 "SE30AFG-M3/6A" V 1250 6050 50  0000 C CNN
 F 2 "ATTINY:DO-221AC" H 1250 5550 50  0001 C CNN
-F 3 "http://uk.farnell.com/multicomp/ss34/schottky-rectifier-3a-40v-do-214ab/dp/2675144" H 1250 5550 50  0001 C CNN
+F 3 "http://uk.farnell.com/vishay/se30afg-m3-6a/rectifier-esd-400v-3a-do-221ac/dp/2313878" H 1250 5550 50  0001 C CNN
 	1    1250 5550
 	-1   0    0    1   
 $EndComp
@@ -421,9 +421,9 @@ L Fuse F1
 U 1 1 5A047495
 P 1650 5550
 F 0 "F1" V 1730 5550 50  0000 C CNN
-F 1 "FUSE" V 1550 5650 50  0000 C CNN
+F 1 "SS34 Schottky Rectifier, 40 V, 3 A" V 1550 5650 50  0000 C CNN
 F 2 "Resistors_SMD:R_1812_HandSoldering" V 1580 5550 50  0001 C CNN
-F 3 "" H 1650 5550 50  0001 C CNN
+F 3 "http://uk.farnell.com/multicomp/ss34/schottky-rectifier-3a-40v-do-214ab/dp/2675144" H 1650 5550 50  0001 C CNN
 	1    1650 5550
 	0    1    1    0   
 $EndComp
