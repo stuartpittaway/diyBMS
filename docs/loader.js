@@ -29,6 +29,9 @@ script.onload = function(){
 	alert('READY!');
 
 	$( document ).on( "mobileinit", function() {
+		
+		alert('mobileinit');
+		
 		//apply overrides here			
 		$('body').load('https://stuartpittaway.github.io/diyBMS/homePage.html', function () {
 			
