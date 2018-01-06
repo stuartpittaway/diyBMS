@@ -14,6 +14,22 @@ script.async = false;
 document.getElementsByTagName('head')[0].appendChild(script);
 }
 
+var ajaxDataRenderer = function(url, plot, options) {
+    var ret = null;
+    $.ajax({
+      // have to use synchronous here, else the function 
+      // will return before the data is fetched
+      async: false,
+      url: url,
+      dataType: "json",
+      success: function(data) {
+        ret = data;
+      }
+    });
+    return ret;
+  };
+  
+
 /* Dynamically load the CSS and JS files from the web */
 var css = ["https://stuartpittaway.github.io/diyBMS/main.css", "https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css","https://fonts.googleapis.com/css?family=Open+Sans:300,400,700","https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.css"];
 css.forEach(addStylesheet);
@@ -26,7 +42,7 @@ script.src = "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"
 
 script.onload = function(){
 	//This fires after JQUERY has loaded
-	console.log('READY!');
+	console.log('JQUERY Ready');
 
 	$( document ).on( "mobileinit", function() {	
 		console.log('mobileinit');
@@ -42,6 +58,7 @@ script.onload = function(){
 				console.log('pageshow');
 				$.jqplot.config.enablePlugins = true;
 			
+				/*
 				var s1 = [ 3.79,3.79,3.79,3.79,3.79,3.79,3.79 ];
 				var ticks = [0,1,2,3,4,5,6];
 		 
@@ -51,7 +68,17 @@ script.onload = function(){
 					axes:{ xaxis:{ label:'Cell module', renderer: $.jqplot.CategoryAxisRenderer, ticks: ticks }	,yaxis:{ label:'Voltage', min:0, max:4.5 }		}
 					,highlighter: { show: false }				
 				}); <!-- end of plot1 -->
+				*/
 				
+				var jsonurl = "./jsondata";
+				
+				var plot1=$.jqplot('chart1',jsonurl,{
+    title: "AJAX JSON Data Renderer",
+    dataRenderer: ajaxDataRenderer,
+    dataRendererOptions: {
+      unusedOptionalUrl: jsonurl
+    }
+  });
 				console.log(plot1);
 			});		
 		}); // end load
