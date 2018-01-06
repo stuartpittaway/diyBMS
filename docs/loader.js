@@ -32,9 +32,7 @@ script.onload = function(){
 		alert('mobileinit');
 		
 
-		$('#main').on( 'pageshow',function(event){
-			alert('pageshow');
-		});		
+	
 		
 		//apply overrides here			
 		$('body').load('https://stuartpittaway.github.io/diyBMS/homePage.html', function () {
@@ -42,6 +40,11 @@ script.onload = function(){
 			alert('after load');
 			
 			$(this).trigger('create');
+			
+			$('#main').on( 'pageshow',function(event){
+				alert('pageshow');
+			});
+		
 			
 			$.jqplot.config.enablePlugins = true;
 			
