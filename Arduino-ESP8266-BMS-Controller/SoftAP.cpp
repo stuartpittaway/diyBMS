@@ -23,17 +23,14 @@ void sendHeaders()
   server.sendHeader("Cache-Control", "private");
 }
 
-/*
-String htmlHeader(bool redirectHeader) {
-  return String(F("<!DOCTYPE HTML>\r\n<html><head><style>.page {width:300px;margin:0 auto 0 auto;background-color:cornsilk;font-family:sans-serif;padding:22px;} label {min-width:120px;display:inline-block;padding: 22px 0 22px 0;}</style>"))
-         + (redirectHeader ? String(F("<meta http-equiv=\"refresh\" content=\"0; URL=https://stuartpittaway.github.io/diyBMS/index.html?IP=")) + WiFi.localIP().toString() + String("\" />") : String(""))
-         + String(F("</head><body><div class=\"page\"><h1>DIY BMS</h1>"));
+
+String htmlHeader() {
+  return String(F("<!DOCTYPE HTML>\r\n<html><head><style>.page {width:300px;margin:0 auto 0 auto;background-color:cornsilk;font-family:sans-serif;padding:22px;} label {min-width:120px;display:inline-block;padding: 22px 0 22px 0;}</style></head><body><div class=\"page\"><h1>DIY BMS</h1>"));
 }
-*/
 
 
-String htmlHeader(bool redirectHeader) {
-return String(F("<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>DIY BMS Management Console</title><script type=\"text/javascript\" src=\"https://stuartpittaway.github.io/diyBMS/loader.js\"></script></head><body></body></html>"));
+String htmlManagementHeader() {
+return String(F("<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>DIY BMS Management Console</title><script type=\"text/javascript\" src=\"https://stuartpittaway.github.io/diyBMS/loader.js\"></script></head><body></body></html>\r\n\r\n"));
 }
 
 
@@ -44,7 +41,7 @@ String htmlFooter() {
 void handleRoot()
 {
   String s;
-  s = htmlHeader(false);
+  s = htmlHeader();
   //F Macro - http://arduino-esp8266.readthedocs.io/en/latest/PROGMEM.html
   s += F("<h2>WiFi Setup</h2><p>Select local WIFI to connect to:</p><form autocomplete=\"off\" method=\"post\" enctype=\"application/x-www-form-urlencoded\" action=\"\\save\"><label for=\"ssid\">SSID:</label><select id=\"ssid\" name=\"ssid\">");
   s += networks;
@@ -56,15 +53,12 @@ void handleRoot()
 }
 
 void handleRedirect() {
-  String s;
-  s = htmlHeader(true);
-
-  s += F("<p>Starting management console</p>");
-  s += htmlFooter();
-
   sendHeaders();
-  server.send(200, "text/html", s);
+  server.send(200, "text/html", htmlManagementHeader());
+}
 
+void handleCellJSONData() { 
+  server.send(200, "application/json", "[[1, 3, 2, 4, 6, 9]]\r\n\r\n");
 }
 
 void handleSave() {
@@ -81,7 +75,7 @@ void handleSave() {
 
     WriteWIFIConfigToEEPROM();
 
-    s = htmlHeader(false) + F("<p>WIFI settings saved, will reboot in a few seconds.</p>") + htmlFooter();
+    s = htmlHeader() + F("<p>WIFI settings saved, will reboot in a few seconds.</p>") + htmlFooter();
     sendHeaders();
     server.send(200, "text/html", s);
 
@@ -92,7 +86,7 @@ void handleSave() {
     ESP.restart();
 
   } else {
-    s = htmlHeader(false) + F("<p>WIFI settings too long.</p>") + htmlFooter();
+    s = htmlHeader() + F("<p>WIFI settings too long.</p>") + htmlFooter();
     sendHeaders();
     server.send(200, "text/html", s);
   }
@@ -147,6 +141,7 @@ void setupAccessPoint(void) {
 
 void SetupManagementRedirect() {
   server.on("/", HTTP_GET, handleRedirect);
+  server.on("/celljson", HTTP_GET, handleCellJSONData);
   server.onNotFound(handleNotFound);
 
   server.begin();

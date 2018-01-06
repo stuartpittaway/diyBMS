@@ -70,7 +70,7 @@ script.onload = function(){
 				}); <!-- end of plot1 -->
 				*/
 				
-				var jsonurl = "./jsondata";
+				var jsonurl = "./celljson";
 				
 				var plot1=$.jqplot('chart1',jsonurl,{
     title: "AJAX JSON Data Renderer",
