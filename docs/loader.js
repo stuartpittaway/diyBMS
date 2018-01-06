@@ -32,9 +32,9 @@ script.onload = function(){
 		//apply overrides here
 		alert('mobileinit');
 		
-		$('body').append('<div data-role="page" id="main"></div>');
+		//$('body').append('<div data-role="page" id="main"></div>');
 		
-		$('#main').load('https://stuartpittaway.github.io/diyBMS/homePage.html').trigger('create');;
+		$('body').load('https://stuartpittaway.github.io/diyBMS/homePage.html').trigger('create');;
 	});
 
 	//Load the other libraries
