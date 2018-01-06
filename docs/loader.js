@@ -43,21 +43,22 @@ script.onload = function(){
 			
 			$('#main').on( 'pageshow',function(event){
 				console.log('pageshow');
+				$.jqplot.config.enablePlugins = true;
+			
+				var s1 = [ 3.79,3.79,3.79,3.79,3.79,3.79,3.79 ];
+				var ticks = [0,1,2,3,4,5,6];
+		 
+				var plot1 = $.jqplot('chart1',[s1],{
+					title: 'Cell Voltages',
+					seriesDefaults:{renderer:$.jqplot.BarRenderer, showMarker:false,	pointLabels: { show:true } , rendererOptions: { barDirection: 'vertical', barMargin: 15,barWidth: 35}},
+					axes:{ xaxis:{ label:'Cell module', renderer: $.jqplot.CategoryAxisRenderer, ticks: ticks }	,yaxis:{ label:'Voltage', min:0, max:4.5 }		}
+					,highlighter: { show: false }				
+				}); <!-- end of plot1 -->
+				
+				console.log(plot1);
 			});		
 			
-			$.jqplot.config.enablePlugins = true;
 			
-			var s1 = [ 3.79,3.79,3.79,3.79,3.79,3.79,3.79 ];
-			var ticks = [0,1,2,3,4,5,6];
-	 
-			var plot1 = $.jqplot('chart1',[s1],{
-				title: 'Cell Voltages',
-				seriesDefaults:{renderer:$.jqplot.BarRenderer, showMarker:false,	pointLabels: { show:true } , rendererOptions: { barDirection: 'vertical', barMargin: 15,barWidth: 35}},
-				axes:{ xaxis:{ label:'Cell module', renderer: $.jqplot.CategoryAxisRenderer, ticks: ticks }	,yaxis:{ label:'Voltage', min:0, max:4.5 }		}
-				,highlighter: { show: false }				
-			}); <!-- end of plot1 -->
-			
-			console.log(plot1);
 
 		}); // end load
 	});
