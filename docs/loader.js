@@ -18,17 +18,23 @@ document.getElementsByTagName('head')[0].appendChild(script);
 var css = ["https://stuartpittaway.github.io/diyBMS/main.css", "https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css","https://fonts.googleapis.com/css?family=Open+Sans:300,400,700","https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.css"];
 css.forEach(addStylesheet);
 
-
 var script = document.createElement('script'); 
 document.head.appendChild(script);
 script.type = 'text/javascript';
+script.async = false;
 script.src = "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js";
-script.onload = function(){
 
+script.onload = function(){
+	//This fires after JQUERY has loaded
 	alert('READY!');
 
+	$( document ).on( "mobileinit", function() {
+		//apply overrides here
+		alert('mobileinit');
+	});
+
+	//Load the other libraries
 	var js = ["https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js","https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.js", "https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.barRenderer.min.js","https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.categoryAxisRenderer.min.js"]
 	js.forEach(addJavascript);
-
 
 } 
