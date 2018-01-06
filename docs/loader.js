@@ -31,6 +31,9 @@ script.onload = function(){
 	$( document ).on( "mobileinit", function() {
 		//apply overrides here			
 		$('body').load('https://stuartpittaway.github.io/diyBMS/homePage.html', function () {
+			
+			alert('after load');
+			
 			$(this).trigger('create');
 			
 			$.jqplot.config.enablePlugins = true;
