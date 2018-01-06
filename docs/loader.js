@@ -19,14 +19,16 @@ var css = ["https://stuartpittaway.github.io/diyBMS/main.css", "https://ajax.goo
 css.forEach(addStylesheet);
 
 
-google.load("jquery", "1.11.3");
-
-google.setOnLoadCallback(function() {
+var script = document.createElement('script'); 
+document.head.appendChild(script);
+script.type = 'text/javascript';
+script.src = "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js";
+script.onload = function(){
 
 	alert('READY!');
 
 	var js = ["https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js","https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.js", "https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.barRenderer.min.js","https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.categoryAxisRenderer.min.js"]
 	js.forEach(addJavascript);
 
-});
-  
+
+} 
