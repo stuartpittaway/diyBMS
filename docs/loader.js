@@ -82,7 +82,7 @@ script.onload = function(){
     dataRendererOptions: { unusedOptionalUrl: jsonurl },
 	axes:{ xaxis:{ label:'Cell module', renderer: $.jqplot.CategoryAxisRenderer, ticks: ticks }	
 	,yaxis:{ label:'Voltage', min:0 }
-	,y2axis: label:'Temperature', min:0 }
+	,y2axis: {label:'Temperature', min:0 }
 	}//end axes
 	 ,series : [{
             yaxis : 'yaxis',
