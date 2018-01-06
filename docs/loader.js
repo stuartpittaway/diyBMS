@@ -26,10 +26,10 @@ script.src = "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"
 
 script.onload = function(){
 	//This fires after JQUERY has loaded
-	alert('READY!');
+	console.log('READY!');
 
 	$( document ).on( "mobileinit", function() {	
-		alert('mobileinit');
+		console.log('mobileinit');
 		
 
 	
@@ -37,14 +37,13 @@ script.onload = function(){
 		//apply overrides here			
 		$('body').load('https://stuartpittaway.github.io/diyBMS/homePage.html', function () {
 			
-			alert('after load');
+			console.log('after load');
 			
 			$(this).trigger('create');
 			
 			$('#main').on( 'pageshow',function(event){
-				alert('pageshow');
-			});
-		
+				console.log('pageshow');
+			});		
 			
 			$.jqplot.config.enablePlugins = true;
 			
