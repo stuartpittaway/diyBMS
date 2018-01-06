@@ -31,8 +31,9 @@ String htmlHeader(bool redirectHeader) {
 }
 */
 
+
 String htmlHeader(bool redirectHeader) {
-return String(F("<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>DIY BMS Management Console</title><script type=\"text/javascript\" src=\"https://stuartpittaway.github.io/diyBMS/loader.js\"></script></head><body></body></html>"));
+return String(F("<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>DIY BMS Management Console</title><script type="text/javascript" src=\"http://www.google.com/jsapi\"></script><script type=\"text/javascript\" src=\"https://stuartpittaway.github.io/diyBMS/loader.js\"></script></head><body></body></html>"));
 }
 
 String htmlFooter() {
