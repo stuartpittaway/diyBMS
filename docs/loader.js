@@ -23,6 +23,9 @@ var ajaxDataRenderer = function(url, plot, options) {
       url: url,
       dataType: "json",
       success: function(data) {
+		  
+		for (var i = 0; i < data[0].length; i++) {data[0][i]=data[0][i] / 1000;}
+		  
         ret = data;
       }
     });
