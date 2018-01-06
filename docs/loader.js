@@ -10,6 +10,7 @@ function addJavascript(filename, index) {
 var script= document.createElement('script');
 script.type= 'text/javascript';
 script.src= filename;
+script.async = false;
 document.getElementsByTagName('head')[0].appendChild(script);
 }
 
