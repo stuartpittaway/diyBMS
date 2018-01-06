@@ -82,15 +82,10 @@ script.onload = function(){
     dataRendererOptions: {
       unusedOptionalUrl: jsonurl
     },
-	axes:{ xaxis:{ label:'Cell module', renderer: $.jqplot.CategoryAxisRenderer, ticks: ticks }	,yaxis:{ label:'Voltage', min:0 }
-	,y2axis: {               
-                rendererOptions: {
-                    // align the ticks on the y2 axis with the y axis.
-                    alignTicks: true,
-                    forceTickAt0: true
-                }
-            }
-	}
+	axes:{ xaxis:{ label:'Cell module', renderer: $.jqplot.CategoryAxisRenderer, ticks: ticks }	
+	,yaxis:{ label:'Voltage', min:0 }
+	,y2axis: label:'Temperature', min:0 }
+	}//end axes
   });
 				console.log(plot1);
 			});		
