@@ -66,7 +66,7 @@ script.onload = function(){
 					title: 'Cell Voltages',
 					seriesDefaults:{renderer:$.jqplot.BarRenderer, showMarker:false,	pointLabels: { show:true } , rendererOptions: { barDirection: 'vertical', barMargin: 15,barWidth: 35}},
 					axes:{ xaxis:{ label:'Cell module', renderer: $.jqplot.CategoryAxisRenderer, ticks: ticks }	,yaxis:{ label:'Voltage', min:0, max:4.5 }		}
-					,highlighter: { show: false }				
+					,highlighter: { show: false }
 				}); <!-- end of plot1 -->
 				*/
 				
@@ -74,6 +74,7 @@ script.onload = function(){
 				
 				var plot1=$.jqplot('chart1',jsonurl,{
     title: "AJAX JSON Data Renderer",
+	seriesDefaults:{renderer:$.jqplot.BarRenderer, showMarker:false, pointLabels:{show:true}, rendererOptions:{ barDirection: 'vertical', barMargin: 15,barWidth: 35}},
     dataRenderer: ajaxDataRenderer,
     dataRendererOptions: {
       unusedOptionalUrl: jsonurl
