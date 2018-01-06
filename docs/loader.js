@@ -32,7 +32,7 @@ script.onload = function(){
 		//apply overrides here
 		alert('mobileinit');
 		
-		$('body').appendChild('<div data-role="page" id="main"></div>');
+		$('body').append('<div data-role="page" id="main"></div>');
 		
 		$('#main').load('https://stuartpittaway.github.io/diyBMS/homePage.html');
 	});
