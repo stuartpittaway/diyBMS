@@ -1,9 +1,11 @@
 #include "Arduino.h"
 
+#include "bms_values.h"
 #include "softap.h"
 #include "settings.h"
-#include <ESP8266mDNS.h>
+#include "bms_values.h"
 
+#include <ESP8266mDNS.h>
 #include <ESP8266WebServer.h>
 
 ESP8266WebServer server(80);
@@ -57,8 +59,27 @@ void handleRedirect() {
   server.send(200, "text/html", htmlManagementHeader());
 }
 
+
 void handleCellJSONData() { 
-  server.send(200, "application/json", "[[1, 3, 2, 4, 6, 9]]\r\n\r\n");
+
+  String json1 = "[";
+  String json2 = "[";
+ if (cell_array_max > 0) {
+    for ( int a = 0; a < cell_array_max; a++) {
+      json1 += String(cell_array[a].voltage);
+
+      json2 += String(cell_array[a].temperature);
+  
+      if (a < cell_array_max - 1) {
+        json1 += ",";
+        json2 += ",";
+      }
+    }
+  }
+
+  json1 += "]";
+  json2 += "]";
+  server.send(200, "application/json", "["+json1+","+json2+"]\r\n\r\n");
 }
 
 void handleSave() {

@@ -1,3 +1,5 @@
+#ifndef bms_values_H_
+#define bms_values_H_
 
 #include "Arduino.h"
 
@@ -29,3 +31,8 @@ struct cell_module {
   uint16_t voltage;
   uint16_t temperature;
 };
+
+
+
+#endif
+

@@ -71,14 +71,15 @@ script.onload = function(){
 				*/
 				
 				var jsonurl = "./celljson";
-				
+				var ticks = [0,1,2,3,4,5,6,7,8,9,10,11,12,13];
 				var plot1=$.jqplot('chart1',jsonurl,{
     title: "AJAX JSON Data Renderer",
 	seriesDefaults:{renderer:$.jqplot.BarRenderer, showMarker:false, pointLabels:{show:true}, rendererOptions:{ barDirection: 'vertical', barMargin: 15,barWidth: 35}},
     dataRenderer: ajaxDataRenderer,
     dataRendererOptions: {
       unusedOptionalUrl: jsonurl
-    }
+    },
+	axes:{ xaxis:{ label:'Cell module', renderer: $.jqplot.CategoryAxisRenderer, ticks: ticks }	,yaxis:{ label:'Voltage', min:0 }		}
   });
 				console.log(plot1);
 			});		
