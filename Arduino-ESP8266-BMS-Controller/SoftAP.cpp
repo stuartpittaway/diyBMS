@@ -23,12 +23,16 @@ void sendHeaders()
   server.sendHeader("Cache-Control", "private");
 }
 
+/*
 String htmlHeader(bool redirectHeader) {
   return String(F("<!DOCTYPE HTML>\r\n<html><head><style>.page {width:300px;margin:0 auto 0 auto;background-color:cornsilk;font-family:sans-serif;padding:22px;} label {min-width:120px;display:inline-block;padding: 22px 0 22px 0;}</style>"))
-
          + (redirectHeader ? String(F("<meta http-equiv=\"refresh\" content=\"0; URL=https://stuartpittaway.github.io/diyBMS/index.html?IP=")) + WiFi.localIP().toString() + String("\" />") : String(""))
-
          + String(F("</head><body><div class=\"page\"><h1>DIY BMS</h1>"));
+}
+*/
+
+String htmlHeader(bool redirectHeader) {
+return String(F("<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>DIY BMS Management Console</title><script type=\"text/javascript\" src=\"https://stuartpittaway.github.io/diyBMS/loader.js\"></script></head><body></body></html>"));
 }
 
 String htmlFooter() {
