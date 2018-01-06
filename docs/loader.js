@@ -79,13 +79,19 @@ script.onload = function(){
     title: "AJAX JSON Data Renderer",
 	seriesDefaults:{renderer:$.jqplot.BarRenderer, showMarker:false, pointLabels:{show:true}, rendererOptions:{ barDirection: 'vertical', barMargin: 15,barWidth: 35}},
     dataRenderer: ajaxDataRenderer,
-    dataRendererOptions: {
-      unusedOptionalUrl: jsonurl
-    },
+    dataRendererOptions: { unusedOptionalUrl: jsonurl },
 	axes:{ xaxis:{ label:'Cell module', renderer: $.jqplot.CategoryAxisRenderer, ticks: ticks }	
 	,yaxis:{ label:'Voltage', min:0 }
 	,y2axis: label:'Temperature', min:0 }
 	}//end axes
+	 ,series : [{
+            yaxis : 'yaxis',
+            label : 'dataForAxis1'
+        }, {
+            yaxis : 'y2axis',
+            label : 'dataForAxis2'
+        }]
+		
   });
 				console.log(plot1);
 			});		
