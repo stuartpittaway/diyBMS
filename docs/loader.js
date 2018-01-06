@@ -29,16 +29,39 @@ script.onload = function(){
 	alert('READY!');
 
 	$( document ).on( "mobileinit", function() {
-		//apply overrides here
-		alert('mobileinit');
+		//apply overrides here			
+		$('body').load('https://stuartpittaway.github.io/diyBMS/homePage.html', function () {
+			$(this).trigger('create');
+			
+			$.jqplot.config.enablePlugins = true;
+			
+			var s1 = [ 3.79,3.79,3.79,3.79,3.79,3.79,3.79 ];
+			var ticks = [0,1,2,3,4,5,6];
+	 
+				var plot1 = $.jqplot('chart1',[s1],{
+				  title: 'Cell Voltages',
+				  
+				  seriesDefaults:{
+					renderer:$.jqplot.BarRenderer, showMarker:false,
+				pointLabels: { show:true } ,
+				
+				 rendererOptions: { barDirection: 'vertical', barMargin: 15,barWidth: 35  }               
+			
+				},
+				axes:{
+					xaxis:{ label:'Cell module', renderer: $.jqplot.CategoryAxisRenderer, ticks: ticks }
+					,
+				yaxis:{ label:'Voltage', min:0, max:4.5 }		
+				}
+				,highlighter: { show: false }
+				
+				}); <!-- end of plot1 -->
 		
-		//$('body').append('<div data-role="page" id="main"></div>');
-		
-		$('body').load('https://stuartpittaway.github.io/diyBMS/homePage.html').trigger('create');;
+		}); // end load
 	});
 
 	//Load the other libraries
 	var js = ["https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js","https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.js", "https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.barRenderer.min.js","https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.categoryAxisRenderer.min.js"]
 	js.forEach(addJavascript);
 
-} 
+}
