@@ -34,7 +34,7 @@ script.onload = function(){
 		
 		$('body').append('<div data-role="page" id="main"></div>');
 		
-		$('#main').load('https://stuartpittaway.github.io/diyBMS/homePage.html');
+		$('#main').load('https://stuartpittaway.github.io/diyBMS/homePage.html').trigger('create');;
 	});
 
 	//Load the other libraries
