@@ -22,25 +22,29 @@
   https://github.com/esp8266/Arduino/issues/698
 */
 
-
-
 extern "C"
 {
 #include "user_interface.h"
 }
 
-
 #define LED_ON digitalWrite(D4, LOW)
 #define LED_OFF digitalWrite(D4, HIGH)
-
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 
+#include "bms_values.h"
 #include "i2c_cmds.h"
 #include "settings.h"
 #include "softap.h"
 #include "WebServiceSubmit.h"
+
+
+//Allow up to 24 modules
+cell_module cell_array[24];
+int cell_array_index = -1;
+int cell_array_max = 0;
+
 
 
 unsigned long next_submit;
@@ -48,11 +52,6 @@ unsigned long next_submit;
 EmonCMS emoncms;
 
 os_timer_t myTimer;
-
-//Allow up to 24 modules
-cell_module cell_array[24];
-int cell_array_index = -1;
-int cell_array_max = 0;
 
 
 void check_module_quick(struct  cell_module *module) {
@@ -110,12 +109,19 @@ void setup() {
 
   cell_module m1;
   m1.address = DEFAULT_SLAVE_ADDR_START_RANGE;
-
   cell_array[0] = m1;
+
+
+  cell_module m2;
+  m2.address = DEFAULT_SLAVE_ADDR_START_RANGE+1;
+  cell_array[1] = m2;
+
+
   cell_array_index = 0;
 
+
   //We have 1 module
-  cell_array_max = 1;
+  cell_array_max = 2;
 
   //Ensure we service the cell modules every 1 second
   os_timer_setfn(&myTimer, timerCallback, NULL);
@@ -136,6 +142,7 @@ void setup() {
 
   SetupManagementRedirect();
 }
+
 
 
 void loop() {
@@ -170,6 +177,8 @@ void loop() {
       //Update emoncms every 10 seconds
       next_submit = millis() + 10000;
     }
+
+    
   }
   
 }//end of loop

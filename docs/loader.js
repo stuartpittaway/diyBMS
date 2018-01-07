@@ -24,8 +24,8 @@ var ajaxDataRenderer = function(url, plot, options) {
       dataType: "json",
       success: function(data) {
 		  
-		for (var i = 0; i < data[0].length; i++) {data[0][i]=data[0][i] / 1000;}
-		  
+		for (var i = 0; i < data[0].length; i++) {data[0][i]= data[0][i] / 1000.0;}
+		 	  
         ret = data;
       }
     });
@@ -34,7 +34,10 @@ var ajaxDataRenderer = function(url, plot, options) {
   
 
 /* Dynamically load the CSS and JS files from the web */
-var css = ["https://stuartpittaway.github.io/diyBMS/main.css", "https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css","https://fonts.googleapis.com/css?family=Open+Sans:300,400,700","https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.css"];
+var css = ["https://stuartpittaway.github.io/diyBMS/main.css", 
+	"https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css",
+	"https://fonts.googleapis.com/css?family=Open+Sans:300,400,700",
+	"https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.css"];
 css.forEach(addStylesheet);
 
 var script = document.createElement('script'); 
@@ -49,56 +52,53 @@ script.onload = function(){
 
 	$( document ).on( "mobileinit", function() {	
 		console.log('mobileinit');
+		
+		$(".ui-page-active").attr('id', 'main').append('<div data-role="header"><h1>DIY BMS Management Console</h1></div><div role="main"  data-role="ui-content"><div id="chart1"></div></div><div data-role="footer"><a href="https://stuartpittaway.github.io/diyBMS/">github</a></div>');
 				
-		//apply overrides here			
-		$('body').load('https://stuartpittaway.github.io/diyBMS/homePage.html', function () {
-			
-			console.log('after load');
-			
-			$('#main').trigger('create');
-			
-			$('#main').on( 'pageshow',function(event){
+		
+			$('#main').on( 'pageshow', function(event){
 				console.log('pageshow');
 				$.jqplot.config.enablePlugins = true;
-			
-				/*
-				var s1 = [ 3.79,3.79,3.79,3.79,3.79,3.79,3.79 ];
-				var ticks = [0,1,2,3,4,5,6];
-		 
-				var plot1 = $.jqplot('chart1',[s1],{
-					title: 'Cell Voltages',
-					seriesDefaults:{renderer:$.jqplot.BarRenderer, showMarker:false,	pointLabels: { show:true } , rendererOptions: { barDirection: 'vertical', barMargin: 15,barWidth: 35}},
-					axes:{ xaxis:{ label:'Cell module', renderer: $.jqplot.CategoryAxisRenderer, ticks: ticks }	,yaxis:{ label:'Voltage', min:0, max:4.5 }		}
-					,highlighter: { show: false }
-				}); <!-- end of plot1 -->
-				*/
 				
+				//var jsonurl = "http://192.168.0.35/celljson";
 				var jsonurl = "./celljson";
-				var ticks = [0,1,2,3,4,5,6,7,8,9,10,11,12,13];
+				
 				var plot1=$.jqplot('chart1',jsonurl,{
-    title: "AJAX JSON Data Renderer",
-	seriesDefaults:{renderer:$.jqplot.BarRenderer, showMarker:false, pointLabels:{show:true}, rendererOptions:{ barDirection: 'vertical', barMargin: 15,barWidth: 35}},
+    title: "Cell Voltages",
     dataRenderer: ajaxDataRenderer,
-    dataRendererOptions: { unusedOptionalUrl: jsonurl },
-	axes:{ xaxis:{ label:'Cell module', renderer: $.jqplot.CategoryAxisRenderer, ticks: ticks }	
-	,yaxis:{ label:'Voltage', min:0 }
-	,y2axis: {label:'Temperature', min:0 }
+    //dataRendererOptions: { unusedOptionalUrl: jsonurl },	
+	axes:{xaxis:{label:'Cell module', renderer: $.jqplot.CategoryAxisRenderer }
+	,yaxis:{ label:'Voltage',syncTicks:true, min: 2.5, max: 4.5, numberTicks:16}
+	,y2axis:{label:'Temperature', min:0 ,syncTicks:true, min: 0, max: 1024, numberTicks:16}
+
 	}//end axes
-	 ,series : [{
+	,
+     highlighter: {show:false}
+	 ,series : [{		 	
+			renderer:$.jqplot.BarRenderer,
+			pointLabels:{show:true},showMarker:true, highlightMouseOver: false,
+			rendererOptions:{ barDirection: 'vertical',barMargin:12},
+			
             yaxis : 'yaxis',
             label : 'dataForAxis1'
         }, {
+			pointLabels:{show:false},showMarker:true, highlightMouseOver: false,
             yaxis : 'y2axis',
             label : 'dataForAxis2'
         }]
 		
   });
-				console.log(plot1);
+				
 			});		
-		}); // end load
 	});
 
 	//Load the other libraries
-	var js = ["https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js","https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.js", "https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.barRenderer.min.js","https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.categoryAxisRenderer.min.js"]
+	var js = ["https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js",
+	"https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.js", 
+	"https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.barRenderer.min.js",
+	"https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.highlighter.js",
+	"https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.cursor.js",
+	"https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.pointLabels.js",
+	"https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.categoryAxisRenderer.min.js"]
 	js.forEach(addJavascript);
 }
