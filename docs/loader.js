@@ -52,7 +52,7 @@ script.onload = function(){
 
 	$("body").append('<div data-role="page" data-url="/" tabindex="0" class="ui-page ui-page-theme-a ui-page-active" id="main"><div data-role="header"><h1>DIY BMS Management Console</h1></div><div role="main" data-role="ui-content"><div id="chart1"></div></div><div data-role="footer"><a href="https://stuartpittaway.github.io/diyBMS/">github</a></div></div>');
 	
-	$( document ).on( "mobileinit", function() {			console.log('mobileinit');			});			});
+	$( document ).on( "mobileinit", function() {			console.log('mobileinit');			});			
 	
 	$('#main').on( 'pageshow', function(event){
 				console.log('pageshow');
@@ -86,6 +86,7 @@ script.onload = function(){
         }]
 		
   });	
+  });
 
 	//Load the other libraries
 	var js = ["https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js",
