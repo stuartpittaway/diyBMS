@@ -50,14 +50,11 @@ script.onload = function(){
 	//This fires after JQUERY has loaded
 	console.log('JQUERY Ready');
 
-	$("body").append('<div id="main"><div data-role="header"><h1>DIY BMS Management Console</h1></div><div role="main" data-role="ui-content"><div id="chart1"></div></div><div data-role="footer"><a href="https://stuartpittaway.github.io/diyBMS/">github</a></div></div>');
+	$("body").append('<div data-role="page" data-url="/" tabindex="0" class="ui-page ui-page-theme-a ui-page-active" id="main"><div data-role="header"><h1>DIY BMS Management Console</h1></div><div role="main" data-role="ui-content"><div id="chart1"></div></div><div data-role="footer"><a href="https://stuartpittaway.github.io/diyBMS/">github</a></div></div>');
 	
-	$( document ).on( "mobileinit", function() {	
-		console.log('mobileinit');
-		
-				
-		
-			$('#main').on( 'pageshow', function(event){
+	$( document ).on( "mobileinit", function() {			console.log('mobileinit');			});			});
+	
+	$('#main').on( 'pageshow', function(event){
 				console.log('pageshow');
 				$.jqplot.config.enablePlugins = true;
 				
@@ -88,10 +85,7 @@ script.onload = function(){
             label : 'dataForAxis2'
         }]
 		
-  });
-				
-			});		
-	});
+  });	
 
 	//Load the other libraries
 	var js = ["https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js",
