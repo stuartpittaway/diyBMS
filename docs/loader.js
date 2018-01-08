@@ -50,10 +50,11 @@ script.onload = function(){
 	//This fires after JQUERY has loaded
 	console.log('JQUERY Ready');
 
+	$("body").append('<div id="main"><div data-role="header"><h1>DIY BMS Management Console</h1></div><div role="main" data-role="ui-content"><div id="chart1"></div></div><div data-role="footer"><a href="https://stuartpittaway.github.io/diyBMS/">github</a></div></div>');
+	
 	$( document ).on( "mobileinit", function() {	
 		console.log('mobileinit');
 		
-		$(".ui-page-active").attr('id', 'main').append('<div data-role="header"><h1>DIY BMS Management Console</h1></div><div role="main"  data-role="ui-content"><div id="chart1"></div></div><div data-role="footer"><a href="https://stuartpittaway.github.io/diyBMS/">github</a></div>');
 				
 		
 			$('#main').on( 'pageshow', function(event){
