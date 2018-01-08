@@ -1,3 +1,7 @@
+//var jsonurl = "http://192.168.0.35/celljson";
+var plot1;
+var jsonurl = "./celljson";
+				
 function addStylesheet(filename, index) {
 var fileref=document.createElement("link")
 fileref.setAttribute("rel", "stylesheet")
@@ -13,26 +17,53 @@ script.src= filename;
 script.async = false;
 document.getElementsByTagName('head')[0].appendChild(script);
 }
+function refreshGraph(){ 
 
-var ajaxDataRenderer = function(url, plot, options) {
-    var ret = null;
-    $.ajax({
+  
+  $.ajax({
       // have to use synchronous here, else the function 
       // will return before the data is fetched
-      async: false,
-      url: url,
+      async: true,
+      url: jsonurl,
       dataType: "json",
-      success: function(data) {
-		  
+      success: function(data) {		 
 		for (var i = 0; i < data[0].length; i++) {data[0][i]= data[0][i] / 1000.0;}
 		 	  
-        ret = data;
+        if (plot1) plot1.destroy();
+		//plot1 = $.jqplot('chart1', data); 
+		
+			plot1=$.jqplot('chart1',data,{
+			title: "Cell Voltages",
+			//dataRenderer: fakeDataRenderer,
+			axes:{xaxis:{label:'Cell module', renderer: $.jqplot.CategoryAxisRenderer }
+			,yaxis:{ label:'Voltage',syncTicks:true, min: 2.5, max: 4.5, numberTicks:16}
+			,y2axis:{label:'Temperature', min:0 ,syncTicks:true, min: 0, max: 1024, numberTicks:16}
+
+			}//end axes
+			,
+			 highlighter: {show:false}
+			 ,series : [{		 	
+					renderer:$.jqplot.BarRenderer,
+					pointLabels:{show:true},showMarker:true, highlightMouseOver: false,
+					rendererOptions:{ barDirection: 'vertical',barMargin:12},
+					
+					yaxis : 'yaxis',
+					label : 'dataForAxis1'
+				}, {
+					pointLabels:{show:false},showMarker:true, highlightMouseOver: false,
+					yaxis : 'y2axis',
+					label : 'dataForAxis2'
+				}]	
+		  });
+		  
+		
+		
       }
     });
-    return ret;
-  };
   
-
+  setTimeout(refreshGraph, 5000);
+  }
+  
 /* Dynamically load the CSS and JS files from the web */
 var css = ["https://stuartpittaway.github.io/diyBMS/main.css", 
 	"https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css",
@@ -40,6 +71,7 @@ var css = ["https://stuartpittaway.github.io/diyBMS/main.css",
 	"https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.css"];
 css.forEach(addStylesheet);
 
+//Dynamically load the jquery library
 var script = document.createElement('script'); 
 document.head.appendChild(script);
 script.type = 'text/javascript';
@@ -50,43 +82,14 @@ script.onload = function(){
 	//This fires after JQUERY has loaded
 	console.log('JQUERY Ready');
 
-	$("body").append('<div data-role="page" data-url="/" tabindex="0" class="ui-page ui-page-theme-a ui-page-active" id="main"><div data-role="header"><h1>DIY BMS Management Console</h1></div><div role="main" data-role="ui-content"><div id="chart1"></div></div><div data-role="footer"><a href="https://stuartpittaway.github.io/diyBMS/">github</a></div></div>');
+	$("body").append('<div data-role="page" data-url="/" tabindex="0" class="ui-page ui-page-theme-a ui-page-active" id="main"><div data-role="header"><h1>DIY BMS Management Console</h1></div><div role="main" data-role="ui-content"><div id="chart1"></div></div><div data-role="footer"><a href="https://github.com/stuartpittaway/diyBMS/">github</a></div></div>');
 	
-	$( document ).on( "mobileinit", function() {			console.log('mobileinit');			});			
+	//$(document).on( "mobileinit", function() {console.log('mobileinit');});			
 	
 	$('#main').on( 'pageshow', function(event){
-				console.log('pageshow');
-				$.jqplot.config.enablePlugins = true;
-				
-				//var jsonurl = "http://192.168.0.35/celljson";
-				var jsonurl = "./celljson";
-				
-				var plot1=$.jqplot('chart1',jsonurl,{
-    title: "Cell Voltages",
-    dataRenderer: ajaxDataRenderer,
-    //dataRendererOptions: { unusedOptionalUrl: jsonurl },	
-	axes:{xaxis:{label:'Cell module', renderer: $.jqplot.CategoryAxisRenderer }
-	,yaxis:{ label:'Voltage',syncTicks:true, min: 2.5, max: 4.5, numberTicks:16}
-	,y2axis:{label:'Temperature', min:0 ,syncTicks:true, min: 0, max: 1024, numberTicks:16}
-
-	}//end axes
-	,
-     highlighter: {show:false}
-	 ,series : [{		 	
-			renderer:$.jqplot.BarRenderer,
-			pointLabels:{show:true},showMarker:true, highlightMouseOver: false,
-			rendererOptions:{ barDirection: 'vertical',barMargin:12},
-			
-            yaxis : 'yaxis',
-            label : 'dataForAxis1'
-        }, {
-			pointLabels:{show:false},showMarker:true, highlightMouseOver: false,
-            yaxis : 'y2axis',
-            label : 'dataForAxis2'
-        }]
-		
-  });	
-  });
+		$.jqplot.config.enablePlugins = true;				
+		setTimeout(refreshGraph, 250);  
+	});	//end pageshow
 
 	//Load the other libraries
 	var js = ["https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js",
