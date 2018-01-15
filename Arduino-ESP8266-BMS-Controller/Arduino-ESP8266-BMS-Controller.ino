@@ -45,8 +45,6 @@ cell_module cell_array[24];
 int cell_array_index = -1;
 int cell_array_max = 0;
 
-
-
 unsigned long next_submit;
 
 EmonCMS emoncms;
@@ -57,6 +55,9 @@ os_timer_t myTimer;
 void check_module_quick(struct  cell_module *module) {
   module->voltage = cell_read_voltage(module->address);
   module->temperature = cell_read_board_temp(module->address);
+
+  if ( module->voltage > module->max_voltage) { module->max_voltage=module->voltage;}
+  if ( module->voltage < module->min_voltage) { module->min_voltage=module->voltage;}
 }
 
 void timerCallback(void *pArg) {
@@ -113,24 +114,27 @@ void setup() {
 
 
   cell_module m2;
-  m2.address = DEFAULT_SLAVE_ADDR_START_RANGE+1;
+  m2.address = DEFAULT_SLAVE_ADDR_START_RANGE + 1;
   cell_array[1] = m2;
 
-
   cell_array_index = 0;
-
 
   //We have 1 module
   cell_array_max = 2;
 
-  //Ensure we service the cell modules every 1 second
-  os_timer_setfn(&myTimer, timerCallback, NULL);
-  os_timer_arm(&myTimer, 1000, true);
+  //Default values
+  for (int i = 0; i <= cell_array_max; i++) {
+    cell_array[i].min_voltage = 0xFFFF;
+    cell_array[i].max_voltage = 0;
+  }
 
+  //Ensure we service the cell modules every 0.5 seconds
+  os_timer_setfn(&myTimer, timerCallback, NULL);
+  os_timer_arm(&myTimer, 500, true);
 
   //Check WIFI is working and connected
   Serial.print(F("WIFI Connecting"));
-  
+
   //TODO: We need a timeout here in case the AP is dead!
   while (WiFi.status() != WL_CONNECTED)
   {
@@ -146,7 +150,7 @@ void setup() {
 
 
 void loop() {
-  
+
   HandleWifiClient();
   yield();
   delay(250);
@@ -172,15 +176,12 @@ void loop() {
     }
     Serial.println();
 
-    if (millis() > next_submit) {
+    if ((millis() > next_submit) && (WiFi.status() == WL_CONNECTED)) {
       emoncms.postData(cell_array, cell_array_max);
-      //Update emoncms every 10 seconds
-      next_submit = millis() + 10000;
+      //Update emoncms every 30 seconds
+      next_submit = millis() + 30000;
     }
-
-    
   }
-  
 }//end of loop
 
 

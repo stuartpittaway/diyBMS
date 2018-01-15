@@ -30,6 +30,10 @@ struct cell_module {
   uint8_t address;
   uint16_t voltage;
   uint16_t temperature;
+
+  //Record min/max volts over time (between cpu resets)
+  uint16_t min_voltage;
+  uint16_t max_voltage;
 };
 
 

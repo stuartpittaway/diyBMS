@@ -64,22 +64,29 @@ void handleCellJSONData() {
 
   String json1 = "[";
   String json2 = "[";
+  String json3 = "[";
+  String json4 = "[";
  if (cell_array_max > 0) {
     for ( int a = 0; a < cell_array_max; a++) {
       json1 += String(cell_array[a].voltage);
-
       json2 += String(cell_array[a].temperature);
-  
+      json3 += String(cell_array[a].min_voltage);
+      json4 += String(cell_array[a].max_voltage);
+
       if (a < cell_array_max - 1) {
         json1 += ",";
         json2 += ",";
+        json3 += ",";
+        json4 += ",";
       }
     }
   }
 
   json1 += "]";
   json2 += "]";
-  server.send(200, "application/json", "["+json1+","+json2+"]\r\n\r\n");
+  json3 += "]";
+  json4 += "]";
+  server.send(200, "application/json", "["+json1+","+json2+","+json3+","+json4+"]\r\n\r\n");
 }
 
 void handleSave() {
