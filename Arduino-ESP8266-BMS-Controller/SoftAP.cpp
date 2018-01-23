@@ -32,7 +32,7 @@ String htmlHeader() {
 
 
 String htmlManagementHeader() {
-return String(F("<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>DIY BMS Management Console</title><script type=\"text/javascript\" src=\"https://stuartpittaway.github.io/diyBMS/loader.js\"></script></head><body></body></html>\r\n\r\n"));
+  return String(F("<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>DIY BMS Management Console</title><script type=\"text/javascript\" src=\"https://stuartpittaway.github.io/diyBMS/loader.js\"></script></head><body></body></html>\r\n\r\n"));
 }
 
 
@@ -59,14 +59,86 @@ void handleRedirect() {
   server.send(200, "text/html", htmlManagementHeader());
 }
 
+void handleProvision() {
+  runProvisioning = true;
+  server.send(200, "application/json", "[1]\r\n\r\n");
+}
 
-void handleCellJSONData() { 
+void handleSetVoltCalib() {
+  uint8_t module =  server.arg("module").toInt();
+  float newValue = server.arg("value").toFloat();
 
+  Serial.print("SetVoltCalib ");
+  Serial.print(module);
+  Serial.print(" = ");
+  Serial.println(newValue,6);
+  
+  for ( int a = 0; a < cell_array_max; a++) {
+    if (cell_array[a].address == module) {
+
+      if (cell_array[a].voltage_calib != newValue) {
+        cell_array[a].voltage_calib = newValue;
+        cell_array[a].update_calibration = true;
+      }
+      server.send(200, "text/plain", "");
+      return;
+    }
+  }
+  server.send(500, "text/plain", "");
+}
+
+void handleSetTempCalib() {
+  uint8_t module =  server.arg("module").toInt();
+  float newValue = server.arg("value").toFloat();
+
+  Serial.print("SetTempCalib ");
+  Serial.print(module);
+  Serial.print(" = ");
+  Serial.println(newValue,6);
+
+  for ( int a = 0; a < cell_array_max; a++) {
+    if (cell_array[a].address == module) {
+      if (cell_array[a].temperature_calib != newValue) {
+        cell_array[a].temperature_calib = newValue;
+        cell_array[a].update_calibration = true;
+      }
+      server.send(200, "text/plain", "");
+      return;
+    }
+  }
+  server.send(500, "text/plain", "");
+}
+
+void handleCellConfigurationJSON() {
+  String json1 = "";
+  if (cell_array_max > 0) {
+    for ( int a = 0; a < cell_array_max; a++) {
+      json1 += "[";
+      json1 += String(cell_array[a].address);
+      json1 += ",";
+      json1 += String(cell_array[a].voltage);
+      json1 += ",";
+      json1 += String(cell_array[a].voltage_calib,6);
+      json1 += ",";
+      json1 += String(cell_array[a].temperature);
+      json1 += ",";
+      json1 += String(cell_array[a].temperature_calib,6);
+      json1 += "]";
+      if (a < cell_array_max - 1) {
+        json1 += ",";
+      }
+    }
+  }
+
+  server.send(200, "application/json", "[" + json1 + "]\r\n\r\n");
+}
+
+void handleCellJSONData() {
   String json1 = "[";
   String json2 = "[";
   String json3 = "[";
   String json4 = "[";
- if (cell_array_max > 0) {
+  if (cell_array_max > 0) {
     for ( int a = 0; a < cell_array_max; a++) {
       json1 += String(cell_array[a].voltage);
       json2 += String(cell_array[a].temperature);
@@ -86,7 +158,7 @@ void handleCellJSONData() {
   json2 += "]";
   json3 += "]";
   json4 += "]";
-  server.send(200, "application/json", "["+json1+","+json2+","+json3+","+json4+"]\r\n\r\n");
+  server.send(200, "application/json", "[" + json1 + "," + json2 + "," + json3 + "," + json4 + "]\r\n\r\n");
 }
 
 void handleSave() {
@@ -170,6 +242,12 @@ void setupAccessPoint(void) {
 void SetupManagementRedirect() {
   server.on("/", HTTP_GET, handleRedirect);
   server.on("/celljson", HTTP_GET, handleCellJSONData);
+  server.on("/provision", HTTP_GET, handleProvision);
+  server.on("/getconfiguration", HTTP_GET, handleCellConfigurationJSON);
+
+  server.on("/setvoltcalib", HTTP_POST, handleSetVoltCalib);
+  server.on("/settempcalib", HTTP_POST, handleSetTempCalib);
+
   server.onNotFound(handleNotFound);
 
   server.begin();

@@ -294,7 +294,7 @@ void loop() {
     switch (c) {
       case 'X':
         Serial.print("i2c SCAN: ");
-        for (uint8_t address = DEFAULT_SLAVE_ADDR_START_RANGE; address <= DEFAULT_SLAVE_ADDR_END_RANGE; address++ )
+        for (uint8_t address = DEFAULT_SLAVE_ADDR; address <= DEFAULT_SLAVE_ADDR_END_RANGE; address++ )
         {
           Wire.beginTransmission(address);
           byte error = Wire.endTransmission();

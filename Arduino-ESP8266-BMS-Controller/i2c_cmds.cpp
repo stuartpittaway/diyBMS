@@ -4,12 +4,12 @@
 #include "Arduino.h"
 
 //Default i2c SLAVE address (used for auto provision of address)
-uint8_t DEFAULT_SLAVE_ADDR= 21;
+uint8_t DEFAULT_SLAVE_ADDR = 21;
 
 //Configured cell modules use i2c addresses 24 to 48 (24S)
 //See http://www.i2c-bus.org/addressing/
-uint8_t DEFAULT_SLAVE_ADDR_START_RANGE =24;
-uint8_t DEFAULT_SLAVE_ADDR_END_RANGE= DEFAULT_SLAVE_ADDR_START_RANGE + 24;
+uint8_t DEFAULT_SLAVE_ADDR_START_RANGE = 24;
+uint8_t DEFAULT_SLAVE_ADDR_END_RANGE = DEFAULT_SLAVE_ADDR_START_RANGE + 24;
 
 
 union {
@@ -161,12 +161,41 @@ uint8_t command_set_bypass_voltage(uint8_t cell_id, uint16_t  value) {
 }
 
 void initWire() {
-    Wire.setTimeout(1000);  //1000ms timeout
+  Wire.setTimeout(1000);  //1000ms timeout
   Wire.setClock(100000);  //100khz
   Wire.setClockStretchLimit(1000);
 
   // join i2c bus
   // DATA=GPIO4/D2, CLOCK=GPIO5/D1
   Wire.begin(4, 5); //SDA/SCL
+}
+
+bool testModuleExists(uint8_t address) {
+  Wire.beginTransmission(address);
+  byte error2 = Wire.endTransmission();
+  if (error2 == 0)
+  {
+      return true;
+  }
+
+  return false;
+}
+
+uint8_t provision() {
+
+  if (testModuleExists(DEFAULT_SLAVE_ADDR))
+  {
+    for (uint8_t address = DEFAULT_SLAVE_ADDR_START_RANGE; address <= DEFAULT_SLAVE_ADDR_END_RANGE; address++ )
+    {
+      if (testModuleExists(address) == false) {
+        //We have found a gap
+        command_set_slave_address(DEFAULT_SLAVE_ADDR, (uint8_t)address);
+        return address;
+        break;
+      }
+    }
+  } 
+
+  return 0;
 }
 

@@ -31,10 +31,18 @@ struct cell_module {
   uint16_t voltage;
   uint16_t temperature;
 
+  float voltage_calib;
+  float temperature_calib;
+
   //Record min/max volts over time (between cpu resets)
   uint16_t min_voltage;
   uint16_t max_voltage;
+
+  bool valid_values;
+
+  bool update_calibration;
 };
+
 
 
 

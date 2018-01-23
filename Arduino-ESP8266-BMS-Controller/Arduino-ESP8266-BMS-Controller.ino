@@ -51,21 +51,83 @@ EmonCMS emoncms;
 
 os_timer_t myTimer;
 
+void print_module_details(struct  cell_module *module) {
+  Serial.print("Mod: ");
+  Serial.print(module->address);
+  Serial.print(" V:");
+  Serial.print(module->voltage);
+  Serial.print(" VC:");
+  Serial.print(module->voltage_calib);
+  Serial.print(" T:");
+  Serial.print(module->temperature);
+  Serial.print(" TC:");
+  Serial.print(module->temperature_calib);
+  Serial.println("");
+}
 
 void check_module_quick(struct  cell_module *module) {
   module->voltage = cell_read_voltage(module->address);
   module->temperature = cell_read_board_temp(module->address);
 
-  if ( module->voltage > module->max_voltage) { module->max_voltage=module->voltage;}
-  if ( module->voltage < module->min_voltage) { module->min_voltage=module->voltage;}
+  if ( module->voltage > module->max_voltage || module->valid_values == false) {
+    module->max_voltage = module->voltage;
+  }
+  if ( module->voltage < module->min_voltage || module->valid_values == false) {
+    module->min_voltage = module->voltage;
+  }
+
+  module->valid_values = true;
 }
+
+
+void check_module_full(struct  cell_module *module) {
+  check_module_quick(module);
+  module->voltage_calib = cell_read_voltage_calibration(module->address);
+  module->temperature_calib = cell_read_temperature_calibration(module->address);
+}
+
+bool runProvisioning;
 
 void timerCallback(void *pArg) {
   LED_ON;
 
+  if (runProvisioning) {
+    Serial.println("runProvisioning");
+    uint8_t newCellI2CAddress = provision();
+
+    if (newCellI2CAddress > 0) {
+      Serial.print("Found ");
+      Serial.println(newCellI2CAddress);
+
+      cell_module m2;
+      m2.address = newCellI2CAddress;
+      cell_array[cell_array_max] = m2;
+      cell_array[cell_array_max].min_voltage = 0xFFFF;
+      cell_array[cell_array_max].max_voltage = 0;
+      cell_array[cell_array_max].valid_values = false;
+
+      //Dont attempt to read here as the module will be rebooting
+      //check_module_quick( &cell_array[cell_array_max] );
+      cell_array_max++;
+    }
+
+    runProvisioning = false;
+    return;
+  }
+
   //Ensure we have some cell modules to check
   if (cell_array_max > 0 && cell_array_index >= 0) {
 
+    if (cell_array[cell_array_index].update_calibration) {
+      //Check to see if we need to configure the calibration data for this module
+      command_set_voltage_calibration(cell_array[cell_array_index].address, cell_array[cell_array_index].voltage_calib);
+      
+      command_set_temperature_calibration(cell_array[cell_array_index].address, cell_array[cell_array_index].temperature_calib);
+
+      cell_array[cell_array_index].update_calibration=false;
+    }
+
+    
     check_module_quick( &cell_array[cell_array_index] );
 
     cell_array_index++;
@@ -107,25 +169,30 @@ void setup() {
     setupAccessPoint();
   }
 
-
-  cell_module m1;
-  m1.address = DEFAULT_SLAVE_ADDR_START_RANGE;
-  cell_array[0] = m1;
-
-
-  cell_module m2;
-  m2.address = DEFAULT_SLAVE_ADDR_START_RANGE + 1;
-  cell_array[1] = m2;
-
   cell_array_index = 0;
 
   //We have 1 module
-  cell_array_max = 2;
+  cell_array_max = 0;
 
-  //Default values
-  for (int i = 0; i <= cell_array_max; i++) {
-    cell_array[i].min_voltage = 0xFFFF;
-    cell_array[i].max_voltage = 0;
+  //Scan the i2c bus looking for modules on start up
+  for (uint8_t address = DEFAULT_SLAVE_ADDR_START_RANGE; address <= DEFAULT_SLAVE_ADDR_END_RANGE; address++ )
+  {
+    if (testModuleExists(address) == true) {
+      //We have found a module
+      cell_module m1;
+      m1.address = address;
+      //Default values
+      m1.valid_values = false;
+      m1.min_voltage = 0xFFFF;
+      m1.max_voltage = 0;
+      cell_array[cell_array_max] = m1;
+
+      check_module_full( &cell_array[cell_array_max] );
+
+      print_module_details( &cell_array[cell_array_max] );
+
+      cell_array_max++;
+    }
   }
 
   //Ensure we service the cell modules every 0.5 seconds
@@ -147,25 +214,24 @@ void setup() {
   SetupManagementRedirect();
 }
 
-
-
 void loop() {
+  HandleWifiClient();
+  yield();
+  delay(250);
+  HandleWifiClient();
+  yield();
+  delay(250);
+  HandleWifiClient();
+  yield();
+  delay(250);
+  HandleWifiClient();
+  yield();
+  delay(250);
 
-  HandleWifiClient();
-  yield();
-  delay(250);
-  HandleWifiClient();
-  yield();
-  delay(250);
-  HandleWifiClient();
-  yield();
-  delay(250);
-  HandleWifiClient();
-  yield();
-  delay(250);
 
   if (cell_array_max > 0) {
 
+/*
     for ( int a = 0; a < cell_array_max; a++) {
       Serial.print(cell_array[a].address);
       Serial.print(':');
@@ -175,7 +241,7 @@ void loop() {
       Serial.print(' ');
     }
     Serial.println();
-
+*/
     if ((millis() > next_submit) && (WiFi.status() == WL_CONNECTED)) {
       emoncms.postData(cell_array, cell_array_max);
       //Update emoncms every 30 seconds
@@ -183,5 +249,4 @@ void loop() {
     }
   }
 }//end of loop
-
 
