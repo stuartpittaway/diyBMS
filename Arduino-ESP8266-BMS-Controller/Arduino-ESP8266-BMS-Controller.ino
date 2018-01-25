@@ -46,6 +46,7 @@ int cell_array_index = -1;
 int cell_array_max = 0;
 
 unsigned long next_submit;
+bool runProvisioning;
 
 EmonCMS emoncms;
 
@@ -69,14 +70,19 @@ void check_module_quick(struct  cell_module *module) {
   module->voltage = cell_read_voltage(module->address);
   module->temperature = cell_read_board_temp(module->address);
 
-  if ( module->voltage > module->max_voltage || module->valid_values == false) {
-    module->max_voltage = module->voltage;
-  }
-  if ( module->voltage < module->min_voltage || module->valid_values == false) {
-    module->min_voltage = module->voltage;
-  }
+  if (module->voltage >= 0 && module->voltage <= 5000) {
 
-  module->valid_values = true;
+    if ( module->voltage > module->max_voltage || module->valid_values == false) {
+      module->max_voltage = module->voltage;
+    }
+    if ( module->voltage < module->min_voltage || module->valid_values == false) {
+      module->min_voltage = module->voltage;
+    }
+
+    module->valid_values = true;
+  } else {
+    module->valid_values = false;
+  }
 }
 
 
@@ -86,7 +92,6 @@ void check_module_full(struct  cell_module *module) {
   module->temperature_calib = cell_read_temperature_calibration(module->address);
 }
 
-bool runProvisioning;
 
 void timerCallback(void *pArg) {
   LED_ON;
@@ -121,13 +126,13 @@ void timerCallback(void *pArg) {
     if (cell_array[cell_array_index].update_calibration) {
       //Check to see if we need to configure the calibration data for this module
       command_set_voltage_calibration(cell_array[cell_array_index].address, cell_array[cell_array_index].voltage_calib);
-      
+
       command_set_temperature_calibration(cell_array[cell_array_index].address, cell_array[cell_array_index].temperature_calib);
 
-      cell_array[cell_array_index].update_calibration=false;
+      cell_array[cell_array_index].update_calibration = false;
     }
 
-    
+
     check_module_quick( &cell_array[cell_array_index] );
 
     cell_array_index++;
@@ -139,35 +144,7 @@ void timerCallback(void *pArg) {
   LED_OFF;
 } // End of timerCallback
 
-
-void setup() {
-  Serial.begin(19200);           // start serial for output
-
-  //D4 is LED
-  pinMode(D4, OUTPUT);
-  LED_OFF;
-
-  Serial.println(F("DIY BMS Controller Startup"));
-
-  initWire();
-
-  if (LoadConfigFromEEPROM()) {
-    Serial.println(F("Settings loaded from EEPROM"));
-  } else {
-    //We are in initial power on mode (factory reset)
-  }
-
-  if (LoadWIFIConfigFromEEPROM()) {
-    Serial.println(F("Connect to WIFI AP"));
-    /* Explicitly set the ESP8266 to be a WiFi-client, otherwise, it by default,
-      would try to act as both a client and an access-point and could cause
-      network-issues with your other WiFi-devices on your WiFi-network. */
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(myConfig_WIFI.wifi_ssid, myConfig_WIFI.wifi_passphrase);
-  } else {
-    //We are in initial power on mode (factory reset)
-    setupAccessPoint();
-  }
+void scani2cBus() {
 
   cell_array_index = 0;
 
@@ -194,6 +171,45 @@ void setup() {
       cell_array_max++;
     }
   }
+}
+
+
+void setup() {
+  Serial.begin(19200);           // start serial for output
+  Serial.println();
+  Serial.println();
+  Serial.println();
+  Serial.println();
+  Serial.println();
+
+  //D4 is LED
+  pinMode(D4, OUTPUT);
+  LED_OFF;
+
+  Serial.println(F("DIY BMS Controller Startup"));
+
+  initWire();
+
+  if (LoadConfigFromEEPROM()) {
+    Serial.println(F("Settings loaded from EEPROM"));
+  } else {
+    Serial.println(F("We are in initial power on mode (factory reset)"));
+    FactoryResetSettings();
+  }
+
+  if (LoadWIFIConfigFromEEPROM()) {
+    Serial.println(F("Connect to WIFI AP"));
+    /* Explicitly set the ESP8266 to be a WiFi-client, otherwise, it by default,
+      would try to act as both a client and an access-point and could cause
+      network-issues with your other WiFi-devices on your WiFi-network. */
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(myConfig_WIFI.wifi_ssid, myConfig_WIFI.wifi_passphrase);
+  } else {
+    //We are in initial power on mode (factory reset)
+    setupAccessPoint();
+  }
+
+  scani2cBus();
 
   //Ensure we service the cell modules every 0.5 seconds
   os_timer_setfn(&myTimer, timerCallback, NULL);
@@ -231,19 +247,19 @@ void loop() {
 
   if (cell_array_max > 0) {
 
-/*
-    for ( int a = 0; a < cell_array_max; a++) {
-      Serial.print(cell_array[a].address);
-      Serial.print(':');
-      Serial.print(cell_array[a].voltage);
-      Serial.print(':');
-      Serial.print(cell_array[a].temperature);
-      Serial.print(' ');
-    }
-    Serial.println();
-*/
+    /*
+        for ( int a = 0; a < cell_array_max; a++) {
+          Serial.print(cell_array[a].address);
+          Serial.print(':');
+          Serial.print(cell_array[a].voltage);
+          Serial.print(':');
+          Serial.print(cell_array[a].temperature);
+          Serial.print(' ');
+        }
+        Serial.println();
+    */
     if ((millis() > next_submit) && (WiFi.status() == WL_CONNECTED)) {
-      emoncms.postData(cell_array, cell_array_max);
+      emoncms.postData(myConfig, cell_array, cell_array_max);
       //Update emoncms every 30 seconds
       next_submit = millis() + 30000;
     }

@@ -29,6 +29,21 @@ uint32_t calculateCRC32(const uint8_t *data, size_t length)
 }
 
 
+void FactoryResetSettings() {
+  const char emoncms_host[] = "192.168.0.26";
+  const char emoncms_apikey[]="1234567890abcdef1234567890abcdef";
+  const char emoncms_url[]="/emoncms/input/bulk?data=";
+
+  strcpy(myConfig.emoncms_host, emoncms_host );
+  strcpy(myConfig.emoncms_apikey, emoncms_apikey);
+  strcpy(myConfig.emoncms_url, emoncms_url);
+
+  myConfig.emoncms_enabled=false;
+  myConfig.emoncms_node_offset = 50 - 24;//DEFAULT_SLAVE_ADDR_START_RANGE;
+  myConfig.emoncms_httpPort = 80;
+
+  WriteConfigToEEPROM();
+}
 
 void WriteConfigToEEPROM() {
   uint32_t checksum = calculateCRC32((uint8_t*)&myConfig, sizeof(eeprom_settings));
@@ -50,8 +65,8 @@ bool LoadConfigFromEEPROM() {
   // Calculate the checksum of an entire buffer at once.
   uint32_t checksum = calculateCRC32((uint8_t*)&restoredConfig, sizeof(eeprom_settings));
 
-  Serial.println(checksum,HEX);
-  Serial.println(existingChecksum,HEX);
+  Serial.println(checksum, HEX);
+  Serial.println(existingChecksum, HEX);
 
   if (checksum == existingChecksum) {
     //Clone the config into our global variable and return all OK
@@ -65,7 +80,7 @@ bool LoadConfigFromEEPROM() {
 
 
 /*
-void hexDump (char *desc, void *addr, int len) {
+  void hexDump (char *desc, void *addr, int len) {
   int i;
   unsigned char buff[17];
   unsigned char *pc = (unsigned char*)addr;
@@ -113,7 +128,7 @@ void hexDump (char *desc, void *addr, int len) {
 
   // And print the final ASCII bit.
   printf ("  %s\n", buff);
-}
+  }
 */
 
 

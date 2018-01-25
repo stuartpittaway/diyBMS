@@ -17,9 +17,14 @@ struct wifi_eeprom_settings {
   char wifi_passphrase[63 + 1];
 };
 
-struct eeprom_settings {
-  //Allow up to 24 modules
-  uint8_t address_list[24];
+//We have allowed space for 1024-256 bytes of EEPROM for settings (768 bytes)
+struct eeprom_settings { 
+  bool emoncms_enabled;
+  uint8_t emoncms_node_offset;
+  int emoncms_httpPort;
+  char emoncms_host[64 + 1];
+  char emoncms_apikey[32 + 1];
+  char emoncms_url[64 + 1];
 };
 
 extern wifi_eeprom_settings myConfig_WIFI;
@@ -29,6 +34,7 @@ void WriteConfigToEEPROM();
 bool LoadConfigFromEEPROM();
 void WriteWIFIConfigToEEPROM();
 bool LoadWIFIConfigFromEEPROM();
+void FactoryResetSettings();
 
 #endif
 

@@ -4,43 +4,40 @@
 
 extern uint8_t DEFAULT_SLAVE_ADDR_START_RANGE;
 
-const char* emoncms_host = "192.168.0.26";
-const char* emoncms_apikey = "yourkeygoeshere";
-const uint8_t emoncms_node_offset = 50 - DEFAULT_SLAVE_ADDR_START_RANGE;
-const int emoncms_httpPort = 80;
-
 //Implements WebServiceSubmit abstract/interface class
-void EmonCMS::postData(cell_module (&cell_array)[24], int cell_array_max) {
+void EmonCMS::postData(eeprom_settings myConfig, cell_module (&cell_array)[24], int cell_array_max) {
 
-  String url = "/emoncms/input/bulk?data=[";
+  if (!myConfig.emoncms_enabled) return;
+
+  String url = myConfig.emoncms_url;// "/emoncms/input/bulk?data=";
+
+  url += "[";
 
   for (int a = 0; a < cell_array_max; a++) {
 
     //Ensure its a sensible value to avoid filling emonCMS graph with high values
-      url += "[0," + String(emoncms_node_offset + cell_array[a].address) + ",{\"V\":";
-      url += String(cell_array[a].voltage < 5000 ? cell_array[a].voltage : 0);
-      url += "},{\"T\":";
-      //Ensure temperature is in a sensible range
-      url += String(cell_array[a].temperature < 1024 ? cell_array[a].temperature : 0 );
-      url += "}]";
+    url += "[0," + String(myConfig.emoncms_node_offset + cell_array[a].address) + ",{\"V\":"
+           + String(cell_array[a].valid_values ? cell_array[a].voltage : 0)
+           + "},{\"T\":"
+           //Ensure temperature is in a sensible range
+           + String(cell_array[a].valid_values ? cell_array[a].temperature : 0)
+           + "}]";
 
-      if (a < cell_array_max - 1) {
-        url += ",";
-      }
+    if (a < cell_array_max - 1) {
+      url += ",";
+    }
   }
 
-  url += "]&offset=0&apikey=" + String(emoncms_apikey);
-
-  //Serial.println(url);
+  url += "]&offset=0&apikey=" + String(myConfig.emoncms_apikey);
 
   WiFiClient client;
 
-  if (!client.connect(emoncms_host, emoncms_httpPort)) {
+  if (!client.connect(myConfig.emoncms_host, myConfig.emoncms_httpPort)) {
     Serial.println("connection failed");
 
   } else {
     // This will send the request to the server
-    client.print(String("GET ") + url + " HTTP/1.1\r\nHost: " + emoncms_host + "\r\nConnection: close\r\n\r\n");
+    client.print(String("GET ") + url + " HTTP/1.1\r\nHost: " + myConfig.emoncms_host + "\r\nConnection: close\r\n\r\n");
 
     unsigned long timeout = millis() + 2500;
     // Read all the lines of the reply from server and print them to Serial

@@ -64,6 +64,28 @@ void handleProvision() {
   server.send(200, "application/json", "[1]\r\n\r\n");
 }
 
+void handleSetEmonCMS() {
+  /* Receives HTTP POST for configuring the emonCMS settings
+    emoncms_enabled:1
+    emoncms_host:192.168.0.26
+    emoncms_httpPort:80
+    emoncms_node_offset:26
+    emoncms_url:/emoncms/input/bulk?data=
+    emoncms_apikey:11111111111111111111111111111111
+  */
+  myConfig.emoncms_enabled = (server.arg("emoncms_enabled").toInt()==1) ? true : false;
+  myConfig.emoncms_node_offset = server.arg("emoncms_node_offset").toInt();
+  myConfig.emoncms_httpPort = server.arg("emoncms_httpPort").toInt();
+
+  server.arg("emoncms_host").toCharArray(myConfig.emoncms_host,sizeof(myConfig.emoncms_host));
+  server.arg("emoncms_url").toCharArray(myConfig.emoncms_url,sizeof(myConfig.emoncms_url));
+  server.arg("emoncms_apikey").toCharArray(myConfig.emoncms_apikey,sizeof(myConfig.emoncms_apikey));
+
+  WriteConfigToEEPROM();
+
+  server.send(200, "text/plain", "");
+}
+
 void handleSetVoltCalib() {
   uint8_t module =  server.arg("module").toInt();
   float newValue = server.arg("value").toFloat();
@@ -71,8 +93,8 @@ void handleSetVoltCalib() {
   Serial.print("SetVoltCalib ");
   Serial.print(module);
   Serial.print(" = ");
-  Serial.println(newValue,6);
-  
+  Serial.println(newValue, 6);
+
   for ( int a = 0; a < cell_array_max; a++) {
     if (cell_array[a].address == module) {
 
@@ -94,7 +116,7 @@ void handleSetTempCalib() {
   Serial.print("SetTempCalib ");
   Serial.print(module);
   Serial.print(" = ");
-  Serial.println(newValue,6);
+  Serial.println(newValue, 6);
 
   for ( int a = 0; a < cell_array_max; a++) {
     if (cell_array[a].address == module) {
@@ -118,19 +140,29 @@ void handleCellConfigurationJSON() {
       json1 += ",";
       json1 += String(cell_array[a].voltage);
       json1 += ",";
-      json1 += String(cell_array[a].voltage_calib,6);
+      json1 += String(cell_array[a].voltage_calib, 6);
       json1 += ",";
       json1 += String(cell_array[a].temperature);
       json1 += ",";
-      json1 += String(cell_array[a].temperature_calib,6);
+      json1 += String(cell_array[a].temperature_calib, 6);
       json1 += "]";
       if (a < cell_array_max - 1) {
         json1 += ",";
       }
     }
   }
-
   server.send(200, "application/json", "[" + json1 + "]\r\n\r\n");
+}
+
+void handleSettingsJSON() {
+  String json1 =   "{\"emoncms_enabled\":" + (myConfig.emoncms_enabled ? String("true") : String("false"))
+                   + ",\"emoncms_node_offset\":" + String(myConfig.emoncms_node_offset)
+                   + ",\"emoncms_httpPort\":" + String(myConfig.emoncms_httpPort)
+                   + ",\"emoncms_host\":\"" + String(myConfig.emoncms_host) + "\""
+                   + ",\"emoncms_apikey\":\"" + String(myConfig.emoncms_apikey) + "\""
+                   + ",\"emoncms_url\":\"" + String(myConfig.emoncms_url) + "\""
+                   + "}\r\n\r\n";
+  server.send(200, "application/json", json1 );
 }
 
 void handleCellJSONData() {
@@ -243,10 +275,12 @@ void SetupManagementRedirect() {
   server.on("/", HTTP_GET, handleRedirect);
   server.on("/celljson", HTTP_GET, handleCellJSONData);
   server.on("/provision", HTTP_GET, handleProvision);
-  server.on("/getconfiguration", HTTP_GET, handleCellConfigurationJSON);
+  server.on("/getmoduleconfig", HTTP_GET, handleCellConfigurationJSON);
+  server.on("/getsettings", HTTP_GET, handleSettingsJSON);
 
   server.on("/setvoltcalib", HTTP_POST, handleSetVoltCalib);
   server.on("/settempcalib", HTTP_POST, handleSetTempCalib);
+  server.on("/setemoncms", HTTP_POST, handleSetEmonCMS);
 
   server.onNotFound(handleNotFound);
 
