@@ -96,4 +96,4 @@ Typical bill of materials for each cell module, costs and part numbers provided 
 |	1	|	R9 47K Resistor 1206 SMT	|		|		|		|
 |	1	|	47R Resistor 1206 SMT	|		|		|		|
 |	2	|	J2/J2 JST_PH_S4B-PH-K_04x2.00mm_Angled	|	0.10	|		S4B-PH-K-S (LF)(SN)	|	http://uk.farnell.com/jst-japan-solderless-terminals/s4b-ph-k-s-lf-sn/header-tht-right-angle-2mm-4way/dp/9492488	|
-|	1	|	J1 	S2B-PH-K-S (LF)(SN)  	| 0.07		|	JST 	S2B-PH-K-S (LF)(SN)	|	http://uk.farnell.com/jst-japan-solderless-terminals/sm02b-sfhrs-tf-lf-sn/header-2pos-1row-1-8mm-red/dp/2399345	|
+|	1	|	J1 	S2B-PH-K-S (LF)(SN)  	| 0.07		|	JST 	S2B-PH-K-S (LF)(SN)	|		|
