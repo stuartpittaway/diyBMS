@@ -109,6 +109,7 @@ void timerCallback(void *pArg) {
       cell_array[cell_array_max] = m2;
       cell_array[cell_array_max].min_voltage = 0xFFFF;
       cell_array[cell_array_max].max_voltage = 0;
+      cell_array[cell_array_max].balance_target = 0;
       cell_array[cell_array_max].valid_values = false;
 
       //Dont attempt to read here as the module will be rebooting
@@ -120,26 +121,30 @@ void timerCallback(void *pArg) {
     return;
   }
 
+
   //Ensure we have some cell modules to check
   if (cell_array_max > 0 && cell_array_index >= 0) {
 
     if (cell_array[cell_array_index].update_calibration) {
       //Check to see if we need to configure the calibration data for this module
       command_set_voltage_calibration(cell_array[cell_array_index].address, cell_array[cell_array_index].voltage_calib);
-
       command_set_temperature_calibration(cell_array[cell_array_index].address, cell_array[cell_array_index].temperature_calib);
-
       cell_array[cell_array_index].update_calibration = false;
     }
 
-
     check_module_quick( &cell_array[cell_array_index] );
+
+    if (cell_array[cell_array_index].balance_target>0) {
+        command_set_bypass_voltage(cell_array[cell_array_index].address, cell_array[cell_array_index].balance_target);
+        cell_array[cell_array_index].balance_target=0;
+    }
 
     cell_array_index++;
     if (cell_array_index >= cell_array_max) {
       cell_array_index = 0;
     }
   }
+
 
   LED_OFF;
 } // End of timerCallback

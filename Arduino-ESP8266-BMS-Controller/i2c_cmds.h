@@ -33,6 +33,7 @@ uint16_t cell_read_board_temp(uint8_t cell_id) ;
 uint16_t cell_read_bypass_voltage_measurement(uint8_t cell_id) ;
 uint8_t command_set_bypass_voltage(uint8_t cell_id, uint16_t  value);
 
+
 void initWire();
 uint8_t provision();
 bool testModuleExists(uint8_t address);

@@ -7,6 +7,7 @@ var getmoduleconfigurationurl = rooturl+"getmoduleconfig";
 var getsettingsurl = rooturl+"getsettings";
 var voltagecalibrationurl = rooturl+"setvoltcalib";
 var temperaturecalibrationurl= rooturl+"settempcalib";
+var aboveavgbalanceurl= rooturl+"aboveavgbalance";
 
 var plot1;
 var timer;
@@ -58,26 +59,20 @@ function refreshModules() {
 	  success: function(data) {	
 	  	  
 		if ( $( "#ct" ).length==0 ) {
-			  //Create table if it doesnt exist already
+			//Create table if it doesnt exist already
 			//$("#moduletable")
 			$("#moduletable").empty().append("<table id='ct'><thead><tr><th>Module id</th><th>Current Voltage</th><th>Voltage calibration</th><th>Temperature</th><th>Temp calibration</th></tr></thead></table>");   
 			$.each(data, function(){ 
 				$("#ct").append("<tr id='module"+this[0]+"'><td>"+this[0]+"</td><td></td><td><input data-moduleid='"+this[0]+"' class='voltcalib' size=8 type='number' step='0.001' min='1.000' max='99.999' value='"+this[2].toFixed(3)+"'/></td><td>&nbsp;</td><td><input data-moduleid='"+this[0]+"' class='tempcalib' size=8 type='number' step='0.001' min='0.001' max='99.999' value='"+this[4].toFixed(3)+"'/></td></tr>");
 			});
-					
+
 			$('.voltcalib').on("change", function (e) {
-				
 				$.post( voltagecalibrationurl, { module: $(this).data( "moduleid" ), value: $(this).val() } );
-				
-					
 			});
 
-			$('.tempcalib').on("change", function (e) {
-				
-				$.post( temperaturecalibrationurl, { module: $(this).data( "moduleid" ), value: $(this).val() } );
-					
-			});
-			
+			$('.tempcalib').on("change", function (e) {				
+				$.post( temperaturecalibrationurl, { module: $(this).data( "moduleid" ), value: $(this).val() } );					
+			});			
 		} //end if
 				
 		//Update the voltage and temperature every refresh
@@ -103,10 +98,13 @@ function refreshGraph(){
       success: function(data) {		 
         if (plot1) plot1.destroy();
 
+		var t=[];
+
 		for (var i = 0; i < data[0].length; i++) {
 			data[0][i]= data[0][i] / 1000.0;
 			data[2][i]= data[2][i] / 1000.0;
-			data[3][i]= data[3][i] / 1000.0;
+			data[3][i]= data[3][i] / 1000.0;		
+			t.push(data[0][i]+"V ["+ data[4][i]+"]");
 		}
 		
 		if (data[0].length==0) {
@@ -115,57 +113,48 @@ function refreshGraph(){
 			$("#nodata").hide();
 				plot1=$.jqplot('chart1',data,{
 				title: "Cell Voltages",
-				axes:{xaxis:{label:'Cell module',renderer:$.jqplot.CategoryAxisRenderer, tickOptions:{formatString:'%i'} }
+				axes:{xaxis:{label:'Cell module',renderer:$.jqplot.CategoryAxisRenderer, ticks: t }
 				,yaxis:{ label:'Voltage',syncTicks:true, min: 2.0, max: 4.2, numberTicks:23, tickOptions:{formatString:'%.2f'} }
 				,y2axis:{label:'Temperature',syncTicks:true,min:512, max:1024, numberTicks:23, tickOptions:{formatString:'%.2f'}}
 				}//end axes
 				,
-				 highlighter: { show: true,
-		  showMarker:false,
-		  tooltipAxes: 'xy',
-		  yvalues: 1}
+				 highlighter: { show: false, showMarker:false, tooltipAxes: 'xy', yvalues: 1}
 				 ,series : [
-				 {		 	
+				 {		 	//Voltage
 						renderer:$.jqplot.BarRenderer,
-						pointLabels:{show:false},showMarker:false, highlightMouseOver: false,
+						showMarker:false, highlightMouseOver: false,
 						rendererOptions:{ barDirection: 'vertical', barMargin:12},					
 						yaxis : 'yaxis',
-						label : 'dataForAxis1'
+						label : 'Voltage'						
+						,pointLabels:{show:false,formatString:'%.2f'}
 					}, {
-						pointLabels:{show:false},showMarker:false, highlightMouseOver: false,
+						//Temperature
+						pointLabels:{show:false,formatString:'%.2f'},
+						showMarker:false, highlightMouseOver: false,
 						yaxis : 'y2axis',
-						label : 'dataForAxis2'
+						label : 'Temperature'
 					}
-					, {lineWidth: 5, color: 'green',
+					, {
+						//Max voltage
+						lineWidth: 3, color: 'green',
 		markerRenderer: $.jqplot.MarkerRenderer,
 		markerOptions: {
-			show: true,
-			style: 'circle',
-			color: 'green',
-			lineWidth: 15,
-			size: 2,
-			shadow: true,
-			shadowAngle: 0,
-			shadowOffset: 0,
-			shadowDepth: 1,
-			shadowAlpha: 0.07
-		}	,linePattern: 'dashed', yaxis : 'yaxis',label : 'VoltMax'}, 
-		{ lineWidth: 5,
+			show: true,			style: 'circle',			color: 'green',			lineWidth: 10,			size: 2,			shadow: true,
+			shadowAngle: 0,			shadowOffset: 0,			shadowDepth: 1,			shadowAlpha: 0.07		}	
+			,linePattern: 'dashed', yaxis : 'yaxis',label : 'VoltMax'
+			,pointLabels:{show:true,formatString:'%.2f'}
+			}, 
+		{ //Min voltage
+		lineWidth: 3,
 		color: 'orange',
 		markerRenderer: $.jqplot.MarkerRenderer,
-		markerOptions: {
-			show: true,
-			style: 'circle',
-			color: 'orange',
-			lineWidth: 15,
-			size: 2,
-			shadow: true,
-			shadowAngle: 0,
-			shadowOffset: 0,
-			shadowDepth: 1,
-			shadowAlpha: 0.07
-		}	,linePattern: 'dashed', yaxis : 'yaxis',label : 'VoltMin'
+		markerOptions: {			show: true,			style: 'circle',			color: 'orange',			lineWidth: 10,			size: 2,
+			shadow: true,			shadowAngle: 0,			shadowOffset: 0,			shadowDepth: 1,			shadowAlpha: 0.07		}	
+			,linePattern: 'dashed', yaxis : 'yaxis',label : 'VoltMin'
+			,pointLabels:{show:true,formatString:'%.2f'}
 					}
+					, {//difference from average
+					show:false }					
 					]	
 			  });
 			  
@@ -198,7 +187,8 @@ script.onload = function(){
 	<div data-role="header"><h1>DIY BMS Management Console</h1></div> \
 	<div role="main" data-role="ui-content"><div id="nodata">There is no data available, please configure modules.</div> \
 	<div id="chart1"></div> \
-	<div id="buttons"><a href="#config" data-transition="pop" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Configure</a> <a href="#modules" data-transition="pop" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Modules</a> <a id="github" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" href="https://github.com/stuartpittaway/diyBMS">GitHub</a></div></div> \
+	<div id="buttons"><a href="#config" data-transition="pop" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Configure</a> <a href="#modules" data-transition="pop" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Modules</a>  \
+	<a id="AboveAvgBalance" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Above Avg Balance</a> <a id="github" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" href="https://github.com/stuartpittaway/diyBMS">GitHub</a></div></div> \
 	</div> \
 	<div data-role="page" id="config" data-dom-cache="true"> \
 	<div data-role="header"><h1>Configuration</h1></div> \
@@ -297,6 +287,17 @@ script.onload = function(){
 		  dataType: "json",
 		  success: function(data) {	
 			alert('Provisioning requested');			
+		  }
+		});
+	});
+	
+	$('#AboveAvgBalance').on("click", function (e) {
+		$.ajax({
+		  async: true,
+		  url: aboveavgbalanceurl,
+		  dataType: "json",
+		  success: function(data) {	
+			alert('Above Average Balancing requested');			
 		  }
 		});
 	});

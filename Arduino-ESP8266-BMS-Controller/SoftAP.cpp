@@ -64,6 +64,29 @@ void handleProvision() {
   server.send(200, "application/json", "[1]\r\n\r\n");
 }
 
+
+
+void handleAboveAverageBalance() {
+  if (cell_array_max > 0) {  
+    //Work out the average
+    float avg=0;
+    for (int a = 0; a < cell_array_max; a++) {
+       avg+=1.0*cell_array[a].voltage;
+    }
+    avg=avg/cell_array_max;
+
+    uint16_t avgint = avg;
+    
+    for ( int a = 0; a < cell_array_max; a++) {
+      if (cell_array[a].voltage > avgint) {
+        cell_array[a].balance_target = avgint;
+      }
+    }   
+  }
+  
+  server.send(200, "application/json", "[1]\r\n\r\n");  
+}
+
 void handleSetEmonCMS() {
   /* Receives HTTP POST for configuring the emonCMS settings
     emoncms_enabled:1
@@ -166,22 +189,41 @@ void handleSettingsJSON() {
 }
 
 void handleCellJSONData() {
+  //Voltage
   String json1 = "[";
+  //Temperature
   String json2 = "[";
+  //Min voltage (since reset)
   String json3 = "[";
+  //Max voltage (since reset)
   String json4 = "[";
+
+  //Out of balance from average
+  String json5="[";
+
   if (cell_array_max > 0) {
+   
+    //Work out the average
+    float avg=0;
+    for (int a = 0; a < cell_array_max; a++) {
+       avg+=1.0*cell_array[a].voltage;
+    }
+    avg=avg/cell_array_max;
+    
     for ( int a = 0; a < cell_array_max; a++) {
       json1 += String(cell_array[a].voltage);
       json2 += String(cell_array[a].temperature);
       json3 += String(cell_array[a].min_voltage);
       json4 += String(cell_array[a].max_voltage);
 
+      json5 += String(cell_array[a].voltage - avg);
+
       if (a < cell_array_max - 1) {
         json1 += ",";
         json2 += ",";
         json3 += ",";
         json4 += ",";
+        json5 += ",";
       }
     }
   }
@@ -190,7 +232,10 @@ void handleCellJSONData() {
   json2 += "]";
   json3 += "]";
   json4 += "]";
-  server.send(200, "application/json", "[" + json1 + "," + json2 + "," + json3 + "," + json4 + "]\r\n\r\n");
+  json5 += "]";
+
+  
+  server.send(200, "application/json", "[" + json1 + "," + json2 + "," + json3 + "," + json4 +","+ json5+ "]\r\n\r\n");
 }
 
 void handleSave() {
@@ -275,6 +320,7 @@ void SetupManagementRedirect() {
   server.on("/", HTTP_GET, handleRedirect);
   server.on("/celljson", HTTP_GET, handleCellJSONData);
   server.on("/provision", HTTP_GET, handleProvision);
+  server.on("/aboveavgbalance", HTTP_GET, handleAboveAverageBalance);
   server.on("/getmoduleconfig", HTTP_GET, handleCellConfigurationJSON);
   server.on("/getsettings", HTTP_GET, handleSettingsJSON);
 

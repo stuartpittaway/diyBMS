@@ -119,9 +119,9 @@ struct cell_module_config {
   // 7 bit slave I2C address
   uint8_t SLAVE_ADDR = DEFAULT_SLAVE_ADDR;
   // Calibration factor for voltage readings
-  float VCCCalibration = 4.250;
+  float VCCCalibration = 4.430;
   // Calibration factor for temp readings
-  float TemperatureCalibration = 1.000;
+  float TemperatureCalibration = 1.080;
 };
 
 static cell_module_config myConfig;

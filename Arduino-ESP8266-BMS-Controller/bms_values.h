@@ -31,6 +31,8 @@ struct cell_module {
   uint16_t voltage;
   uint16_t temperature;
 
+  uint16_t balance_target;
+  
   float voltage_calib;
   float temperature_calib;
 
