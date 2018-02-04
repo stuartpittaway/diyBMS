@@ -171,6 +171,9 @@ void scani2cBus() {
 
       check_module_full( &cell_array[cell_array_max] );
 
+      //Switch off bypass if its on
+      command_set_bypass_voltage(address,0);
+
       print_module_details( &cell_array[cell_array_max] );
 
       cell_array_max++;
