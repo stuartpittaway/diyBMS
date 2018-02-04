@@ -573,22 +573,13 @@ ISR(TIMER1_COMPA_vect)
 {
   //Flash LED in sync with bit pattern
 
-  if (green_pattern==0) {
+  ///Rotate pattern
+  green_pattern = (byte)(green_pattern << 1) | (green_pattern >> 7);
 
-    if (flashLed) {
+  if (green_pattern & 0x01) {
     ledGreen();
-    } else { ledOff(); }
-    flashLed=!flashLed;
   } else {
-
-    ///Rotate pattern
-    green_pattern = (byte)(green_pattern << 1) | (green_pattern >> 7);
-  
-    if (green_pattern & 0x01) {
-      ledGreen();
-    } else {
-      ledOff();
-    }
+    ledOff();
   }
 
   if (ByPassEnabled) {
@@ -613,7 +604,6 @@ ISR(TIMER1_COMPA_vect)
     {
       //We are in ACTIVE BYPASS mode - the RESISTOR will be ACTIVE + BURNING ENERGY
       ByPassCounter--;
-      //Enable bypass transistor/resistor
       digitalWrite(PB4, HIGH);
 
       if (ByPassCounter == 0)
