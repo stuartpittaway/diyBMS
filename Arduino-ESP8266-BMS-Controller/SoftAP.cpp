@@ -67,6 +67,7 @@ void handleProvision() {
 
 
 void handleAboveAverageBalance() {
+  uint16_t avgint=0;
   if (cell_array_max > 0) {  
     //Work out the average
     float avg=0;
@@ -75,7 +76,7 @@ void handleAboveAverageBalance() {
     }
     avg=avg/cell_array_max;
 
-    uint16_t avgint = avg;
+    avgint = avg;
     
     for ( int a = 0; a < cell_array_max; a++) {
       if (cell_array[a].voltage > avgint) {
@@ -84,7 +85,7 @@ void handleAboveAverageBalance() {
     }   
   }
   
-  server.send(200, "application/json", "[1]\r\n\r\n");  
+  server.send(200, "application/json", "["+String(avgint)+"]\r\n\r\n");  
 }
 
 void handleSetEmonCMS() {
