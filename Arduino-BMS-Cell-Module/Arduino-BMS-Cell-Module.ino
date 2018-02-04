@@ -46,10 +46,9 @@
 
 //LED light patterns
 #define GREEN_LED_PATTERN_STANDARD B00010000
-#define GREEN_LED_PATTERN_BYPASS B01110100
-#define GREEN_LED_PATTERN_WAITREADY B11100011
+#define GREEN_LED_PATTERN_BYPASS B01101100
 #define GREEN_LED_PANIC B01010101
-#define GREEN_LED_PATTERN_UNCONFIGURED B11111111
+#define GREEN_LED_PATTERN_UNCONFIGURED B11101111
 
 //Where in EEPROM do we store the configuration
 #define EEPROM_CHECKSUM_ADDRESS 0
@@ -74,7 +73,7 @@
 //If we receive a cmdByte with BIT 6 set its a command byte so there is another byte waiting for us to process
 #define COMMAND_BIT 6
 #define COMMAND_green_led_pattern   1
-#define COMMAND_led_off   2
+//#define COMMAND_led_off   2
 #define COMMAND_factory_default 3
 #define COMMAND_set_slave_address 4
 #define COMMAND_green_led_default 5
@@ -100,7 +99,7 @@ volatile uint8_t analogValIndex;
 volatile uint8_t buffer_ready = 0;
 volatile uint8_t reading_count = 0;
 volatile uint8_t cmdByte = 0;
-volatile uint8_t goDarkCount = 0;
+
 volatile uint8_t last_i2c_request = 255;
 volatile uint16_t VCCMillivolts = 0;
 volatile uint16_t ByPassVCCMillivolts = 0;
@@ -110,6 +109,8 @@ volatile uint8_t ByPassCounter = 0;
 volatile boolean ByPassEnabled = false;
 
 uint16_t error_counter = 0;
+
+bool flashLed;
 
 //Number of voltage readings to take before we take a temperature reading
 #define TEMP_READING_LOOP_FREQ 16
@@ -149,7 +150,7 @@ void setup() {
   digitalWrite(PB4, LOW);
 
   ledGreen();
-  delay(1000);
+  delay(500);
   ledOff();
 
   //Load our EEPROM configuration
@@ -184,12 +185,11 @@ void setup() {
 boolean inPanicMode = false;
 
 void panic() {
-  goDarkCount = 0;
   green_pattern = GREEN_LED_PANIC;
   inPanicMode = true;
 }
 
-uint8_t previousLedState=0;
+uint8_t previousLedState = 0;
 void loop() {
   wdt_reset();
 
@@ -205,7 +205,7 @@ void loop() {
     //We have had at least one i2c request and not currently in PANIC mode
     if (last_i2c_request == 0 && inPanicMode == false) {
 
-      previousLedState=green_pattern ;
+      previousLedState = green_pattern ;
 
       //Panic after a few seconds of not receiving i2c requests...
       panic();
@@ -220,7 +220,7 @@ void loop() {
     if (last_i2c_request > 0 && inPanicMode == true) {
       //Just come back from a PANIC situation
       LEDReset();
-      green_pattern=previousLedState;
+      green_pattern = previousLedState;
       inPanicMode = false;
     }
 
@@ -307,7 +307,6 @@ void Reboot() {
 
 void wait_for_buffer_ready() {
   //Just delay here so the buffers are all ready before we service i2c
-  green_pattern = GREEN_LED_PATTERN_WAITREADY;
   while (!buffer_ready) {
     delay(100);
     wdt_reset();
@@ -374,6 +373,8 @@ void receiveEvent(int howMany) {
   //master failed to request any data after command
   if (cmdByte != 0) error_counter++;
 
+  flashLed=true;
+
   cmdByte = Wire.read();
   howMany--;
 
@@ -393,10 +394,6 @@ void receiveEvent(int howMany) {
         green_pattern = GREEN_LED_PATTERN_STANDARD;
         break;
 
-      case COMMAND_led_off:
-        //Switch green LED off for a short while - GO DARK
-        goDarkCount = 100;
-        break;
 
       case COMMAND_factory_default:
         factory_default();
@@ -499,7 +496,14 @@ float Update_VCCMillivolts() {
 void requestEvent() {
   switch (cmdByte) {
     case read_voltage:
-      sendUnsignedInt(VCCMillivolts);
+      //If we are in bypass then only return the voltage
+      //thats taken outside of the resistor load being switched on
+      if (ByPassEnabled) {
+        sendUnsignedInt(ByPassVCCMillivolts);
+      } else {
+        sendUnsignedInt(VCCMillivolts);
+      }
+
       break;
 
     case read_raw_voltage:
@@ -539,7 +543,7 @@ void requestEvent() {
   cmdByte = 0;
 
   //Reset when we last processed a request, if this times out master has stopped communicating with module
-  last_i2c_request = 100;
+  last_i2c_request = 150;
 }
 
 inline void ledGreen() {
@@ -568,14 +572,18 @@ inline void ledOff() {
 ISR(TIMER1_COMPA_vect)
 {
   //Flash LED in sync with bit pattern
-  if (goDarkCount > 0) {
-    goDarkCount--;
-    ledOff();
+
+  if (green_pattern==0) {
+
+    if (flashLed) {
+    ledGreen();
+    } else { ledOff(); }
+    flashLed=!flashLed;
   } else {
 
     ///Rotate pattern
     green_pattern = (byte)(green_pattern << 1) | (green_pattern >> 7);
-
+  
     if (green_pattern & 0x01) {
       ledGreen();
     } else {
@@ -605,6 +613,7 @@ ISR(TIMER1_COMPA_vect)
     {
       //We are in ACTIVE BYPASS mode - the RESISTOR will be ACTIVE + BURNING ENERGY
       ByPassCounter--;
+      //Enable bypass transistor/resistor
       digitalWrite(PB4, HIGH);
 
       if (ByPassCounter == 0)
