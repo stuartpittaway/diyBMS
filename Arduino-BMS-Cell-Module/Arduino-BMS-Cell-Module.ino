@@ -45,7 +45,7 @@
 // __DATE__
 
 //LED light patterns
-#define GREEN_LED_PATTERN_STANDARD B00010000
+#define GREEN_LED_PATTERN_STANDARD 0
 #define GREEN_LED_PATTERN_BYPASS B01101100
 #define GREEN_LED_PANIC B01010101
 #define GREEN_LED_PATTERN_UNCONFIGURED B11101111
@@ -72,16 +72,18 @@
 
 //If we receive a cmdByte with BIT 6 set its a command byte so there is another byte waiting for us to process
 #define COMMAND_BIT 6
+
 #define COMMAND_green_led_pattern   1
-//#define COMMAND_led_off   2
+//unused #define COMMAND_led_off   2
 #define COMMAND_factory_default 3
 #define COMMAND_set_slave_address 4
 #define COMMAND_green_led_default 5
 #define COMMAND_set_voltage_calibration 6
 #define COMMAND_set_temperature_calibration 7
 #define COMMAND_set_bypass_voltage 8
+#define COMMAND_set_load_resistance 9
 
-//Read values
+
 #define read_voltage 10
 #define read_temperature 11
 #define read_voltage_calibration 12
@@ -90,6 +92,7 @@
 #define read_error_counter 15
 #define read_bypass_enabled_state 16
 #define read_bypass_voltage_measurement 17
+#define read_load_resistance 18
 
 volatile bool skipNextADC = false;
 volatile uint8_t green_pattern = GREEN_LED_PATTERN_STANDARD;
@@ -107,6 +110,7 @@ volatile uint16_t last_raw_adc = 0;
 volatile uint16_t targetByPassVoltage = 0;
 volatile uint8_t ByPassCounter = 0;
 volatile boolean ByPassEnabled = false;
+volatile boolean flash_green = false;
 
 uint16_t error_counter = 0;
 
@@ -123,6 +127,8 @@ struct cell_module_config {
   float VCCCalibration = 4.430;
   // Calibration factor for temp readings
   float TemperatureCalibration = 1.080;
+  // Resistance of bypass load
+  float LoadResistance = 10.0;
 };
 
 static cell_module_config myConfig;
@@ -373,7 +379,7 @@ void receiveEvent(int howMany) {
   //master failed to request any data after command
   if (cmdByte != 0) error_counter++;
 
-  flashLed=true;
+  flashLed = true;
 
   cmdByte = Wire.read();
   howMany--;
@@ -394,16 +400,13 @@ void receiveEvent(int howMany) {
         green_pattern = GREEN_LED_PATTERN_STANDARD;
         break;
 
-
       case COMMAND_factory_default:
         factory_default();
         Reboot();
         break;
 
       case COMMAND_set_voltage_calibration:
-        //Set i2c slave address and write to EEPROM, then reboot
         if (howMany == sizeof(float)) {
-
           float newValue = readFloat();
           //Only accept if its different
           if (newValue != myConfig.VCCCalibration) {
@@ -414,7 +417,6 @@ void receiveEvent(int howMany) {
         break;
 
       case COMMAND_set_temperature_calibration:
-        //Set i2c slave address and write to EEPROM, then reboot
         if (howMany == sizeof(float)) {
           float newValue = readFloat();
           //Only accept if its different
@@ -425,8 +427,18 @@ void receiveEvent(int howMany) {
         }
         break;
 
+      case COMMAND_set_load_resistance:
+        if (howMany == sizeof(float)) {
+          float newValue = readFloat();
+          //Only accept if its different
+          if (newValue != myConfig.LoadResistance) {
+            myConfig.LoadResistance = newValue;
+            WriteConfigToEEPROM();
+          }
+        }
+        break;
+
       case COMMAND_set_bypass_voltage:
-        //Set i2c slave address and write to EEPROM, then reboot
         if (howMany == sizeof(uint16_t)) {
           uint16_t newValue = readUINT16();
           //Only accept if its a realistic value and the value is LESS than the last voltage reading
@@ -443,6 +455,7 @@ void receiveEvent(int howMany) {
           }
         }
         break;
+
 
       case COMMAND_set_slave_address:
         //Set i2c slave address and write to EEPROM, then reboot
@@ -466,6 +479,7 @@ void receiveEvent(int howMany) {
     switch (cmdByte) {
       case read_voltage:
         VCCMillivolts = Update_VCCMillivolts();
+        flash_green = true;
         break;
     }
   }
@@ -534,6 +548,10 @@ void requestEvent() {
       sendFloat(myConfig.TemperatureCalibration);
       break;
 
+    case read_load_resistance:
+      sendFloat(myConfig.LoadResistance);
+      break;
+
     default:
       //Dont do anything - timeout
       break;
@@ -573,13 +591,21 @@ ISR(TIMER1_COMPA_vect)
 {
   //Flash LED in sync with bit pattern
 
-  ///Rotate pattern
-  green_pattern = (byte)(green_pattern << 1) | (green_pattern >> 7);
 
-  if (green_pattern & 0x01) {
-    ledGreen();
+  if (green_pattern == 0) {
+    if (flash_green)  {
+      ledGreen();
+    }
+    flash_green = false;
   } else {
-    ledOff();
+    ///Rotate pattern
+    green_pattern = (byte)(green_pattern << 1) | (green_pattern >> 7);
+
+    if (green_pattern & 0x01) {
+      ledGreen();
+    } else {
+      ledOff();
+    }
   }
 
   if (ByPassEnabled) {
@@ -621,6 +647,11 @@ ISR(TIMER1_COMPA_vect)
     //Safety check we ensure bypass is always off if not enabled
     digitalWrite(PB4, LOW);
   }
+
+  if (green_pattern == 0) {
+    ledOff();
+  }
+
 
   //trigger ADC reading
   ADCSRA |= (1 << ADSC);

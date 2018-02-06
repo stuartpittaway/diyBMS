@@ -297,7 +297,7 @@ script.onload = function(){
 				
 			}		
 			if (data.prevPage[0].id=='modules') {
-				
+				$( "#ct" ).remove();
 			}
 			if (data.prevPage[0].id=='config') {
 				
