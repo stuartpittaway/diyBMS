@@ -8,6 +8,8 @@ var getsettingsurl = rooturl+"getsettings";
 var voltagecalibrationurl = rooturl+"setvoltcalib";
 var temperaturecalibrationurl= rooturl+"settempcalib";
 var aboveavgbalanceurl= rooturl+"aboveavgbalance";
+var setloadresistanceurl= rooturl+"setloadresistance";
+var factoryreseturl= rooturl+"factoryreset";
 
 var plot1;
 var timer;
@@ -59,11 +61,17 @@ function refreshModules() {
 	  success: function(data) {	
 	  	  
 		if ( $( "#ct" ).length==0 ) {
-			//Create table if it doesnt exist already
-			//$("#moduletable")
-			$("#moduletable").empty().append("<table id='ct'><thead><tr><th>Module id</th><th>Current Voltage</th><th>Voltage calibration</th><th>Temperature</th><th>Temp calibration</th></tr></thead></table>");   
+			//Create table if it doesn't exist already
+			$("#moduletable").empty().append("<table id='ct'><thead><tr><th>Module id</th><th>Current Voltage</th><th>Voltage calibration</th><th>Temperature</th><th>Temp calibration</th><th>Load resistance</th></tr></thead></table>");
 			$.each(data, function(){ 
-				$("#ct").append("<tr id='module"+this[0]+"'><td>"+this[0]+"</td><td></td><td><input data-moduleid='"+this[0]+"' class='voltcalib' size=8 type='number' step='0.001' min='1.000' max='99.999' value='"+this[2].toFixed(3)+"'/></td><td>&nbsp;</td><td><input data-moduleid='"+this[0]+"' class='tempcalib' size=8 type='number' step='0.001' min='0.001' max='99.999' value='"+this[4].toFixed(3)+"'/></td></tr>");
+				$("#ct").append("<tr id='module"+this.address+"'><td>"+this.address+"</td> \
+				<td></td> \
+				<td><input data-moduleid='"+this.address+"' class='voltcalib' size=8 type='number' step='0.001' min='1.000' max='99.999' value='"+this.voltc.toFixed(3)+"'/></td> \
+				<td>&nbsp;</td> \
+				<td><input data-moduleid='"+this.address+"' class='tempcalib' size=8 type='number' step='0.001' min='0.001' max='99.999' value='"+this.tempc.toFixed(3)+"'/></td> \
+				<td><input data-moduleid='"+this.address+"' class='resistancec' size=8 type='number' step='0.1' min='1.0' max='200.000' value='"+this.resistance.toFixed(3)+"'/></td> \
+				<td><input type='button' data-moduleid='"+this.address+"' class='factoryreset' type='button' value='Factory Reset'/></td> \
+				</tr>");
 			});
 
 			$('.voltcalib').on("change", function (e) {
@@ -72,19 +80,25 @@ function refreshModules() {
 
 			$('.tempcalib').on("change", function (e) {				
 				$.post( temperaturecalibrationurl, { module: $(this).data( "moduleid" ), value: $(this).val() } );					
-			});			
+			});
+			$('.resistancec').on("change", function (e) {				
+				$.post( setloadresistanceurl, { module: $(this).data( "moduleid" ), value: $(this).val() } );					
+			});
+			$('.factoryreset').on("click", function (e) {				
+				$.post( factoryreseturl, { module: $(this).data( "moduleid" ) } );					
+			});
 		} //end if
 				
 		//Update the voltage and temperature every refresh
 		$.each(data, function(){ 
-			$("#module"+this[0]+" > td:nth-child(2)").html(""+(this[1] /1000.0).toFixed(3)+"");		
-			$("#module"+this[0]+" > td:nth-child(4)").html(""+this[3]+"");
+			$("#module"+this.address+" > td:nth-child(2)").html(""+(this.volt /1000.0).toFixed(3)+"");		
+			$("#module"+this.address+" > td:nth-child(4)").html(""+this.temp+"");
 		});
 		
 	  }
 	});	
 	
-	moduletimer=setTimeout(refreshModules, 3000);
+	moduletimer=setTimeout(refreshModules, 5000);
 }
 
 function refreshGraph(){ 
@@ -158,6 +172,14 @@ function refreshGraph(){
 					]	
 			  });
 			  
+			  
+	$('#chart1').height($(window).height()*0.90);
+	 $(window).bind('resize', function(event, ui) {
+        $('#chart1').height($(window).height()*0.90);
+        $('#chart1').width($(window).width()*0.90);
+        plot1.replot({resetAxes:true});
+    });
+	
 		  }
 	  }
     });
@@ -182,6 +204,7 @@ script.src = "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"
 script.onload = function(){
 	//This fires after JQUERY has loaded
 	console.log('JQUERY Ready');
+	
 
 	$("body").append('<div data-role="page" data-url="/" tabindex="0" class="ui-page ui-page-theme-a ui-page-active" id="main"> \
 	<div data-role="header"><h1>DIY BMS Management Console</h1></div> \
@@ -249,6 +272,8 @@ script.onload = function(){
 		$.mobile.maxTransitionWidth=800;		
 	});
 
+
+
 	$(document).on("pagecontainershow", function (e, data) {		
 		clearTimeout(timer);
 		clearTimeout(moduletimer);
@@ -314,12 +339,9 @@ $( "#form_emoncms" ).submit(function( event ) {
 	var posting = $.post( url,  d  );
 	
 	// Put the results in a div
-  posting.done(function( data ) {
+	posting.done(function( data ) {
 	  alert('ok');
-    //var content = $( data ).find( "#content" );
-    //$( "#result" ).empty().append( content );
-  });
-
+	});
 });	
 	
 	//Load the other libraries
