@@ -39,12 +39,10 @@ extern "C"
 #include "softap.h"
 #include "WebServiceSubmit.h"
 
-
 //Allow up to 24 modules
 cell_module cell_array[24];
 int cell_array_index = -1;
 int cell_array_max = 0;
-
 unsigned long next_submit;
 bool runProvisioning;
 
@@ -63,6 +61,8 @@ void print_module_details(struct  cell_module *module) {
   Serial.print(module->temperature);
   Serial.print(" TC:");
   Serial.print(module->temperature_calib);
+  Serial.print(" R:");
+  Serial.print(module->loadResistance);
   Serial.println("");
 }
 
@@ -85,13 +85,12 @@ void check_module_quick(struct  cell_module *module) {
   }
 }
 
-
 void check_module_full(struct  cell_module *module) {
   check_module_quick(module);
   module->voltage_calib = cell_read_voltage_calibration(module->address);
   module->temperature_calib = cell_read_temperature_calibration(module->address);
+  module->loadResistance = cell_read_load_resistance(module->address);
 }
-
 
 void timerCallback(void *pArg) {
   LED_ON;
@@ -125,18 +124,27 @@ void timerCallback(void *pArg) {
   //Ensure we have some cell modules to check
   if (cell_array_max > 0 && cell_array_index >= 0) {
 
+
     if (cell_array[cell_array_index].update_calibration) {
-      //Check to see if we need to configure the calibration data for this module
-      command_set_voltage_calibration(cell_array[cell_array_index].address, cell_array[cell_array_index].voltage_calib);
-      command_set_temperature_calibration(cell_array[cell_array_index].address, cell_array[cell_array_index].temperature_calib);
+
+      if (cell_array[cell_array_index].factoryReset) {
+        command_factory_reset(cell_array[cell_array_index].address);
+      } else {
+
+        //Check to see if we need to configure the calibration data for this module
+        command_set_voltage_calibration(cell_array[cell_array_index].address, cell_array[cell_array_index].voltage_calib);
+        command_set_temperature_calibration(cell_array[cell_array_index].address, cell_array[cell_array_index].temperature_calib);
+
+        command_set_load_resistance(cell_array[cell_array_index].address, cell_array[cell_array_index].loadResistance);
+      }
       cell_array[cell_array_index].update_calibration = false;
     }
 
     check_module_quick( &cell_array[cell_array_index] );
 
-    if (cell_array[cell_array_index].balance_target>0) {
-        command_set_bypass_voltage(cell_array[cell_array_index].address, cell_array[cell_array_index].balance_target);
-        cell_array[cell_array_index].balance_target=0;
+    if (cell_array[cell_array_index].balance_target > 0) {
+      command_set_bypass_voltage(cell_array[cell_array_index].address, cell_array[cell_array_index].balance_target);
+      cell_array[cell_array_index].balance_target = 0;
     }
 
     cell_array_index++;
@@ -172,7 +180,7 @@ void scani2cBus() {
       check_module_full( &cell_array[cell_array_max] );
 
       //Switch off bypass if its on
-      command_set_bypass_voltage(address,0);
+      command_set_bypass_voltage(address, 0);
 
       print_module_details( &cell_array[cell_array_max] );
 
@@ -221,7 +229,7 @@ void setup() {
 
   //Ensure we service the cell modules every 0.5 seconds
   os_timer_setfn(&myTimer, timerCallback, NULL);
-  os_timer_arm(&myTimer, 500, true);
+  os_timer_arm(&myTimer, 1000, true);
 
   //Check WIFI is working and connected
   Serial.print(F("WIFI Connecting"));

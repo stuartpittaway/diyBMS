@@ -14,6 +14,8 @@
 #define COMMAND_set_voltage_calibration 6
 #define COMMAND_set_temperature_calibration 7
 #define COMMAND_set_bypass_voltage 8
+#define COMMAND_set_load_resistance 9
+
 
 #define read_voltage 10
 #define read_temperature 11
@@ -23,6 +25,7 @@
 #define read_error_counter 15
 #define read_bypass_enabled_state 16
 #define read_bypass_voltage_measurement 17
+#define read_load_resistance 18
 
 //Default values
 struct cell_module {
@@ -35,6 +38,9 @@ struct cell_module {
   
   float voltage_calib;
   float temperature_calib;
+  float loadResistance;
+
+  bool factoryReset;
 
   //Record min/max volts over time (between cpu resets)
   uint16_t min_voltage;

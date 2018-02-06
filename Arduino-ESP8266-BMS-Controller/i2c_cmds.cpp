@@ -117,12 +117,14 @@ uint8_t command_set_slave_address(uint8_t cell_id, uint8_t newAddress) {
 
 uint8_t command_set_voltage_calibration(uint8_t cell_id, float value) {
   return send_command(cell_id, cmdByte(COMMAND_set_voltage_calibration ), value);
-
 }
 uint8_t command_set_temperature_calibration(uint8_t cell_id, float value) {
   return send_command(cell_id, cmdByte(COMMAND_set_temperature_calibration ), value);
-
 }
+uint8_t command_set_load_resistance(uint8_t cell_id, float value) {
+  return send_command(cell_id, cmdByte(COMMAND_set_load_resistance), value);
+}
+
 
 float cell_read_voltage_calibration(uint8_t cell_id) {
   return read_float_from_cell(cell_id, read_voltage_calibration);
@@ -130,6 +132,10 @@ float cell_read_voltage_calibration(uint8_t cell_id) {
 
 float cell_read_temperature_calibration(uint8_t cell_id) {
   return read_float_from_cell(cell_id, read_temperature_calibration);
+}
+
+float cell_read_load_resistance(uint8_t cell_id) {
+  return read_float_from_cell(cell_id, read_load_resistance);
 }
 
 uint16_t cell_read_voltage(uint8_t cell_id) {

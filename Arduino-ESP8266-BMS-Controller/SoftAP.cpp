@@ -67,25 +67,65 @@ void handleProvision() {
 
 
 void handleAboveAverageBalance() {
-  uint16_t avgint=0;
-  if (cell_array_max > 0) {  
+  uint16_t avgint = 0;
+  if (cell_array_max > 0) {
     //Work out the average
-    float avg=0;
+    float avg = 0;
     for (int a = 0; a < cell_array_max; a++) {
-       avg+=1.0*cell_array[a].voltage;
+      avg += 1.0 * cell_array[a].voltage;
     }
-    avg=avg/cell_array_max;
+    avg = avg / cell_array_max;
 
     avgint = avg;
-    
+
     for ( int a = 0; a < cell_array_max; a++) {
       if (cell_array[a].voltage > avgint) {
         cell_array[a].balance_target = avgint;
       }
-    }   
+    }
   }
-  
-  server.send(200, "application/json", "["+String(avgint)+"]\r\n\r\n");  
+
+  server.send(200, "application/json", "[" + String(avgint) + "]\r\n\r\n");
+}
+
+void handleFactoryReset() {
+  uint8_t module =  server.arg("module").toInt();
+  float newValue = server.arg("value").toFloat();
+
+  for ( int a = 0; a < cell_array_max; a++) {
+    if (cell_array[a].address == module) {
+      Serial.print("FactoryReset ");
+      Serial.print(module);
+      cell_array[a].factoryReset = true;
+      cell_array[a].update_calibration = true;
+      server.send(200, "text/plain", "");
+      return;
+    }
+  }
+  server.send(500, "text/plain", "");  
+}
+
+void handleSetLoadResistance() {
+  uint8_t module =  server.arg("module").toInt();
+  float newValue = server.arg("value").toFloat();
+
+  Serial.print("SetLoadResistance ");
+  Serial.print(module);
+  Serial.print(" = ");
+  Serial.println(newValue, 6);
+
+  for ( int a = 0; a < cell_array_max; a++) {
+    if (cell_array[a].address == module) {
+
+      if (cell_array[a].loadResistance != newValue) {
+        cell_array[a].loadResistance = newValue;
+        cell_array[a].update_calibration = true;
+      }
+      server.send(200, "text/plain", "");
+      return;
+    }
+  }
+  server.send(500, "text/plain", "");
 }
 
 void handleSetEmonCMS() {
@@ -97,13 +137,13 @@ void handleSetEmonCMS() {
     emoncms_url:/emoncms/input/bulk?data=
     emoncms_apikey:11111111111111111111111111111111
   */
-  myConfig.emoncms_enabled = (server.arg("emoncms_enabled").toInt()==1) ? true : false;
+  myConfig.emoncms_enabled = (server.arg("emoncms_enabled").toInt() == 1) ? true : false;
   myConfig.emoncms_node_offset = server.arg("emoncms_node_offset").toInt();
   myConfig.emoncms_httpPort = server.arg("emoncms_httpPort").toInt();
 
-  server.arg("emoncms_host").toCharArray(myConfig.emoncms_host,sizeof(myConfig.emoncms_host));
-  server.arg("emoncms_url").toCharArray(myConfig.emoncms_url,sizeof(myConfig.emoncms_url));
-  server.arg("emoncms_apikey").toCharArray(myConfig.emoncms_apikey,sizeof(myConfig.emoncms_apikey));
+  server.arg("emoncms_host").toCharArray(myConfig.emoncms_host, sizeof(myConfig.emoncms_host));
+  server.arg("emoncms_url").toCharArray(myConfig.emoncms_url, sizeof(myConfig.emoncms_url));
+  server.arg("emoncms_apikey").toCharArray(myConfig.emoncms_apikey, sizeof(myConfig.emoncms_apikey));
 
   WriteConfigToEEPROM();
 
@@ -159,17 +199,13 @@ void handleCellConfigurationJSON() {
   String json1 = "";
   if (cell_array_max > 0) {
     for ( int a = 0; a < cell_array_max; a++) {
-      json1 += "[";
-      json1 += String(cell_array[a].address);
-      json1 += ",";
-      json1 += String(cell_array[a].voltage);
-      json1 += ",";
-      json1 += String(cell_array[a].voltage_calib, 6);
-      json1 += ",";
-      json1 += String(cell_array[a].temperature);
-      json1 += ",";
-      json1 += String(cell_array[a].temperature_calib, 6);
-      json1 += "]";
+      json1 += "{\"address\":" + String(cell_array[a].address)
+        +",\"volt\":" + String(cell_array[a].voltage)
+        +",\"voltc\":" + String(cell_array[a].voltage_calib, 6)
+        +",\"temp\":" + String(cell_array[a].temperature)
+        +",\"tempc\":" + String(cell_array[a].temperature_calib, 6)
+        +",\"resistance\":" + String( isnan(cell_array[a].loadResistance) ? 0:cell_array[a].loadResistance, 6) 
+        + "}";
       if (a < cell_array_max - 1) {
         json1 += ",";
       }
@@ -200,17 +236,17 @@ void handleCellJSONData() {
   String json4 = "[";
 
   //Out of balance from average
-  String json5="[";
+  String json5 = "[";
 
   if (cell_array_max > 0) {
-   
+
     //Work out the average
-    float avg=0;
+    float avg = 0;
     for (int a = 0; a < cell_array_max; a++) {
-       avg+=1.0*cell_array[a].voltage;
+      avg += 1.0 * cell_array[a].voltage;
     }
-    avg=avg/cell_array_max;
-    
+    avg = avg / cell_array_max;
+
     for ( int a = 0; a < cell_array_max; a++) {
       json1 += String(cell_array[a].voltage);
       json2 += String(cell_array[a].temperature);
@@ -235,8 +271,8 @@ void handleCellJSONData() {
   json4 += "]";
   json5 += "]";
 
-  
-  server.send(200, "application/json", "[" + json1 + "," + json2 + "," + json3 + "," + json4 +","+ json5+ "]\r\n\r\n");
+
+  server.send(200, "application/json", "[" + json1 + "," + json2 + "," + json3 + "," + json4 + "," + json5 + "]\r\n\r\n");
 }
 
 void handleSave() {
@@ -325,6 +361,8 @@ void SetupManagementRedirect() {
   server.on("/getmoduleconfig", HTTP_GET, handleCellConfigurationJSON);
   server.on("/getsettings", HTTP_GET, handleSettingsJSON);
 
+  server.on("/factoryreset", HTTP_POST, handleFactoryReset);
+  server.on("/setloadresistance", HTTP_POST, handleSetLoadResistance);
   server.on("/setvoltcalib", HTTP_POST, handleSetVoltCalib);
   server.on("/settempcalib", HTTP_POST, handleSetTempCalib);
   server.on("/setemoncms", HTTP_POST, handleSetEmonCMS);
