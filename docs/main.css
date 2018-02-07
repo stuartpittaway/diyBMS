@@ -2,3 +2,10 @@
 th {text-align: left;}
 
 #ct {  }
+
+#ct .v { background-color:beige; }
+#ct .t { background-color:lightgoldenrodyellow; }
+
+.voltcalib { width: 4em; }
+.tempcalib { width: 4em; }
+.resistancec { width: 4em;}
