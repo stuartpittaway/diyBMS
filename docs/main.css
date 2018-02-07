@@ -1,7 +1,9 @@
 
-th {text-align: left;}
+#ct th {text-align: left; padding:2px;}
 
-#ct {  }
+#ct td {text-align: left; padding:2px;}
+
+#ct { border-spacing: 0; }
 
 #ct .v { background-color:beige; }
 #ct .t { background-color:lightgoldenrodyellow; }
