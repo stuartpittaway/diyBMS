@@ -1,12 +1,12 @@
 
 #ct th {text-align: left; padding:2px;}
 
-#ct td {text-align: left; padding:2px;}
+#ct td {text-align: left; padding:8px;}
 
 #ct { border-spacing: 0; }
 
 #ct .v { background-color:beige; }
-#ct .t { background-color:lightgoldenrodyellow; }
+#ct .t { background-color:azure; }
 
 .voltcalib { width: 4em; }
 .tempcalib { width: 4em; }
