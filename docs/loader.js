@@ -344,7 +344,7 @@ script.onload = function(){
 				console.log( "",this.address," current value:", this.tempc, " recommended:", v);
 				$(".tempcalib[data-moduleid='"+this.address+"']").val(v);
 				
-				$.post( voltagecalibrationurl, { module: this.address, value: v } );
+				$.post( temperaturecalibrationurl, { module: this.address, value: v } );
 				
 			});
 			
