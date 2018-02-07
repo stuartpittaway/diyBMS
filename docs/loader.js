@@ -62,13 +62,16 @@ function refreshModules() {
 	  	  
 		if ( $( "#ct" ).length==0 ) {
 			//Create table if it doesn't exist already
-			$("#moduletable").empty().append("<table id='ct'><thead><tr><th>Module id</th><th>Current Voltage</th><th>Voltage calibration</th><th>Temperature</th><th>Temp calibration</th><th>Load resistance</th></tr></thead></table>");
+			$("#moduletable").empty().append("<table id='ct' data-role='table'><thead><tr><th>Module<br/>id</th><th>Current<br/>Voltage</th><th>Voltage<br/>calibration</th><th>Manual<br/>Calibration</th><th>Temperature</th><th>Temp<br/>calibration</th><th>Load<br/>resistance</th></tr></thead><tbody></tbody></table>");
 			$.each(data, function(){ 
-				$("#ct").append("<tr id='module"+this.address+"'><td>"+this.address+"</td> \
-				<td></td> \
-				<td><input data-moduleid='"+this.address+"' class='voltcalib' size=8 type='number' step='0.001' min='1.000' max='99.999' value='"+this.voltc.toFixed(3)+"'/></td> \
-				<td>&nbsp;</td> \
-				<td><input data-moduleid='"+this.address+"' class='tempcalib' size=8 type='number' step='0.001' min='0.001' max='99.999' value='"+this.tempc.toFixed(3)+"'/></td> \
+				$("#ct tbody").append("<tr id='module"+this.address+"'><td >"+this.address+"</td> \
+				<td id='module"+this.address+"volt' data-moduleid='"+this.address+"' data-value='' class='voltage v'>&nbsp;</td> \
+				<td class='v'><input data-moduleid='"+this.address+"' class='voltcalib' size=8 type='number' step='0.001' min='1.000' max='99.999' value='"+this.voltc.toFixed(3)+"'/></td> \
+				<td class='v'><input data-moduleid='"+this.address+"' class='manualreading' size=8 type='number' step='0.001' min='1.000' max='99.999' value=''/> \
+				<input type='button' data-moduleid='"+this.address+"' class='manualreadingbutton' type='button' value='Go'/> \
+				</td> \
+				<td id='module"+this.address+"temp' class='t'>&nbsp;</td> \
+				<td class='t'><input data-moduleid='"+this.address+"' class='tempcalib' size=8 type='number' step='0.001' min='0.001' max='99.999' value='"+this.tempc.toFixed(3)+"'/></td> \
 				<td><input data-moduleid='"+this.address+"' class='resistancec' size=8 type='number' step='0.1' min='1.0' max='200.000' value='"+this.resistance.toFixed(3)+"'/></td> \
 				<td><input type='button' data-moduleid='"+this.address+"' class='factoryreset' type='button' value='Factory Reset'/></td> \
 				</tr>");
@@ -87,12 +90,38 @@ function refreshModules() {
 			$('.factoryreset').on("click", function (e) {				
 				$.post( factoryreseturl, { module: $(this).data( "moduleid" ) } );					
 			});
+			
+			$('.manualreadingbutton').on("click", function (e) {			
+				var moduleid=$(this).data( "moduleid" );
+				
+				var v=parseFloat( $(".manualreading[data-moduleid='"+moduleid+"']").val());
+				
+				if (!isNaN(v)) {
+
+					var currentV=parseFloat( $(".voltage[data-moduleid='"+moduleid+"']").data("value"));
+
+					var scale=parseFloat( $(".voltcalib[data-moduleid='"+moduleid+"']").val());
+				
+					scale= (v/currentV) * scale;
+				
+					console.log("Module:",moduleid," CurrentV:",currentV," ActualV:",v," New Scale:",scale);
+					
+					$(".voltcalib[data-moduleid='"+moduleid+"']").val(scale.toFixed(3));
+					$(".manualreading[data-moduleid='"+moduleid+"']").val("");
+					
+					$.post( voltagecalibrationurl, { module: moduleid, value: scale } );
+				
+				}
+				//$.post( factoryreseturl, { module: $(this).data( "moduleid" ) } );					
+			});
+			
 		} //end if
 				
 		//Update the voltage and temperature every refresh
 		$.each(data, function(){ 
-			$("#module"+this.address+" > td:nth-child(2)").html(""+(this.volt /1000.0).toFixed(3)+"");		
-			$("#module"+this.address+" > td:nth-child(4)").html(""+this.temp+"");
+			$("#module"+this.address+"volt").data("value",(this.volt/1000.0).toFixed(3));		
+			$("#module"+this.address+"volt").html(""+(this.volt /1000.0).toFixed(3)+"");		
+			$("#module"+this.address+"temp").html(""+this.temp+"");
 		});
 		
 	  }
@@ -173,9 +202,10 @@ function refreshGraph(){
 			  });
 			  
 			  
-	$('#chart1').height($(window).height()*0.90);
+	$('#chart1').height($(window).height()*0.85);
+	
 	 $(window).bind('resize', function(event, ui) {
-        $('#chart1').height($(window).height()*0.90);
+        $('#chart1').height($(window).height()*0.85);
         $('#chart1').width($(window).width()*0.90);
         plot1.replot({resetAxes:true});
     });
