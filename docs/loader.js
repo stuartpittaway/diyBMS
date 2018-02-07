@@ -264,7 +264,7 @@ script.onload = function(){
 	<div role="main" data-role="ui-content"> \
 	<div id="moduletable"></div> \
 	<p>Use the Provision button to add a new cell module to the controller.  To begin, add ONE (and only one) new module to the monitoring cable and click the Provision button.</p> \
-	<p><a id="provButton" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Provision</a> <a href="#main" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">Cancel</a></p> \
+	<p><a id="provButton" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Provision</a> <a id="syncTempCalib" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Sync Temp Calibration</a> <a href="#main" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">Cancel</a></p> \
 	</div> \
 	</div>');
 
@@ -327,6 +327,32 @@ script.onload = function(){
 		});
 	});
 
+	$('#syncTempCalib').on("click", function (e) {
+		$.ajax({
+		  async: true,
+		  url: getmoduleconfigurationurl,
+		  dataType: "json",
+		  success: function(data) {	
+			var avgTempVal=0;
+			$.each(data, function(){ 
+				avgTempVal+=this.temp;
+			});
+			avgTempVal=Math.floor(avgTempVal/ data.length);
+
+			$.each(data, function(){ 
+				var v=(avgTempVal/this.temp * this.tempc).toFixed(3);
+				console.log( "",this.address," current value:", this.tempc, " recommended:", v);
+				$(".tempcalib[data-moduleid='"+this.address+"']").val(v);
+				
+				$.post( voltagecalibrationurl, { module: this.address, value: v } );
+				
+			});
+			
+
+			}
+		});
+	});
+	
 $( "#form_emoncms" ).submit(function( event ) {
  	// Stop form from submitting normally
 	event.preventDefault();
