@@ -40,7 +40,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 1 1
 Title "DIYBMS CELL MODULE"
-Date "2017-12-03"
+Date "2018-03-15"
 Rev "2"
 Comp ""
 Comment1 ""
@@ -781,4 +781,18 @@ Wire Wire Line
 Connection ~ 3090 4200
 Text Notes 1760 3280 0    60   ~ 0
 For C1/C2/C6 Surface-mount ceramic types. \nIn all cases, X7R or X5R dielectric are recommended.
+$Comp
+L TEST TP2
+U 1 1 5A804029
+P 9990 5350
+F 0 "TP2" H 9990 5650 50  0000 C BNN
+F 1 "TPGND" H 9990 5600 50  0000 C CNN
+F 2 "Connectors:PINTST" H 9990 5350 50  0001 C CNN
+F 3 "" H 9990 5350 50  0001 C CNN
+	1    9990 5350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9990 5350 9990 5400
+Connection ~ 9990 5400
 $EndSCHEMATC

@@ -1,4 +1,4 @@
-update=02/12/2017 13:00:52
+update=15/03/2018 17:04:45
 version=1
 last_client=kicad
 [cvpcb]
@@ -23,16 +23,6 @@ SolderMaskMinWidth=0
 DrawSegmentWidth=0.2
 BoardOutlineThickness=0.15
 ModuleOutlineThickness=0.15
-[schematic_editor]
-version=1
-PageLayoutDescrFile=
-PlotDirectoryName=BMS-Cell-Module.pdf
-SubpartIdSeparator=0
-SubpartFirstId=65
-NetFmtName=Pcbnew
-SpiceForceRefPrefix=0
-SpiceUseNetNumbers=0
-LabSize=60
 [general]
 version=1
 [eeschema]
@@ -73,3 +63,13 @@ LibName31=contrib
 LibName32=valves
 LibName33=adum1250arz
 LibName34=reg710
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=BMS-Cell-Module.pdf
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=Pcbnew
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60
