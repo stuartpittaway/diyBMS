@@ -18,7 +18,7 @@ float    read_float_from_cell(uint8_t cell_id, uint8_t cmd) ;
 void     clear_buffer();
 uint8_t cell_green_led_default(uint8_t cell_id);
 uint8_t cell_green_led_pattern(uint8_t cell_id);
-uint8_t cell_led_off(uint8_t cell_id);
+
 uint8_t command_factory_reset(uint8_t cell_id) ;
 uint8_t command_set_slave_address(uint8_t cell_id, uint8_t newAddress);
 uint8_t command_set_voltage_calibration(uint8_t cell_id, float value);

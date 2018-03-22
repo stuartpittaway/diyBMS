@@ -103,10 +103,6 @@ uint8_t cell_green_led_pattern(uint8_t cell_id) {
   return send_command(cell_id, cmdByte( COMMAND_green_led_pattern ), (uint8_t)202);
 }
 
-uint8_t cell_led_off(uint8_t cell_id) {
-  return send_command(cell_id, cmdByte( COMMAND_led_off ));
-}
-
 uint8_t command_factory_reset(uint8_t cell_id) {
   return send_command(cell_id, cmdByte( COMMAND_factory_default ));
 }
@@ -124,24 +120,18 @@ uint8_t command_set_temperature_calibration(uint8_t cell_id, float value) {
 uint8_t command_set_load_resistance(uint8_t cell_id, float value) {
   return send_command(cell_id, cmdByte(COMMAND_set_load_resistance), value);
 }
-
-
 float cell_read_voltage_calibration(uint8_t cell_id) {
   return read_float_from_cell(cell_id, read_voltage_calibration);
 }
-
 float cell_read_temperature_calibration(uint8_t cell_id) {
   return read_float_from_cell(cell_id, read_temperature_calibration);
 }
-
 float cell_read_load_resistance(uint8_t cell_id) {
   return read_float_from_cell(cell_id, read_load_resistance);
 }
-
 uint16_t cell_read_voltage(uint8_t cell_id) {
   return read_uint16_from_cell(cell_id, read_voltage);
 }
-
 uint16_t cell_read_bypass_enabled_state(uint8_t cell_id) {
   return read_uint8_t_from_cell(cell_id, read_bypass_enabled_state);
 }
