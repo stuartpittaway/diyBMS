@@ -268,13 +268,37 @@ script.onload = function(){
 	</div> \
 	\
 	<div class="ui-field-contain"> \
-	<label for="grafana_host">Grafana Host:</label> \
-	<input id="Grafana_host" name="Grafana_host" size="64" type="text" /> \
+	<label for="emoncms_node_offset">Node offset:</label> \
+	<input id="emoncms_node_offset" name="emoncms_node_offset" size="40" type="number" /> \
+	</div> \
+	<div class="ui-field-contain"> \
+	<label for="emoncms_url">URI:</label> \
+	<input id="emoncms_url" name="emoncms_url" size="64" type="text" /> \
+	</div> \
+	<div class="ui-field-contain"> \
+	<label for="emoncms_apikey">API key:</label> \
+	<input id="emoncms_apikey" name="emoncms_apikey" size="32" type="text" /> \
+	</div> \
+	<div class="ui-field-contain"> \
+    <label for="submit-1"></label> \
+		<h2>Grafana Integration</h2> \
+	<form id="form_emoncms" method="POST" action="'+rooturl+'setemoncms">\
+	<div class="ui-field-contain"> \
+	<label for="grafana_enabled">Grafana enabled</label> \
+	<select data-role="slider" id="emoncms_enabled" name="grafana_enabled"> \
+	<option value="0">Off</option> \
+	<option value="1">On</option> \
+	</select> \
 	</div> \
 	\
 	<div class="ui-field-contain"> \
-	<label for="grafana_httpPort">Grafana HTTP Port:</label> \
-	<input id="Grafana_httpPort" name="grafana_httpPort" size="40" type="number" /> \
+	<label for="emoncms_host">Host:</label> \
+	<input id="emoncms_host" name="emoncms_host" size="64" type="text" /> \
+	</div> \
+	\
+	<div class="ui-field-contain"> \
+	<label for="emoncms_httpPort">HTTP Port:</label> \
+	<input id="emoncms_httpPort" name="emoncms_httpPort" size="40" type="number" /> \
 	</div> \
 	\
 	<div class="ui-field-contain"> \
