@@ -292,8 +292,8 @@ script.onload = function(){
 	</div> \
 	\
 	<div class="ui-field-contain"> \
-	<label for="emoncms_host">Host:</label> \
-	<input id="emoncms_host" name="emoncms_host" size="64" type="text" /> \
+	<label for="grafana_host">Host:</label> \
+	<input id="grafana_host" name="grafana_host" size="64" type="text" /> \
 	</div> \
 	\
 	<div class="ui-field-contain"> \
