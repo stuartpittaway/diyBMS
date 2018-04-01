@@ -1,4 +1,3 @@
-//var rooturl = "http://192.168.0.35/";
 var rooturl = "./";
 
 var provisionurl = rooturl+"provision";
@@ -266,6 +265,16 @@ script.onload = function(){
 	<div class="ui-field-contain"> \
 	<label for="emoncms_httpPort">HTTP Port:</label> \
 	<input id="emoncms_httpPort" name="emoncms_httpPort" size="40" type="number" /> \
+	</div> \
+	\
+	<div class="ui-field-contain"> \
+	<label for="grafana_host">Grafana Host:</label> \
+	<input id="Grafana_host" name="Grafana_host" size="64" type="text" /> \
+	</div> \
+	\
+	<div class="ui-field-contain"> \
+	<label for="grafana_httpPort">Grafana HTTP Port:</label> \
+	<input id="Grafana_httpPort" name="grafana_httpPort" size="40" type="number" /> \
 	</div> \
 	\
 	<div class="ui-field-contain"> \

@@ -7,7 +7,7 @@
 #define COMMAND_BIT 6
 
 #define COMMAND_green_led_pattern   1
-//unused #define COMMAND_led_off   2
+#define COMMAND_led_off   2
 #define COMMAND_factory_default 3
 #define COMMAND_set_slave_address 4
 #define COMMAND_green_led_default 5
