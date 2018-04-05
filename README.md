@@ -1,8 +1,15 @@
 # diyBMS
 Do it yourself battery management system to Lithium ion battery packs/cells
 
+This is a fork of Stuart Pittaways excellent diyBMS project to which i've added influxdb support.  I will then be tying this into my grafana setup.
+
 More discussion
 https://community.openenergymonitor.org/t/diy-lithium-battery-balancer-and-monitoring-bms/5594/10
+
+Some Youtube videos on the BMS building and testing can be found at
+https://www.youtube.com/playlist?list=PLiYbY8lzAN-2qB9rR0Sc7Z7sUrsgYzsiV
+
+I've left Stuarts readme pretty much as standard below for now.
 
 # Problem
 

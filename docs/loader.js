@@ -37,17 +37,25 @@ function refreshConfig() {
 	  url: getsettingsurl,
 	  dataType: "json",
 	  success: function(data) {	
-		//$("#emoncms_enabled").val( );
 		
 		var myswitch = $( "#emoncms_enabled" );
 		myswitch[0].selectedIndex = data.emoncms_enabled ? 1:0;
 		myswitch.slider( "refresh" );
+		
+		var myswitch_influxdb = $( "#emoncms_enabled" );
+		myswitch_influxdb[0].selectedIndex = data.influxdb_enabled ? 1:0;
+		myswitch_influxdb.slider( "refresh" );
 		
 		$("#emoncms_apikey").val( data.emoncms_apikey );
 		$("#emoncms_host").val( data.emoncms_host );
 		$("#emoncms_httpPort").val( data.emoncms_httpPort );
 		$("#emoncms_node_offset").val( data.emoncms_node_offset );
 		$("#emoncms_url").val( data.emoncms_url );
+		$("#influxdb_host").val( data.influxdb_host );
+		$("#influxdb_httpPort").val( data.influxdb_httpPort );
+		$("#influxdb_database").val( data.influxdb_database );
+		$("#influxdb_user").val( data.influxdb_user );
+		$("#influxdb_password").val( data.influxdb_password );
 	  }
 	});
 } //end function
@@ -281,37 +289,32 @@ script.onload = function(){
 	</div> \
 	<div class="ui-field-contain"> \
     <label for="submit-1"></label> \
-		<h2>Grafana Integration</h2> \
-	<form id="form_emoncms" method="POST" action="'+rooturl+'setemoncms">\
-	<div class="ui-field-contain"> \
-	<label for="grafana_enabled">Grafana enabled</label> \
-	<select data-role="slider" id="emoncms_enabled" name="grafana_enabled"> \
+	<h3>InfluxDB Integration</h3> \
+	<label for="influxdb_enabled">InfluxDB enabled</label> \
+	<select data-role="slider" id="influxdb_enabled" name="influxdb_enabled"> \
 	<option value="0">Off</option> \
 	<option value="1">On</option> \
 	</select> \
 	</div> \
 	\
 	<div class="ui-field-contain"> \
-	<label for="grafana_host">Host:</label> \
-	<input id="grafana_host" name="grafana_host" size="64" type="text" /> \
+	<label for="influxdb_host">InfluxDB Host:</label> \
+	<input id="influxdb_host" name="influxdb_host" size="64" type="text" /> \
 	</div> \
 	\
 	<div class="ui-field-contain"> \
-	<label for="emoncms_httpPort">HTTP Port:</label> \
-	<input id="emoncms_httpPort" name="emoncms_httpPort" size="40" type="number" /> \
+	<label for="influxdb_httpPort">HTTP Port:</label> \
+	<input id="influxdb_httpPort" name="influxdb_httpPort" size="40" type="number" /> \
 	</div> \
-	\
+		\
 	<div class="ui-field-contain"> \
-	<label for="emoncms_node_offset">Node offset:</label> \
-	<input id="emoncms_node_offset" name="emoncms_node_offset" size="40" type="number" /> \
+	<label for="influxdb_user">InfluxDB Username:</label> \
+	<input id="influxdb_user" name="influxdb_user" size="40" type="number" /> \
 	</div> \
+		\
 	<div class="ui-field-contain"> \
-	<label for="emoncms_url">URI:</label> \
-	<input id="emoncms_url" name="emoncms_url" size="64" type="text" /> \
-	</div> \
-	<div class="ui-field-contain"> \
-	<label for="emoncms_apikey">API key:</label> \
-	<input id="emoncms_apikey" name="emoncms_apikey" size="32" type="text" /> \
+	<label for="influxdb_password">InfluxDB Password:</label> \
+	<input id="influxdb_password" name="influxdb_password" size="40" type="number" /> \
 	</div> \
 	<div class="ui-field-contain"> \
     <label for="submit-1"></label> \

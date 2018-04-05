@@ -128,15 +128,23 @@ void handleSetLoadResistance() {
   server.send(500, "text/plain", "");
 }
 
+void handleSetInfluxDB() {
+
+  myConfig.influxdb_enabled = (server.arg("influxdb_enabled").toInt() == 1) ? true : false;
+  myConfig.influxdb_httpPort = server.arg("influxdb_httpPort").toInt();
+
+  server.arg("influxdb_host").toCharArray(myConfig.influxdb_host, sizeof(myConfig.influxdb_host));
+  server.arg("influxdb_database").toCharArray(myConfig.influxdb_database, sizeof(myConfig.influxdb_database));
+  server.arg("influxdb_user").toCharArray(myConfig.influxdb_user, sizeof(myConfig.influxdb_user));
+  server.arg("influxdb_password").toCharArray(myConfig.influxdb_password, sizeof(myConfig.influxdb_password));
+  
+  WriteConfigToEEPROM();
+
+  server.send(200, "text/plain", "");
+}
+
 void handleSetEmonCMS() {
-  /* Receives HTTP POST for configuring the emonCMS settings
-    emoncms_enabled:1
-    emoncms_host:192.168.0.26
-    emoncms_httpPort:80
-    emoncms_node_offset:26
-    emoncms_url:/emoncms/input/bulk?data=
-    emoncms_apikey:11111111111111111111111111111111
-  */
+
   myConfig.emoncms_enabled = (server.arg("emoncms_enabled").toInt() == 1) ? true : false;
   myConfig.emoncms_node_offset = server.arg("emoncms_node_offset").toInt();
   myConfig.emoncms_httpPort = server.arg("emoncms_httpPort").toInt();
@@ -221,6 +229,12 @@ void handleSettingsJSON() {
                    + ",\"emoncms_host\":\"" + String(myConfig.emoncms_host) + "\""
                    + ",\"emoncms_apikey\":\"" + String(myConfig.emoncms_apikey) + "\""
                    + ",\"emoncms_url\":\"" + String(myConfig.emoncms_url) + "\""
+                   + ",\"influxdb_enabled\":" + (myConfig.influxdb_enabled ? String("true") : String("false"))
+                   + ",\"influxdb_host\":" + String(myConfig.influxdb_host) + "\""
+                   + ",\"influxdb_httpPort\":\"" + String(myConfig.influxdb_httpPort)
+                   + ",\"influxdb_database\":\"" + String(myConfig.influxdb_database) + "\""
+                   + ",\"influxdb_user\":\"" + String(myConfig.influxdb_user) + "\""
+                   + ",\"influxdb_password\":\"" + String(myConfig.influxdb_password) + "\""
                    + "}\r\n\r\n";
   server.send(200, "application/json", json1 );
 }
@@ -366,6 +380,7 @@ void SetupManagementRedirect() {
   server.on("/setvoltcalib", HTTP_POST, handleSetVoltCalib);
   server.on("/settempcalib", HTTP_POST, handleSetTempCalib);
   server.on("/setemoncms", HTTP_POST, handleSetEmonCMS);
+  server.on("/handleSetInfluxDB", HTTP_POST, handleSetInfluxDB);
 
   server.onNotFound(handleNotFound);
 

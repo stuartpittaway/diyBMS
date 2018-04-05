@@ -32,6 +32,8 @@ extern "C"
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
+#include <ESP8266HTTPClient.h>
+
 
 #include "bms_values.h"
 #include "i2c_cmds.h"
@@ -47,6 +49,7 @@ unsigned long next_submit;
 bool runProvisioning;
 
 EmonCMS emoncms;
+Influxdb influxdb;
 
 os_timer_t myTimer;
 

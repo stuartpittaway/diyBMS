@@ -1,10 +1,11 @@
 #include "WebServiceSubmit.h"
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
+#include <ESP8266HTTPClient.h>
 
 extern uint8_t DEFAULT_SLAVE_ADDR_START_RANGE;
 
-//Implements WebServiceSubmit abstract/interface class
+//Implements EmonCMS WebServiceSubmit abstract/interface class
 void EmonCMS::postData(eeprom_settings myConfig, cell_module (&cell_array)[24], int cell_array_max) {
 
   if (!myConfig.emoncms_enabled) return;
@@ -38,6 +39,58 @@ void EmonCMS::postData(eeprom_settings myConfig, cell_module (&cell_array)[24], 
   } else {
     // This will send the request to the server
     client.print(String("GET ") + url + " HTTP/1.1\r\nHost: " + myConfig.emoncms_host + "\r\nConnection: close\r\n\r\n");
+
+    unsigned long timeout = millis() + 2500;
+    // Read all the lines of the reply from server and print them to Serial
+    while (client.connected())
+    {
+      yield();
+
+      if (millis() > timeout) {
+        Serial.println(">>> Client Timeout !");
+        client.stop();
+        return;
+      }
+
+      if (client.available())
+      {
+        String line = client.readStringUntil('\n');
+        Serial.println(line);
+      }
+    }
+    client.stop();
+  }
+}
+
+//Implements Influxdb WebServiceSubmit abstract/interface class
+void Influxdb::postData(eeprom_settings myConfig, cell_module (&cell_array)[24], int cell_array_max) {
+
+  if (!myConfig.influxdb_enabled) return;
+
+  //Construct URL for the influxdb
+  String url = "http://" + String(myConfig.influxdb_host) + ":" + myConfig.influxdb_httpPort + "/write?db=" + String(myConfig.influxdb_database) ;
+
+  //Cycle through each module and push the voltage to grafana using a http post.
+  for (int a = 0; a < cell_array_max; a++) {
+
+    HTTPClient http;
+    http.begin(url);
+    http.addHeader("Content-Type", "data-binary");
+    int httpCode = http.POST("cell-voltages,Cell=" + String(a+1) +" value="+String(cell_array[a].voltage));
+    String payload = http.getString();
+    Serial.println("cell-voltages,Cell=" + String(a+1) +" value="+String(cell_array[a].voltage));
+    Serial.println(payload);
+
+  }
+
+  WiFiClient client;
+
+  if (!client.connect(myConfig.influxdb_host, myConfig.influxdb_httpPort)) {
+    Serial.println("connection failed");
+
+  } else {
+    // This will send the request to the server
+    client.print(String("GET ") + url + " HTTP/1.1\r\nHost: " + myConfig.influxdb_host + "\r\nConnection: close\r\n\r\n");
 
     unsigned long timeout = millis() + 2500;
     // Read all the lines of the reply from server and print them to Serial
