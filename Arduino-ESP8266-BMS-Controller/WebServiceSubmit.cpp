@@ -64,7 +64,11 @@ void EmonCMS::postData(eeprom_settings myConfig, cell_module (&cell_array)[24], 
 
 //Implements Influxdb WebServiceSubmit abstract/interface class
 void Influxdb::postData(eeprom_settings myConfig, cell_module (&cell_array)[24], int cell_array_max) {
+  Serial.println("in the influxdb loop");
+  myConfig.influxdb_enabled=1;
+  Serial.println(myConfig.influxdb_enabled);
 
+  
   if (!myConfig.influxdb_enabled) return;
 
   //Construct URL for the influxdb

@@ -321,6 +321,7 @@ script.onload = function(){
 	<label for="influxdb_password">InfluxDB Password:</label> \
 	<input id="influxdb_password" name="influxdb_password" size="64" type="text" /> \
 	</div> \
+	\
 	<div class="ui-field-contain"> \
     <label for="submit-1"></label> \
     <button type="submit" id="submit-1" class="ui-shadow ui-btn ui-corner-all">Save</button> \
