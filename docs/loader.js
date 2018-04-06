@@ -308,6 +308,11 @@ script.onload = function(){
 	</div> \
 		\
 	<div class="ui-field-contain"> \
+	<label for="influxdb_database">InfluxDB Database:</label> \
+	<input id="influxdb_database" name="influxdb_database" size="40" type="number" /> \
+	</div> \
+		\
+	<div class="ui-field-contain"> \
 	<label for="influxdb_user">InfluxDB Username:</label> \
 	<input id="influxdb_user" name="influxdb_user" size="40" type="number" /> \
 	</div> \
