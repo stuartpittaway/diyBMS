@@ -266,7 +266,7 @@ void loop() {
 
   if (cell_array_max > 0) {
 
-    /*
+    
         for ( int a = 0; a < cell_array_max; a++) {
           Serial.print(cell_array[a].address);
           Serial.print(':');
@@ -276,7 +276,7 @@ void loop() {
           Serial.print(' ');
         }
         Serial.println();
-   */
+   
     if ((millis() > next_submit) && (WiFi.status() == WL_CONNECTED)) {
       emoncms.postData(myConfig, cell_array, cell_array_max);
       influxdb.postData(myConfig, cell_array, cell_array_max);

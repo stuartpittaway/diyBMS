@@ -42,7 +42,7 @@ function refreshConfig() {
 		myswitch[0].selectedIndex = data.emoncms_enabled ? 1:0;
 		myswitch.slider( "refresh" );
 		
-		var myswitch_influxdb = $( "#emoncms_enabled" );
+		var myswitch_influxdb = $( "#influxdb_enabled" );
 		myswitch_influxdb[0].selectedIndex = data.influxdb_enabled ? 1:0;
 		myswitch_influxdb.slider( "refresh" );
 		

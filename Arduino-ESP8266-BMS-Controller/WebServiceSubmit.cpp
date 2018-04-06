@@ -8,6 +8,10 @@ extern uint8_t DEFAULT_SLAVE_ADDR_START_RANGE;
 //Implements EmonCMS WebServiceSubmit abstract/interface class
 void EmonCMS::postData(eeprom_settings myConfig, cell_module (&cell_array)[24], int cell_array_max) {
 
+  Serial.println("in the econcms loop");
+  //myConfig.influxdb_enabled=1;
+  Serial.println(myConfig.emoncms_enabled);
+  
   if (!myConfig.emoncms_enabled) return;
 
   String url = myConfig.emoncms_url;// "/emoncms/input/bulk?data=";
@@ -65,7 +69,7 @@ void EmonCMS::postData(eeprom_settings myConfig, cell_module (&cell_array)[24], 
 //Implements Influxdb WebServiceSubmit abstract/interface class
 void Influxdb::postData(eeprom_settings myConfig, cell_module (&cell_array)[24], int cell_array_max) {
   Serial.println("in the influxdb loop");
-  myConfig.influxdb_enabled=1;
+  //myConfig.influxdb_enabled=1;
   Serial.println(myConfig.influxdb_enabled);
 
   
