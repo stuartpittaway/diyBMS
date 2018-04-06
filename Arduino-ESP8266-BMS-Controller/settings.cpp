@@ -34,7 +34,7 @@ void FactoryResetSettings() {
   const char emoncms_apikey[]="1234567890abcdef1234567890abcdef";
   const char emoncms_url[]="/emoncms/input/bulk?data=";
 
-  const char* influxdb_host = "192.168.0.25";
+  const char* influxdb_host = "192.168.0.129";
   const uint16_t influxdb_httpPort = 8086;
  
   const char* influxdb_database = "powerwall";

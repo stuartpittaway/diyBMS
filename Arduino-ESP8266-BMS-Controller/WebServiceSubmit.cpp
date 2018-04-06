@@ -91,7 +91,7 @@ void Influxdb::postData(eeprom_settings myConfig, cell_module (&cell_array)[24],
   } else {
     // This will send the request to the server
     client.print(String("GET ") + url + " HTTP/1.1\r\nHost: " + myConfig.influxdb_host + "\r\nConnection: close\r\n\r\n");
-
+    
     unsigned long timeout = millis() + 2500;
     // Read all the lines of the reply from server and print them to Serial
     while (client.connected())

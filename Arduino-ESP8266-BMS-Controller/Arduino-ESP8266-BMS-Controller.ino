@@ -264,9 +264,9 @@ void loop() {
   delay(250);
 
 
-  if (cell_array_max > 0) {
+/*  if (cell_array_max > 0) {
 
-    /*
+    
         for ( int a = 0; a < cell_array_max; a++) {
           Serial.print(cell_array[a].address);
           Serial.print(':');
@@ -276,11 +276,30 @@ void loop() {
           Serial.print(' ');
         }
         Serial.println();
-    */
+ */   
     if ((millis() > next_submit) && (WiFi.status() == WL_CONNECTED)) {
       emoncms.postData(myConfig, cell_array, cell_array_max);
-      //Update emoncms every 30 seconds
-      next_submit = millis() + 30000;
+      //Influxdb.postData(myConfig, cell_array, cell_array_max);
+
+  //Construct URL for the influxdb
+  String url = "http://" + String(myConfig.influxdb_host) + ":" + myConfig.influxdb_httpPort + "/write?db=" + String(myConfig.influxdb_database) ;
+Serial.println(url);
+  //Cycle through each module and push the voltage to grafana using a http post.
+  for (int a = 0; a < cell_array_max; a++) {
+
+    HTTPClient http;
+    http.begin(url);
+    http.addHeader("Content-Type", "data-binary");
+    int httpCode = http.POST("cell-voltages,Cell=" + String(a+1) +" value="+String(cell_array[a].voltage));
+    String payload = http.getString();
+    Serial.println("cell-voltages,Cell=" + String(a+1) +" value="+String(cell_array[a].voltage));
+    Serial.println(payload);
+
+  }
+
+      
+      //Update Influsdbemoncms every 60 seconds
+      next_submit = millis() + 60000;
     }
   }
 }//end of loop

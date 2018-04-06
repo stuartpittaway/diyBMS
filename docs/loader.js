@@ -309,17 +309,17 @@ script.onload = function(){
 		\
 	<div class="ui-field-contain"> \
 	<label for="influxdb_database">InfluxDB Database:</label> \
-	<input id="influxdb_database" name="influxdb_database" size="40" type="number" /> \
+	<input id="influxdb_database" name="influxdb_database" size="64" type="text" /> \
 	</div> \
 		\
 	<div class="ui-field-contain"> \
 	<label for="influxdb_user">InfluxDB Username:</label> \
-	<input id="influxdb_user" name="influxdb_user" size="40" type="number" /> \
+	<input id="influxdb_user" name="influxdb_user" size="64" type="text" /> \
 	</div> \
 		\
 	<div class="ui-field-contain"> \
 	<label for="influxdb_password">InfluxDB Password:</label> \
-	<input id="influxdb_password" name="influxdb_password" size="40" type="number" /> \
+	<input id="influxdb_password" name="influxdb_password" size="64" type="text" /> \
 	</div> \
 	<div class="ui-field-contain"> \
     <label for="submit-1"></label> \
@@ -327,7 +327,7 @@ script.onload = function(){
 	</div>	\
 	</form> \
 	</div> \
-	<p><a href="#main" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">Cancel</a></p> \
+	<p><a href="#main" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">Close</a></p> \
 	</div> \
 	</div> \
 	<div data-role="page" id="modules" data-dom-cache="true"> \
