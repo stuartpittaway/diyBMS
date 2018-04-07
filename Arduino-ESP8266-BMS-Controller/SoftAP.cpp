@@ -145,6 +145,14 @@ void handleSetInfluxDB() {
 
 void handleSetEmonCMS() {
 
+  myConfig.influxdb_enabled = (server.arg("influxdb_enabled").toInt() == 1) ? true : false;
+  myConfig.influxdb_httpPort = server.arg("influxdb_httpPort").toInt();
+
+  server.arg("influxdb_host").toCharArray(myConfig.influxdb_host, sizeof(myConfig.influxdb_host));
+  server.arg("influxdb_database").toCharArray(myConfig.influxdb_database, sizeof(myConfig.influxdb_database));
+  server.arg("influxdb_user").toCharArray(myConfig.influxdb_user, sizeof(myConfig.influxdb_user));
+  server.arg("influxdb_password").toCharArray(myConfig.influxdb_password, sizeof(myConfig.influxdb_password));
+
   myConfig.emoncms_enabled = (server.arg("emoncms_enabled").toInt() == 1) ? true : false;
   myConfig.emoncms_node_offset = server.arg("emoncms_node_offset").toInt();
   myConfig.emoncms_httpPort = server.arg("emoncms_httpPort").toInt();
@@ -380,7 +388,7 @@ void SetupManagementRedirect() {
   server.on("/setvoltcalib", HTTP_POST, handleSetVoltCalib);
   server.on("/settempcalib", HTTP_POST, handleSetTempCalib);
   server.on("/setemoncms", HTTP_POST, handleSetEmonCMS);
-  server.on("/handleSetInfluxDB", HTTP_POST, handleSetInfluxDB);
+  //server.on("/handleSetInfluxDB", HTTP_POST, handleSetInfluxDB);
 
   server.onNotFound(handleNotFound);
 
