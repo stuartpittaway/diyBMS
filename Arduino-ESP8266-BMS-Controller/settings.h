@@ -17,7 +17,7 @@ struct wifi_eeprom_settings {
   char wifi_passphrase[63 + 1];
 };
 
-//We have allowed space for 2048-512 bytes of EEPROM for settings (1792 bytes)
+//We have allowed space for 2048-512 bytes of EEPROM for settings (1536 bytes)
 struct eeprom_settings { 
   bool emoncms_enabled;
   uint8_t emoncms_node_offset;

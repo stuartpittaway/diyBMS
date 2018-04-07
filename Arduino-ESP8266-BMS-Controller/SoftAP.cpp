@@ -238,8 +238,8 @@ void handleSettingsJSON() {
                    + ",\"emoncms_apikey\":\"" + String(myConfig.emoncms_apikey) + "\""
                    + ",\"emoncms_url\":\"" + String(myConfig.emoncms_url) + "\""
                    + ",\"influxdb_enabled\":" + (myConfig.influxdb_enabled ? String("true") : String("false"))
-                   + ",\"influxdb_host\":" + String(myConfig.influxdb_host) + "\""
-                   + ",\"influxdb_httpPort\":\"" + String(myConfig.influxdb_httpPort)
+                   + ",\"influxdb_host\":\"" + String(myConfig.influxdb_host) + "\""
+                   + ",\"influxdb_httpPort\":" + String(myConfig.influxdb_httpPort)
                    + ",\"influxdb_database\":\"" + String(myConfig.influxdb_database) + "\""
                    + ",\"influxdb_user\":\"" + String(myConfig.influxdb_user) + "\""
                    + ",\"influxdb_password\":\"" + String(myConfig.influxdb_password) + "\""

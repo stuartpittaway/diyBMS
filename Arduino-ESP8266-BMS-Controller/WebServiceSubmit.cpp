@@ -71,7 +71,7 @@ void Influxdb::postData(eeprom_settings myConfig, cell_module (&cell_array)[24],
   Serial.println("in the influxdb loop");
   //myConfig.influxdb_enabled=1;
   Serial.println(myConfig.influxdb_enabled);
-
+  Serial.println(myConfig.influxdb_host);
   
   if (!myConfig.influxdb_enabled) return;
 

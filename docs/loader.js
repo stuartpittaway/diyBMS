@@ -248,7 +248,7 @@ script.onload = function(){
 	<div role="main" data-role="ui-content"><div id="nodata">There is no data available, please configure modules.</div> \
 	<div id="chart1"></div> \
 	<div id="buttons"><a href="#config" data-transition="pop" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Configure</a> <a href="#modules" data-transition="pop" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Modules</a>  \
-	<a id="AboveAvgBalance" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Above Avg Balance</a> <a id="github" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" href="https://github.com/stuartpittaway/diyBMS">GitHub</a></div></div> \
+	<a id="AboveAvgBalance" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Above Avg Balance</a> <a id="github" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" href="https://github.com/chickey/diyBMS">GitHub</a></div></div> \
 	</div> \
 	<div data-role="page" id="config" data-dom-cache="true"> \
 	<div data-role="header"><h1>Configuration</h1></div> \
@@ -336,7 +336,7 @@ script.onload = function(){
 	<div role="main" data-role="ui-content"> \
 	<div id="moduletable"></div> \
 	<p>Use the Provision button to add a new cell module to the controller.  To begin, add ONE (and only one) new module to the monitoring cable and click the Provision button.</p> \
-	<p><a id="provButton" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Provision</a> <a id="syncTempCalib" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Sync Temp Calibration</a> <a href="#main" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">Cancel</a></p> \
+	<p><a id="provButton" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Provision</a> <a id="syncTempCalib" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Sync Temp Calibration</a> <a href="#main" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">Close</a></p> \
 	</div> \
 	</div>');
 
