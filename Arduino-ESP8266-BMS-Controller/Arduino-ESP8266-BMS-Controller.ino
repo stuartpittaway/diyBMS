@@ -1,4 +1,3 @@
-
 /* ____  ____  _  _  ____  __  __  ___
   (  _ \(_  _)( \/ )(  _ \(  \/  )/ __)
    )(_) )_)(_  \  /  ) _ < )    ( \__ \
@@ -72,18 +71,18 @@ void print_module_details(struct  cell_module *module) {
 void check_module_quick(struct  cell_module *module) {
   module->voltage = cell_read_voltage(module->address);
   module->temperature = cell_read_board_temp(module->address);
-
+  
   if (module->voltage >= 0 && module->voltage <= 5000) {
-
     if ( module->voltage > module->max_voltage || module->valid_values == false) {
       module->max_voltage = module->voltage;
     }
     if ( module->voltage < module->min_voltage || module->valid_values == false) {
       module->min_voltage = module->voltage;
     }
-
+    Serial.println("valid values = true");
     module->valid_values = true;
   } else {
+    Serial.println("valid values = false");
     module->valid_values = false;
   }
 }
@@ -264,9 +263,7 @@ void loop() {
   delay(250);
 
 
-  if (cell_array_max > 0) {
-
-    
+  if (cell_array_max > 0) {  
         for ( int a = 0; a < cell_array_max; a++) {
           Serial.print(cell_array[a].address);
           Serial.print(':');
@@ -281,24 +278,7 @@ void loop() {
       emoncms.postData(myConfig, cell_array, cell_array_max);
       influxdb.postData(myConfig, cell_array, cell_array_max);
 
-/*  //Construct URL for the influxdb
-  String url = "http://" + String(myConfig.influxdb_host) + ":" + myConfig.influxdb_httpPort + "/write?db=" + String(myConfig.influxdb_database) ;
-  Serial.println(url);
-  //Cycle through each module and push the voltage to grafana using a http post.
-  for (int a = 0; a < cell_array_max; a++) {
-
-    HTTPClient http;
-    http.begin(url);
-    http.addHeader("Content-Type", "data-binary");
-    int httpCode = http.POST("cell-voltages,Cell=" + String(a+1) +" value="+String(cell_array[a].voltage));
-    String payload = http.getString();
-    Serial.println("cell-voltages,Cell=" + String(a+1) +" value="+String(cell_array[a].voltage));
-    Serial.println(payload);
-
-  }
-
-  */    
-      //Update Influsdbemoncms every 60 seconds
+      //Update Influxdb/emoncms every 60 seconds
       next_submit = millis() + 60000;
     }
   }
