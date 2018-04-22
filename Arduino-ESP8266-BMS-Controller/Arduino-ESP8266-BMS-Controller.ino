@@ -4,7 +4,8 @@
   (____/(____) (__) (____/(_/\/\_)(___/
 
   (c) 2017 Stuart Pittaway
-
+  Modifications for Grafna code made by Colin Hickey
+  
   This is the code for the controller - it talks to the cell modules over isolated i2c bus
 
   This code runs on ESP-8266-12E (NODE MCU 1.0) and compiles with Arduino 1.8.5 environment
