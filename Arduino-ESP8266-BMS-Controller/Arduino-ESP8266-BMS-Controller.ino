@@ -79,10 +79,8 @@ void check_module_quick(struct  cell_module *module) {
     if ( module->voltage < module->min_voltage || module->valid_values == false) {
       module->min_voltage = module->voltage;
     }
-    Serial.println("valid values = true");
     module->valid_values = true;
   } else {
-    Serial.println("valid values = false");
     module->valid_values = false;
   }
 }
@@ -264,7 +262,7 @@ void loop() {
 
 
   if (cell_array_max > 0) {  
-        for ( int a = 0; a < cell_array_max; a++) {
+      /*  for ( int a = 0; a < cell_array_max; a++) {
           Serial.print(cell_array[a].address);
           Serial.print(':');
           Serial.print(cell_array[a].voltage);
@@ -273,7 +271,7 @@ void loop() {
           Serial.print(' ');
         }
         Serial.println();
-   
+    */
     if ((millis() > next_submit) && (WiFi.status() == WL_CONNECTED)) {
       emoncms.postData(myConfig, cell_array, cell_array_max);
       influxdb.postData(myConfig, cell_array, cell_array_max);

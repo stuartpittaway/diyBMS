@@ -74,15 +74,19 @@ void Influxdb::postData(eeprom_settings myConfig, cell_module (&cell_array)[24],
 
   //Cycle through each module and push the voltage to grafana using a http post.
   for (int a = 0; a < cell_array_max; a++) {
-
+    Serial.print(" Module :");
+    Serial.print(cell_array[a].address);
+    Serial.print(" Voltage: ");
+    Serial.print(cell_array[a].voltage);
+    Serial.print(" Valid values = ");
+    Serial.println(cell_array[a].valid_values);
+    
     HTTPClient http;
     http.begin(url);
     http.addHeader("Content-Type", "data-binary");
     //Ensure its a sensible value to avoid filling influxdb graph with high values
-    if (cell_array[a].valid_values=true) {
+    if (cell_array[a].valid_values==true) {
         int httpCode = http.POST("cell-voltages,Cell=" + String(a+1) +" value="+String(cell_array[a].voltage));
-        //httpCode = http.POST("cell-temperatures,Cell=" + String(a+1) +" value="+String(cell_array[a].temperature));
-        //httpCode = http.POST("cell-balance_target,Cell=" + String(a+1) +" value="+String(cell_array[a].balance_target));
     }
     String payload = http.getString();
   }
@@ -111,7 +115,7 @@ void Influxdb::postData(eeprom_settings myConfig, cell_module (&cell_array)[24],
       if (client.available())
       {
         String line = client.readStringUntil('\n');
-        Serial.println(line);
+        //Serial.println(line);
       }
     }
     client.stop();
