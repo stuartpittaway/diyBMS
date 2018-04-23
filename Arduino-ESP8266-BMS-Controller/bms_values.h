@@ -32,7 +32,8 @@ struct cell_module {
   // 7 bit slave I2C address
   uint8_t address;
   uint16_t voltage;
-  uint16_t temperature;
+//  uint16_t temperature;
+  float temperature;
 
   uint16_t balance_target;
   

@@ -48,6 +48,24 @@ int cell_array_max = 0;
 unsigned long next_submit;
 bool runProvisioning;
 
+//Configuration for thermistor conversion
+//use the datasheet to get this data.
+//https://www.instructables.com/id/NTC-Temperature-Sensor-With-Arduino/
+float Vin=3.3;     // [V]        
+float Rt=10000;    // Resistor t [ohm]
+float R0=20000;    // value of rct in T0 [ohm]
+float T1=273.15;   // [K] in datasheet 0º C
+float T2=373.15;   // [K] in datasheet 100° C
+float RT1=35563;   // [ohms]  resistence in T1
+float RT2=549.4;     // [ohms]   resistence in T2
+float beta=0.0;    // initial parameters [K]
+float Rinf=0.0;    // initial parameters [ohm]   
+float T0=298.15;   // use T0 in Kelvin [K]
+float Vout=0.0;    // Vout in A0 
+float Rout=0.0;    // Rout in A0
+float TempK=0.0;   // variable output
+float TempC=0.0;   // variable output
+
 EmonCMS emoncms;
 Influxdb influxdb;
 
@@ -71,9 +89,8 @@ void print_module_details(struct  cell_module *module) {
 
 void check_module_quick(struct  cell_module *module) {
   module->voltage = cell_read_voltage(module->address);
-  module->temperature = cell_read_board_temp(module->address);
-  
-  if (module->voltage >= 0 && module->voltage <= 5000) {
+  module->temperature = tempconvert(cell_read_board_temp(module->address));   
+ if (module->voltage >= 0 && module->voltage <= 5000) {
     if ( module->voltage > module->max_voltage || module->valid_values == false) {
       module->max_voltage = module->voltage;
     }
@@ -190,6 +207,15 @@ void scani2cBus() {
   }
 }
 
+float tempconvert(float rawtemp) {
+  Vout=Vin*((float)(rawtemp)/1024.0); // calc for ntc
+  Rout=(Rt*Vout*(Vin-Vout));
+
+  TempK=(beta/log(Rout/Rinf)); // calc for temperature
+  TempC=TempK-273.15;
+
+  return TempC;
+}
 
 void setup() {
   Serial.begin(19200);           // start serial for output
@@ -203,6 +229,10 @@ void setup() {
   pinMode(D4, OUTPUT);
   LED_OFF;
 
+  //Thermistor setup
+  beta=(log(RT1/RT2))/((1/T1)-(1/T2));
+  Rinf=R0*exp(-beta/T0);
+  
   Serial.println(F("DIY BMS Controller Startup"));
 
   initWire();

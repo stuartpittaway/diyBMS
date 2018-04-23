@@ -66,30 +66,26 @@ void EmonCMS::postData(eeprom_settings myConfig, cell_module (&cell_array)[24], 
 
 //Implements Influxdb WebServiceSubmit abstract/interface class
 void Influxdb::postData(eeprom_settings myConfig, cell_module (&cell_array)[24], int cell_array_max) {
-  
   if (!myConfig.influxdb_enabled) return;
-
+  String poststring;
+  String poststring1;
+  HTTPClient http;
+  
   //Construct URL for the influxdb
   String url = "http://" + String(myConfig.influxdb_host) + ":" + myConfig.influxdb_httpPort + "/write?db=" + String(myConfig.influxdb_database) ;
 
   //Cycle through each module and push the voltage to grafana using a http post.
+
   for (int a = 0; a < cell_array_max; a++) {
-    Serial.print(" Module :");
-    Serial.print(cell_array[a].address);
-    Serial.print(" Voltage: ");
-    Serial.print(cell_array[a].voltage);
-    Serial.print(" Valid values = ");
-    Serial.println(cell_array[a].valid_values);
-    
-    HTTPClient http;
-    http.begin(url);
-    http.addHeader("Content-Type", "data-binary");
     //Ensure its a sensible value to avoid filling influxdb graph with high values
     if (cell_array[a].valid_values==true) {
-        int httpCode = http.POST("cell-voltages,Cell=" + String(a+1) +" value="+String(cell_array[a].voltage));
-    }
-    String payload = http.getString();
+      poststring = poststring + ("Cells,Cell=" + String(a+1) + " " + "Voltage=" + String(cell_array[a].voltage) + ",Temp=" + String(cell_array[a].temperature) + ",Bypass=" + cell_array[a].balance_target + "\n");
+     }
   }
+  http.begin(url);
+  http.addHeader("Content-Type", "data-binary");
+  int httpCode = http.POST(poststring);
+  String payload = http.getString();
 
   WiFiClient client;
 
