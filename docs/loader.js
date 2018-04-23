@@ -164,7 +164,7 @@ function refreshGraph(){
 				plot1=$.jqplot('chart1',data,{
 				title: "Cell Voltages",
 				axes:{xaxis:{label:'Cell module',renderer:$.jqplot.CategoryAxisRenderer, ticks: t }
-				,yaxis:{ label:'Voltage',syncTicks:true, min: 2.0, max: 4.2, numberTicks:23, tickOptions:{formatString:'%.2f'} }
+				,yaxis:{ label:'Voltage',syncTicks:true, min: 2.0, max: 4.3, numberTicks:23, tickOptions:{formatString:'%.2f'} }
 				,y2axis:{label:'Temperature',syncTicks:true,min:-25, max:100, numberTicks:23, tickOptions:{formatString:'%.2f'}}
 				}//end axes
 				,
