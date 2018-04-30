@@ -79,21 +79,16 @@ Typical bill of materials for each cell module, costs and part numbers provided 
 |	1	|	B57891M0103K000 Thermistor, NTC, 10 kohm, B57891M Series, 3950 K, Through Hole	|	0.571	|	EPCOS B57891M0103K000	|	http://uk.farnell.com/epcos/b57891m0103k000/thermistor-ntc-radial-leaded/dp/2285471?ost=B57891M0103K000&iscrfnonsku=false&ddkey=http%3Aen-GB%2FElement14_United_Kingdom%2Fsearch	|
 |	1	|	1x GREEN LED 1206 SMT	|		|		|		|
 |	1	|	1x BLUE LED 1206 SMT	|	0.12	|	King Bright KPL-3015QBC-D	|	http://uk.farnell.com/kingbright/kpl-3015qbc-d/led-blue-200mcd-465nm-smd/dp/2426226?ost=KPL-3015QBC-D&iscrfnonsku=false&ddkey=http%3Aen-GB%2FElement14_United_Kingdom%2Fsearch	|
+|	2	|	C1/C2 2.2uF Cap 1210 SMT	|		|	X7R	|		|
 |	3	|	C3/C4/C5 0.1uF Cap 1210 SMT SMD Multilayer Ceramic Capacitor, 1210 [3225 Metric], 0.1 µF, 100 V, ± 10%, X7R, Y Series FF-CAP	|	0.15	|	KEMET C1210Y104K1RACTU	|	http://uk.farnell.com/kemet/c1210y104k1ractu/capacitor-1210-100nf-100v-x7r/dp/1520317	|
-|	2	|	C1 2.2uF Cap 1210 SMT	|		|	X7R	|		|
-|	2	|	C2 2.2uF Cap 1210 SMT	|		|	X7R	|		|
 |	2	|	C6 0.22uF Cap 1210 SMT	|		|	X7R	|		|
+|	1	|	R1 3.3R 50W Wire Wound Resistor |		|	HS50 3R3 J |		|
+|	1	|	R2 47R Resistor 1206 SMT	|		|		|		|
+|	1	|	R3 68K Resistor 1206 SMT	|		|		|		|
 |	1	|	R4 10K Resistor 1206 SMT	|		|		|		|
-|	1	|	R5 47K Resistor 1206 SMT	|		|		|		|
+|	2	|	R5/R9 47K Resistor 1206 SMT	|		|		|		|
 |	1	|	R6 470K Resistor 1206 SMT	|		|		|		|
 |	1	|	R7 680K Resistor 1206 SMT	|		|		|		|
-|	1	|	R8 2K2 Resistor 1206 SMT	|		|		|		|
-|	1	|	R3 20K Resistor 1206 SMT	|		|		|		|
-|	1	|	R10 2K2 Resistor 1206 SMT	|		|		|		|
-|	1	|	R11 510R Resistor 1206 SMT	|		|		|		|
-|	1	|	R12 510R Resistor 1206 SMT	|		|		|		|
-|	1	|	R11 2K2 Resistor 1206 SMT	|		|		|		|
-|	1	|	R9 47K Resistor 1206 SMT	|		|		|		|
-|	1	|	47R Resistor 1206 SMT	|		|		|		|
-|	2	|	J2/J2 JST_PH_S4B-PH-K_04x2.00mm_Angled	|	0.10	|		S4B-PH-K-S (LF)(SN)	|	http://uk.farnell.com/jst-japan-solderless-terminals/s4b-ph-k-s-lf-sn/header-tht-right-angle-2mm-4way/dp/9492488	|
+|	3	|	R8/R10/R12 2K2 Resistor 1206 SMT	|		|		|		|
+|	2	|	J2/J3 JST_PH_S4B-PH-K_04x2.00mm_Angled	|	0.10	|		S4B-PH-K-S (LF)(SN)	|	http://uk.farnell.com/jst-japan-solderless-terminals/s4b-ph-k-s-lf-sn/header-tht-right-angle-2mm-4way/dp/9492488	|
 |	1	|	J1 	S2B-PH-K-S (LF)(SN)  	| 0.07		|	JST 	S2B-PH-K-S (LF)(SN)	|		|
