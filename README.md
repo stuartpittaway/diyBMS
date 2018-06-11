@@ -84,7 +84,7 @@ Typical bill of materials for each cell module, costs and part numbers provided 
 |	2	|	C6 0.22uF Cap 1210 SMT	|		|	X7R	|		|
 |	1	|	R1 3.3R 50W Wire Wound Resistor |		|	HS50 3R3 J |		|
 |	1	|	R2 47R Resistor 1206 SMT	|		|		|		|
-|	1	|	R3 68K Resistor 1206 SMT	|		|		|		|
+|	1	|	R3 20K Resistor 1206 SMT	|		|		|		|
 |	1	|	R4 10K Resistor 1206 SMT	|		|		|		|
 |	2	|	R5/R9 47K Resistor 1206 SMT	|		|		|		|
 |	1	|	R6 470K Resistor 1206 SMT	|		|		|		|
