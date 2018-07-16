@@ -50,6 +50,8 @@ struct cell_module {
   bool valid_values;
 
   bool update_calibration;
+
+  bool bypass_status;
 };
 
 

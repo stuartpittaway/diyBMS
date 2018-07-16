@@ -90,6 +90,7 @@ void print_module_details(struct  cell_module *module) {
 void check_module_quick(struct  cell_module *module) {
   module->voltage = cell_read_voltage(module->address);
   module->temperature = tempconvert(cell_read_board_temp(module->address));   
+  module->bypass_status = cell_read_bypass_enabled_state(module->address);
  if (module->voltage >= 0 && module->voltage <= 5000) {
     if ( module->voltage > module->max_voltage || module->valid_values == false) {
       module->max_voltage = module->voltage;
@@ -163,7 +164,11 @@ void timerCallback(void *pArg) {
     if (cell_array[cell_array_index].balance_target > 0) {
       command_set_bypass_voltage(cell_array[cell_array_index].address, cell_array[cell_array_index].balance_target);
       cell_array[cell_array_index].balance_target = 0;
-    }
+      //cell_array[cell_array_index].bypass_status = 1;
+    } /*else
+    {
+      cell_array[cell_array_index].bypass_status = 0;
+    }*/
 
     cell_array_index++;
     if (cell_array_index >= cell_array_max) {
@@ -293,16 +298,18 @@ void loop() {
 
 
   if (cell_array_max > 0) {  
-      /*  for ( int a = 0; a < cell_array_max; a++) {
+        for ( int a = 0; a < cell_array_max; a++) {
           Serial.print(cell_array[a].address);
           Serial.print(':');
           Serial.print(cell_array[a].voltage);
           Serial.print(':');
           Serial.print(cell_array[a].temperature);
+          Serial.print(':');
+          Serial.print(cell_array[a].bypass_status);
           Serial.print(' ');
         }
         Serial.println();
-    */
+    
     if ((millis() > next_submit) && (WiFi.status() == WL_CONNECTED)) {
       emoncms.postData(myConfig, cell_array, cell_array_max);
       influxdb.postData(myConfig, cell_array, cell_array_max);
