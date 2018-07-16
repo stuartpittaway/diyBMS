@@ -65,6 +65,16 @@ void handleProvision() {
 }
 
 
+void handleCancelAverageBalance() {
+  if (cell_array_max > 0) {
+    for (int a = 0; a < cell_array_max; a++) {
+      cell_array[a].balance_target = 0;
+    }
+  }
+
+//  server.send(200, "application/json", "[" + String(avgint) + "]\r\n\r\n");
+}
+
 
 void handleAboveAverageBalance() {
   uint16_t avgint = 0;
@@ -380,6 +390,7 @@ void SetupManagementRedirect() {
   server.on("/celljson", HTTP_GET, handleCellJSONData);
   server.on("/provision", HTTP_GET, handleProvision);
   server.on("/aboveavgbalance", HTTP_GET, handleAboveAverageBalance);
+  server.on("/cancelavgbalance", HTTP_GET, handleCancelAverageBalance);
   server.on("/getmoduleconfig", HTTP_GET, handleCellConfigurationJSON);
   server.on("/getsettings", HTTP_GET, handleSettingsJSON);
 

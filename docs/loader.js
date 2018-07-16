@@ -7,6 +7,7 @@ var getsettingsurl = rooturl+"getsettings";
 var voltagecalibrationurl = rooturl+"setvoltcalib";
 var temperaturecalibrationurl= rooturl+"settempcalib";
 var aboveavgbalanceurl= rooturl+"aboveavgbalance";
+var cancelavgbalanceurl= rooturl+"cancelavgbalance";
 var setloadresistanceurl= rooturl+"setloadresistance";
 var factoryreseturl= rooturl+"factoryreset";
 
@@ -164,11 +165,7 @@ function refreshGraph(){
 				plot1=$.jqplot('chart1',data,{
 				title: "Cell Voltages",
 				axes:{xaxis:{label:'Cell module',renderer:$.jqplot.CategoryAxisRenderer, ticks: t }
-<<<<<<< HEAD
-				,yaxis:{ label:'Voltage',syncTicks:true, min: 2.0, max: 4.2, numberTicks:23, tickOptions:{formatString:'%.2f'} }
-=======
 				,yaxis:{ label:'Voltage',syncTicks:true, min: 2.0, max: 4.3, numberTicks:23, tickOptions:{formatString:'%.2f'} }
->>>>>>> 8f62d881c064f58ee52be10e82f3e1ce7d708bde
 				,y2axis:{label:'Temperature',syncTicks:true,min:-25, max:100, numberTicks:23, tickOptions:{formatString:'%.2f'}}
 				}//end axes
 				,
@@ -252,7 +249,7 @@ script.onload = function(){
 	<div role="main" data-role="ui-content"><div id="nodata">There is no data available, please configure modules.</div> \
 	<div id="chart1"></div> \
 	<div id="buttons"><a href="#config" data-transition="pop" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Configure</a> <a href="#modules" data-transition="pop" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Modules</a>  \
-	<a id="AboveAvgBalance" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Above Avg Balance</a> <a id="github" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" href="https://github.com/chickey/diyBMS">GitHub</a></div></div> \
+	<a id="AboveAvgBalance" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Above Avg Balance</a> <a id="CancelAvgBalance" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Cancel Avg Balance</a> <a id="github" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" href="https://github.com/chickey/diyBMS">GitHub</a></div></div> \
 	</div> \
 	<div data-role="page" id="config" data-dom-cache="true"> \
 	<div data-role="header"><h1>Configuration</h1></div> \
@@ -398,11 +395,23 @@ script.onload = function(){
 		  url: aboveavgbalanceurl,
 		  dataType: "json",
 		  success: function(data) {	
-			alert('Above Average Balancing requested');			
+			alert('Above Average Balancing requested');	
 		  }
 		});
 	});
 
+	$('#CancelAvgBalance').on("click", function (e) {
+		$.ajax({
+		  async: true,
+		  url: cancelavgbalanceurl,
+		  dataType: "json",
+		  success: function(data) {	
+			alert('Cancel Average Balancing requested');	
+		  }
+		});
+	});
+
+	
 	$('#syncTempCalib').on("click", function (e) {
 		$.ajax({
 		  async: true,
