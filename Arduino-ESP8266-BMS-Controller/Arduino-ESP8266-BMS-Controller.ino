@@ -164,11 +164,7 @@ void timerCallback(void *pArg) {
     if (cell_array[cell_array_index].balance_target > 0) {
       command_set_bypass_voltage(cell_array[cell_array_index].address, cell_array[cell_array_index].balance_target);
       cell_array[cell_array_index].balance_target = 0;
-      //cell_array[cell_array_index].bypass_status = 1;
-    } /*else
-    {
-      cell_array[cell_array_index].bypass_status = 0;
-    }*/
+    }
 
     cell_array_index++;
     if (cell_array_index >= cell_array_max) {
