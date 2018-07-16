@@ -23,14 +23,7 @@ A large number of people have utilised the commercial BATRIUM BMS system in thei
 
 # My Situtation/Environment
 
-UK based, with existing solar panel installation and “feed in tariff” - this is a grid tied install.
-I do not want to change/interfere with the existing installation as I get the maximum FIT rates for the next 20 years!
-
-I may also install additional solar panels to a separate inverter in the future.
-
-Therefore, I am looking at an “AC coupled” solution where excess electric generation is diverted to store in a battery rather than exported to grid. This energy is then released at night (or at peak costs) to reduce cost of importing energy.
-
-I am NOT looking to go off-grid (or islanding) as UK power cuts are a rare event in my area.
+UK based, but with only a small setup.  I have a 7s96p setup which i need to keep in balance.
 
 # Existing Energy Usage
 
