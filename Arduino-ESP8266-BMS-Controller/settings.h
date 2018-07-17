@@ -30,7 +30,11 @@ struct eeprom_settings {
   int influxdb_httpPort;
   char influxdb_database[32 + 1];
   char influxdb_user[32 + 1];
-  char influxdb_password[32 + 1];  
+  char influxdb_password[32 + 1];
+  bool autobalance_enabled;
+  float max_voltage;
+  float balance_voltage;
+  float balance_dev;
 };
 
 extern wifi_eeprom_settings myConfig_WIFI;

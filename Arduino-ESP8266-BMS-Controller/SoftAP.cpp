@@ -15,6 +15,8 @@ const char* ssid = "DIY_BMS_CONTROLLER";
 
 String networks;
 
+bool manual_balance = false;
+
 void handleNotFound()
 {
   String message = "File Not Found\n\n";
@@ -72,6 +74,8 @@ void handleCancelAverageBalance() {
       command_set_bypass_voltage(cell_array[a].address,0);
     }
   }
+  manual_balance = false;
+  
   Serial.println("Cancelling balancing");
   server.send(200, "application/json", "[1]\r\n\r\n");
 }
@@ -96,6 +100,8 @@ void handleAboveAverageBalance() {
     }
   }
 
+  manual_balance = true;
+  
   server.send(200, "application/json", "[" + String(avgint) + "]\r\n\r\n");
 }
 
@@ -156,6 +162,11 @@ void handleSetInfluxDB() {
 
 void handleSetEmonCMS() {
 
+  myConfig.autobalance_enabled = (server.arg("autobalance_enabled").toInt() == 1) ? true : false;
+  myConfig.max_voltage = server.arg("max_voltage").toFloat();
+  myConfig.balance_voltage = server.arg("balance_voltage").toFloat();
+  myConfig.balance_dev = server.arg("balance_dev").toFloat();
+      
   myConfig.influxdb_enabled = (server.arg("influxdb_enabled").toInt() == 1) ? true : false;
   myConfig.influxdb_httpPort = server.arg("influxdb_httpPort").toInt();
 
@@ -256,6 +267,10 @@ void handleSettingsJSON() {
                    + ",\"influxdb_database\":\"" + String(myConfig.influxdb_database) + "\""
                    + ",\"influxdb_user\":\"" + String(myConfig.influxdb_user) + "\""
                    + ",\"influxdb_password\":\"" + String(myConfig.influxdb_password) + "\""
+                   + ",\"autobalance_enabled\":" + (myConfig.autobalance_enabled ? String("true") : String("false"))
+                   + ",\"max_voltage\":\"" + String(myConfig.max_voltage) + "\""
+                   + ",\"balance_voltage\":\"" + String(myConfig.balance_voltage) + "\""
+                   + ",\"balance_dev\":\"" + String(myConfig.balance_dev) + "\""
                    + "}\r\n\r\n";
   server.send(200, "application/json", json1 );
 }
