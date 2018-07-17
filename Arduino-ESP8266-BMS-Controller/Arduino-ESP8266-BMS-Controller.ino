@@ -4,7 +4,7 @@
   (____/(____) (__) (____/(_/\/\_)(___/
 
   (c) 2017 Stuart Pittaway
-  Modifications for Grafna code made by Colin Hickey
+  Modifications for InfluxDB and additions made by Colin Hickey
   
   This is the code for the controller - it talks to the cell modules over isolated i2c bus
 
