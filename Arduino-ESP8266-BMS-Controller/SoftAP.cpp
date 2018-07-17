@@ -231,6 +231,7 @@ void handleCellConfigurationJSON() {
         +",\"volt\":" + String(cell_array[a].voltage)
         +",\"voltc\":" + String(cell_array[a].voltage_calib, 6)
         +",\"temp\":" + String(cell_array[a].temperature)
+        +",\"bypass\":" + String(cell_array[a].bypass_status)
         +",\"tempc\":" + String(cell_array[a].temperature_calib, 6)
         +",\"resistance\":" + String( isnan(cell_array[a].loadResistance) ? 0:cell_array[a].loadResistance, 6) 
         + "}";
