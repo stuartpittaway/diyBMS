@@ -339,10 +339,6 @@ script.onload = function(){
 	<div role="main" data-role="ui-content"> \
 	<div id="moduletable"></div> \
 	<p>Use the Provision button to add a new cell module to the controller.  To begin, add ONE (and only one) new module to the monitoring cable and click the Provision button.</p> \
-	<div class="ui-field-contain"> \
-	<label for="Cell_Limit">Cell Limit:</label> \
-	<input id="Cell_Limit" name="Cell_Limit" size="64" type="text" /> \
-	</div> \
 	<p><a id="provButton" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Provision</a> <a id="syncTempCalib" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Sync Temp Calibration</a> <a href="#main" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">Close</a></p> \
 	</div> \
 	</div>');
