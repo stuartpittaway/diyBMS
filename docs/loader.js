@@ -333,7 +333,6 @@ script.onload = function(){
 	<input id="influxdb_password" name="influxdb_password" size="64" type="text" /> \
 	</div> \
 	\
-
 	<div class="ui-field-contain"> \
     <label for="submit-3"></label> \
 	<h4>Balancing Settings</h4> \
@@ -343,8 +342,6 @@ script.onload = function(){
 	<option value="1">On</option> \
 	</select> \
 	</div> \
-	
-	
 	\
 	<div class="ui-field-contain"> \
 	<label for="max_voltage">Max Allowed Cell Voltage:</label> \
@@ -367,6 +364,7 @@ script.onload = function(){
 	</div>	\
 	</form> \
 	</div> \
+	\
 	<p><a href="#main" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" data-rel="back">Close</a></p> \
 	</div> \
 	</div> \
