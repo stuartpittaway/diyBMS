@@ -345,12 +345,12 @@ script.onload = function(){
 	\
 	<div class="ui-field-contain"> \
 	<label for="max_voltage">Max Allowed Cell Voltage:</label> \
-	<input id="max_voltage" name="max_voltage" size="64" type="text" /> \
+	<input id="max_voltage" name="max_voltage" size="64" type="text" min="3.00" max="4.20" /> \
 	</div> \
 	\
 	<div class="ui-field-contain"> \
 	<label for="balance_voltage">Voltage to Balance above:</label> \
-	<input id="balance_voltage" name="balance_voltage" size="64" type="text" /> \
+	<input id="balance_voltage" name="balance_voltage" size="64" type="text" min="3.00" max="4.20" /> \
 	</div> \
 	\
 	<div class="ui-field-contain"> \
