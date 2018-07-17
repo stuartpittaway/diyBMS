@@ -70,7 +70,6 @@ void handleCancelAverageBalance() {
   if (cell_array_max > 0) {
     for (int a = 0; a < cell_array_max; a++) {
       command_set_bypass_voltage(cell_array[a].address,0);
-      //cell_array[a].balance_target = 0;
     }
   }
   Serial.println("Cancelling balancing");
