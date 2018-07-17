@@ -225,6 +225,7 @@ void handleSetTempCalib() {
 
 void handleCellConfigurationJSON() {
   String json1 = "";
+  
   if (cell_array_max > 0) {
     for ( int a = 0; a < cell_array_max; a++) {
       json1 += "{\"address\":" + String(cell_array[a].address)
