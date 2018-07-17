@@ -70,7 +70,7 @@ function refreshModules() {
 	  	  
 		if ( $( "#ct" ).length==0 ) {
 			//Create table if it doesn't exist already
-			$("#moduletable").empty().append("<table id='ct' data-role='table'><thead><tr><th>Module<br/>id</th><th>Current<br/>Voltage</th><th>Voltage<br/>calibration</th><th>Manual<br/>Calibration</th><th>Temperature</th><th>Bypass</th><th>Temp<br/>calibration</th><th>Load<br/>resistance</th></tr></thead><tbody></tbody></table>");
+			$("#moduletable").empty().append("<table id='ct' data-role='table'><thead><tr><th>Module<br/>id</th><th>Current<br/>Voltage</th><th>Voltage<br/>calibration</th><th>Manual<br/>Calibration</th><th>Temperature</th><th>Bypass<br/>Status</th><th>Temp<br/>calibration</th><th>Load<br/>resistance</th></tr></thead><tbody></tbody></table>");
 			$.each(data, function(){ 
 				$("#ct tbody").append("<tr id='module"+this.address+"'><td >"+this.address+"</td> \
 				<td id='module"+this.address+"volt' data-moduleid='"+this.address+"' data-value='' class='voltage v'>&nbsp;</td> \
