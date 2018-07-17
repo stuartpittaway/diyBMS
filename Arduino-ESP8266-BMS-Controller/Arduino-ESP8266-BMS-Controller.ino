@@ -92,7 +92,7 @@ void avg_balance() {
     Serial.println("Average cell voltage is currently : " + String(avg/1000));
     Serial.println("Configured balance voltage : " + String(myConfig.balance_voltage));
 
-    if ( avg/1000 >= myConfig.balance_voltage )  {
+    if ( avg/1000 > myConfig.balance_voltage )  {
       for ( int a = 0; a < cell_array_max; a++) {
         if (cell_array[a].voltage > avgint) {
           cell_array[a].balance_target = avgint;
@@ -345,14 +345,11 @@ void loop() {
     if ((millis() > next_submit) && (WiFi.status() == WL_CONNECTED)) {
       emoncms.postData(myConfig, cell_array, cell_array_max);
       influxdb.postData(myConfig, cell_array, cell_array_max);
-
-      Serial.println("Configured Maximum voltage : " + String(myConfig.max_voltage));
-      
+ 
       for (int a = 0; a < cell_array_max; a++) {
         if (cell_array[a].voltage >= myConfig.max_voltage*1000) {
           cell_array[a].balance_target = myConfig.max_voltage*1000; 
            max_enabled = true;
-           Serial.println("Cell voltage : " + String(cell_array[a].voltage) + " Balance Target = " +  cell_array[a].balance_target  );
         }
       }
       if (max_enabled!=true) avg_balance();
