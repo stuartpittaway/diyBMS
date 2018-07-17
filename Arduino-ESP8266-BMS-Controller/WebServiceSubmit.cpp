@@ -21,6 +21,9 @@ void EmonCMS::postData(eeprom_settings myConfig, cell_module (&cell_array)[24], 
            + "},{\"T\":"
            //Ensure temperature is in a sensible range
            + String(cell_array[a].valid_values ? cell_array[a].temperature : 0)
+           + "},{\"T\":"
+           //Ensure Bypass is in a sensible range
+           + String(cell_array[a].valid_values ? cell_array[a].bypass_status : 0)
            + "}]";
 
     if (a < cell_array_max - 1) {
