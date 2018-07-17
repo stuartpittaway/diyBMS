@@ -352,14 +352,6 @@ script.onload = function(){
 	<label for="balance_voltage">Voltage to Balance above:</label> \
 	<input id="balance_voltage" name="balance_voltage" size="64" type="text" /> \
 	</div> \
-	
-	/*
-	<div class="ui-field-contain"> \
-	<label for="balance_dev">Allowed Voltage deviation:</label> \
-	<input id="balance_dev" name="balance_dev" size="64" type="text" /> \
-	</div> \
-	\
-	*/
 	\
 	<div class="ui-field-contain"> \
     <label for="submit-1"></label> \
