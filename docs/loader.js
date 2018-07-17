@@ -57,7 +57,15 @@ function refreshConfig() {
 		$("#influxdb_database").val( data.influxdb_database );
 		$("#influxdb_user").val( data.influxdb_user );
 		$("#influxdb_password").val( data.influxdb_password );
-	  }
+
+		var myswitch_autobalance = $( "#autobalance_enabled" );
+		myswitch_autobalance[0].selectedIndex = data.autobalance_enabled ? 1:0;
+		myswitch_autobalance.slider( "refresh" );
+		$("#max_voltage").val( data.max_voltage );
+		$("#balance_voltage").val( data.balance_voltage );
+		$("#balance_dev").val( data.balance_dev );
+
+		}
 	});
 } //end function
 
@@ -325,6 +333,34 @@ script.onload = function(){
 	<input id="influxdb_password" name="influxdb_password" size="64" type="text" /> \
 	</div> \
 	\
+
+	<div class="ui-field-contain"> \
+    <label for="submit-3"></label> \
+	<h4>Balancing Settings</h4> \
+	<label for="autobalance_enabled">Auto Balance enabled</label> \
+	<select data-role="slider" id="autobalance_enabled" name="autobalance_enabled"> \
+	<option value="0">Off</option> \
+	<option value="1">On</option> \
+	</select> \
+	</div> \
+	
+	
+	\
+	<div class="ui-field-contain"> \
+	<label for="max_voltage">Max Allowed Cell Voltage:</label> \
+	<input id="max_voltage" name="max_voltage" size="64" type="text" /> \
+	</div> \
+	\
+	<div class="ui-field-contain"> \
+	<label for="balance_voltage">Voltage to Balance above:</label> \
+	<input id="balance_voltage" name="balance_voltage" size="64" type="text" /> \
+	</div> \
+	\
+	<div class="ui-field-contain"> \
+	<label for="balance_dev">Allowed Voltage deviation:</label> \
+	<input id="balance_dev" name="balance_dev" size="64" type="text" /> \
+	</div> \
+	\
 	<div class="ui-field-contain"> \
     <label for="submit-1"></label> \
     <button type="submit" id="submit-1" class="ui-shadow ui-btn ui-corner-all">Save</button> \
@@ -412,7 +448,6 @@ script.onload = function(){
 		  }
 		});
 	});
-
 	
 	$('#syncTempCalib').on("click", function (e) {
 		$.ajax({
