@@ -330,7 +330,7 @@ void loop() {
   HandleWifiClient();
   yield();
   delay(250);
-      Serial.println("Testing");
+
   if (cell_array_max > 0) {  
        /* for ( int a = 0; a < cell_array_max; a++) {
           Serial.print(cell_array[a].address);
