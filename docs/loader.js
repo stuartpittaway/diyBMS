@@ -8,6 +8,7 @@ var voltagecalibrationurl = rooturl+"setvoltcalib";
 var temperaturecalibrationurl= rooturl+"settempcalib";
 var aboveavgbalanceurl= rooturl+"aboveavgbalance";
 var cancelavgbalanceurl= rooturl+"cancelavgbalance";
+var ResetESPurl= rooturl+"ResetESP";
 var setloadresistanceurl= rooturl+"setloadresistance";
 var factoryreseturl= rooturl+"factoryreset";
 
