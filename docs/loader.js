@@ -259,17 +259,12 @@ script.onload = function(){
 	<div role="main" data-role="ui-content"><div id="nodata">There is no data available, please configure modules.</div> \
 	<div id="chart1"></div> \
 	<div id="buttons"><a href="#config" data-transition="pop" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Configure</a> <a href="#modules" data-transition="pop" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Modules</a>  \
-	<a id="AboveAvgBalance" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Above Avg Balance</a>  <a id="CancelAvgBalance" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Cancel Avg Balance</a> <a id="github" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" href="https://github.com/chickey/diyBMS">GitHub</a></div></div> \
+	<a id="AboveAvgBalance" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Above Avg Balance</a>  <a id="CancelAvgBalance" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">Cancel Avg Balance</a> <a id="ResetESP" class="ui-btn ui-corner-all ui-shadow ui-btn-inline">ResetESP</a> <a id="github" class="ui-btn ui-corner-all ui-shadow ui-btn-inline" href="https://github.com/chickey/diyBMS">GitHub</a></div></div> \
 	</div> \
 	<div data-role="page" id="config" data-dom-cache="true"> \
 	<div data-role="header"><h1>Configuration</h1></div> \
 	<div role="main" data-role="ui-content"> \
 	<h1>Configuration</h1> \
-	\
-	<div class="ui-field-contain"> \
-    <label for="ResetESP"></label> \
-    <button type="submit" id="buttons" class="ui-shadow ui-btn ui-corner-all">ResetESP</button> \
-	<div> \
 	\
 	<h2>emonCMS Integration</h2> \
 	<form id="form_emoncms" method="POST" action="'+rooturl+'setemoncms">\
