@@ -4,6 +4,7 @@
 #include <ESP8266HTTPClient.h>
 
 extern uint8_t DEFAULT_SLAVE_ADDR_START_RANGE;
+extern int balance_status;
 
 //Implements EmonCMS WebServiceSubmit abstract/interface class
 void EmonCMS::postData(eeprom_settings myConfig, cell_module (&cell_array)[24], int cell_array_max) {
@@ -77,16 +78,20 @@ void Influxdb::postData(eeprom_settings myConfig, cell_module (&cell_array)[24],
   //Cycle through each module and push the voltage to grafana using a http post.
 
   for (int a = 0; a < cell_array_max; a++) {
-    //Ensure its a sensible value to avoid filling influxdb graph with high values
+    //Ensure its a sensible value to avoid filling influxdb db with high values
     if (cell_array[a].valid_values==true) {
       poststring = poststring + ("Cells,Cell=" + String(a+1) + " " + "Voltage=" + String(cell_array[a].voltage) + ",Temp=" + String(cell_array[a].temperature) + ",Bypass=" + int(cell_array[a].bypass_status) + "\n");
      }
   }
+  poststring = poststring + ("Cells Battery-Balancing=" + String(balance_status) + "\n");
+  Serial.println (poststring);
+  
   http.begin(url);
   http.addHeader("Content-Type", "data-binary");
   int httpCode = http.POST(poststring);
   String payload = http.getString();
-
+  Serial.println (payload);
+  
   WiFiClient client;
 
   if (!client.connect(myConfig.influxdb_host, myConfig.influxdb_httpPort)) {

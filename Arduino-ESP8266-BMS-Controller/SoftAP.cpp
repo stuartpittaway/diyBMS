@@ -16,6 +16,7 @@ const char* ssid = "DIY_BMS_CONTROLLER";
 String networks;
 
 bool manual_balance = false;
+extern int balance_status;
 
 void handleNotFound()
 {
@@ -75,7 +76,7 @@ void handleCancelAverageBalance() {
     }
   }
   manual_balance = false;
-  
+  balance_status = 0;
   Serial.println("Cancelling balancing");
   server.send(200, "application/json", "[1]\r\n\r\n");
 }
@@ -101,7 +102,7 @@ void handleAboveAverageBalance() {
   }
 
   manual_balance = true;
-  
+  balance_status = 1;
   server.send(200, "application/json", "[" + String(avgint) + "]\r\n\r\n");
 }
 

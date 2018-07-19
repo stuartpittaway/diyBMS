@@ -50,6 +50,8 @@ bool runProvisioning;
 
 extern bool manual_balance;
 bool max_enabled = false;
+int balance_status = 0;
+// 0=No balancing 1=Manual balancing started 2=Auto Balancing enabled 3=Auto Balancing enabled and bypass happening 4=A module is over max voltage
   
 //Configuration for thermistor conversion
 //use the datasheet to get this data.
@@ -80,7 +82,7 @@ void avg_balance() {
   if ((myConfig.autobalance_enabled == true) && (manual_balance == false)) {
     
     if (cell_array_max > 0) {
-    //Work out the average
+    //Work out the average 
     float avg = 0;
     for (int a = 0; a < cell_array_max; a++) {
       avg += 1.0 * cell_array[a].voltage;
@@ -89,22 +91,23 @@ void avg_balance() {
 
     avgint = avg;
 
+    balance_status = 2;
+    
     Serial.println("Average cell voltage is currently : " + String(avg/1000));
     Serial.println("Configured balance voltage : " + String(myConfig.balance_voltage));
 
-    if ( avg/1000 > myConfig.balance_voltage )  {
+    if ( avg/1000 >= myConfig.balance_voltage )  {
       for ( int a = 0; a < cell_array_max; a++) {
         if (cell_array[a].voltage > avgint) {
           cell_array[a].balance_target = avgint;
+          balance_status = 3;
         }
-      }
+      } 
     }  else {
       for (int a = 0; a < cell_array_max; a++) {
         command_set_bypass_voltage(cell_array[a].address,0); }}
         } 
-  }
-
-      
+  } else  balance_status = 0;    
 }
 
 void print_module_details(struct  cell_module *module) {
@@ -328,7 +331,6 @@ void loop() {
   yield();
   delay(250);
 
-
   if (cell_array_max > 0) {  
        /* for ( int a = 0; a < cell_array_max; a++) {
           Serial.print(cell_array[a].address);
@@ -350,10 +352,13 @@ void loop() {
         if (cell_array[a].voltage >= myConfig.max_voltage*1000) {
           cell_array[a].balance_target = myConfig.max_voltage*1000; 
            max_enabled = true;
+           balance_status = 4;
         }
       }
-      if (max_enabled!=true) avg_balance();
+      if (max_enabled!=true) avg_balance(); 
       max_enabled = false;
+
+      
       //Update Influxdb/emoncms every 60 seconds
       next_submit = millis() + 60000;
     }
