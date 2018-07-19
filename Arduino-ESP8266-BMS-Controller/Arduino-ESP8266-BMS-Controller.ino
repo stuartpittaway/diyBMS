@@ -330,7 +330,7 @@ void loop() {
   HandleWifiClient();
   yield();
   delay(250);
-
+      Serial.println("Testing");
   if (cell_array_max > 0) {  
        /* for ( int a = 0; a < cell_array_max; a++) {
           Serial.print(cell_array[a].address);
@@ -358,7 +358,7 @@ void loop() {
       if (max_enabled!=true) avg_balance(); 
       max_enabled = false;
 
-      
+
       //Update Influxdb/emoncms every 60 seconds
       next_submit = millis() + 60000;
     }
