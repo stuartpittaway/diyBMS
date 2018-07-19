@@ -265,7 +265,12 @@ script.onload = function(){
 	<div data-role="header"><h1>Configuration</h1></div> \
 	<div role="main" data-role="ui-content"> \
 	<h1>Configuration</h1> \
+	\
+	<div class="ui-field-contain"> \
+    <label for="ResetESP"></label> \
+    <button type="submit" id="buttons" class="ui-shadow ui-btn ui-corner-all">ResetESP</button> \
 	<div> \
+	\
 	<h2>emonCMS Integration</h2> \
 	<form id="form_emoncms" method="POST" action="'+rooturl+'setemoncms">\
 	<div class="ui-field-contain"> \

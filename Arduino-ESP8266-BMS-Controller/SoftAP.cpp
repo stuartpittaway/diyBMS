@@ -69,6 +69,13 @@ void handleProvision() {
 }
 
 
+void handleResetESP() {
+  Serial.println("Restarting Controller");
+
+  ESP.restart();
+  server.send(200, "application/json", "[1]\r\n\r\n");
+}
+
 void handleCancelAverageBalance() {
   if (cell_array_max > 0) {
     for (int a = 0; a < cell_array_max; a++) {
@@ -410,6 +417,7 @@ void SetupManagementRedirect() {
   server.on("/provision", HTTP_GET, handleProvision);
   server.on("/aboveavgbalance", HTTP_GET, handleAboveAverageBalance);
   server.on("/cancelavgbalance", HTTP_GET, handleCancelAverageBalance);
+  server.on("/ResetESP", HTTP_GET, handleResetESP);
   server.on("/getmoduleconfig", HTTP_GET, handleCellConfigurationJSON);
   server.on("/getsettings", HTTP_GET, handleSettingsJSON);
   server.on("/factoryreset", HTTP_POST, handleFactoryReset);
