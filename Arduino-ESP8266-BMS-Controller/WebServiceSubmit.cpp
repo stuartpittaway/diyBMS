@@ -84,7 +84,7 @@ void Influxdb::postData(eeprom_settings myConfig, cell_module (&cell_array)[24],
      }
   }
   poststring = poststring + ("Cells Battery-Balancing=" + String(balance_status) + "\n");
-  Serial.println (poststring);
+  //Serial.println (poststring);
   
   http.begin(url);
   http.addHeader("Content-Type", "data-binary");
