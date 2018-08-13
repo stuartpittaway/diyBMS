@@ -347,6 +347,7 @@ script.onload = function(){
 	</select> \
 	</div> \
 	\
+	\
 	<div class="ui-field-contain"> \
     <label for="submit-4"></label> \
 	<label for="InverterMon_enabled">Inverter Monitoring enabled</label> \
