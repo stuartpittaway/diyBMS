@@ -348,8 +348,7 @@ script.onload = function(){
 	</div> \
 	\
 	<div class="ui-field-contain"> \
-    <label for="submit-3"></label> \
-	<h4>Balancing Settings</h4> \
+    <label for="submit-4"></label> \
 	<label for="InverterMon_enabled">Inverter Monitoring enabled</label> \
 	<select data-role="slider" id="InverterMon_enabled" name="InverterMon_enabled"> \
 	<option value="0">Off</option> \
