@@ -17,6 +17,7 @@ String networks;
 
 bool manual_balance = false;
 extern int balance_status;
+extern bool InverterMon;
 
 void handleNotFound()
 {
@@ -171,6 +172,7 @@ void handleSetInfluxDB() {
 void handleSetEmonCMS() {
 
   myConfig.autobalance_enabled = (server.arg("autobalance_enabled").toInt() == 1) ? true : false;
+  myConfig.invertermon_enabled = (server.arg("invertermon_enabled").toInt() == 1) ? true : false;
   myConfig.max_voltage = server.arg("max_voltage").toFloat();
   myConfig.balance_voltage = server.arg("balance_voltage").toFloat();
   myConfig.balance_dev = server.arg("balance_dev").toFloat();
@@ -275,6 +277,7 @@ void handleSettingsJSON() {
                    + ",\"influxdb_database\":\"" + String(myConfig.influxdb_database) + "\""
                    + ",\"influxdb_user\":\"" + String(myConfig.influxdb_user) + "\""
                    + ",\"influxdb_password\":\"" + String(myConfig.influxdb_password) + "\""
+                   + ",\"invertermon_enabled\":" + (myConfig.invertermon_enabled ? String("true") : String("false"))
                    + ",\"autobalance_enabled\":" + (myConfig.autobalance_enabled ? String("true") : String("false"))
                    + ",\"max_voltage\":\"" + String(myConfig.max_voltage) + "\""
                    + ",\"balance_voltage\":\"" + String(myConfig.balance_voltage) + "\""

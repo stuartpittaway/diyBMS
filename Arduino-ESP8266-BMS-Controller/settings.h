@@ -32,6 +32,7 @@ struct eeprom_settings {
   char influxdb_user[32 + 1];
   char influxdb_password[32 + 1];
   bool autobalance_enabled;
+  bool invertermon_enabled;
   float max_voltage;
   float balance_voltage;
   float balance_dev;
