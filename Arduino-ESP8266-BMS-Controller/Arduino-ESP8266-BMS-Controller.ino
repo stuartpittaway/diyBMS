@@ -40,6 +40,17 @@ extern "C"
 #include "settings.h"
 #include "softap.h"
 #include "WebServiceSubmit.h"
+#include <Wire.h>
+
+const int sensorIn = A0;
+int mVperAmp = 66; // use 100 for 20A Module and 66 for 30A Module
+int ACS712shift = 22;
+bool InverterMon = false;
+
+double Voltage = 0;
+double VRMS = 0;
+double AmpsRMS = 0;
+
 
 //Allow up to 24 modules
 cell_module cell_array[24];
@@ -50,8 +61,8 @@ bool runProvisioning;
 
 extern bool manual_balance;
 bool max_enabled = false;
-int balance_status = 0;
 // 0=No balancing 1=Manual balancing started 2=Auto Balancing enabled 3=Auto Balancing enabled and bypass happening 4=A module is over max voltage
+int balance_status = 0;
   
 //Configuration for thermistor conversion
 //use the datasheet to get this data.
@@ -75,6 +86,37 @@ EmonCMS emoncms;
 Influxdb influxdb;
 
 os_timer_t myTimer;
+
+float getVPP() {
+  float result;
+  
+  int readValue;             //value read from the sensor
+  int maxValue = 0;          // store max value here
+  int minValue = 1024;          // store min value here
+
+   uint32_t start_time = millis();
+   while((millis()-start_time) < 1000) //sample for 1 Sec
+   {
+       readValue = analogRead(sensorIn-ACS712shift);
+
+       // see if you have a new maxValue
+       if (readValue > maxValue) 
+       {
+           /*record the maximum sensor value*/
+           maxValue = readValue;
+       }
+       if (readValue < minValue) 
+       {
+           /*record the maximum sensor value*/
+           minValue = readValue;
+       }
+   }
+   //Serial.println(readValue);
+   // Subtract min from max
+   result = ((maxValue - minValue) * 5.0)/1024.0;
+      
+   return result;
+ }
 
 void avg_balance() {
   uint16_t avgint = 0;
@@ -213,7 +255,6 @@ void timerCallback(void *pArg) {
     }
   }
 
-
   LED_OFF;
 } // End of timerCallback
 
@@ -347,6 +388,12 @@ void loop() {
         Serial.println();  */
     
     if ((millis() > next_submit) && (WiFi.status() == WL_CONNECTED)) {
+        if {InverterMon == true ) {
+          Voltage = getVPP();
+          VRMS = (Voltage/2.0) *0.707; 
+          AmpsRMS = (VRMS * 1000)/mVperAmp;
+        }
+      
       emoncms.postData(myConfig, cell_array, cell_array_max);
       influxdb.postData(myConfig, cell_array, cell_array_max);
  

@@ -5,6 +5,8 @@
 
 extern uint8_t DEFAULT_SLAVE_ADDR_START_RANGE;
 extern int balance_status;
+extern bool InverterMon;
+extern double AmpsRMS;
 
 //Implements EmonCMS WebServiceSubmit abstract/interface class
 void EmonCMS::postData(eeprom_settings myConfig, cell_module (&cell_array)[24], int cell_array_max) {
@@ -84,8 +86,8 @@ void Influxdb::postData(eeprom_settings myConfig, cell_module (&cell_array)[24],
      }
   }
   poststring = poststring + ("Cells Battery-Balancing=" + String(balance_status) + "\n");
-  //Serial.println (poststring);
-  
+  if (InverterMon == true) poststring = poststring + ("Inverter Amp Usage=" + String(AmpsRMS) + "\n");
+
   http.begin(url);
   http.addHeader("Content-Type", "data-binary");
   int httpCode = http.POST(poststring);
