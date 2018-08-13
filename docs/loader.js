@@ -347,16 +347,6 @@ script.onload = function(){
 	</select> \
 	</div> \
 	\
-	\
-	<div class="ui-field-contain"> \
-    <label for="submit-4"></label> \
-	<label for="invertermon_enabled">Inverter Monitoring enabled</label> \
-	<select data-role="slider" id="invertermon_enabled" name="invertermon_enabled"> \
-	<option value="0">Off</option> \
-	<option value="1">On</option> \
-	</select> \
-	</div> \
-	\
 	<div class="ui-field-contain"> \
 	<label for="max_voltage">Max Allowed Cell Voltage:</label> \
 	<input id="max_voltage" name="max_voltage" size="64" type="number" min="3.00" max="4.20" step="0.01" /> \
@@ -365,6 +355,16 @@ script.onload = function(){
 	<div class="ui-field-contain"> \
 	<label for="balance_voltage">Voltage to Balance above:</label> \
 	<input id="balance_voltage" name="balance_voltage" size="64" type="number" min="3.00" max="4.20" step="0.01" /> \
+	</div> \
+	\
+	<div class="ui-field-contain"> \
+    <label for="submit-4"></label> \
+	<h4>Inverter Settings</h4> \
+	<label for="invertermon_enabled">Inverter Monitoring enabled</label> \
+	<select data-role="slider" id="invertermon_enabled" name="invertermon_enabled"> \
+	<option value="0">Off</option> \
+	<option value="1">On</option> \
+	</select> \
 	</div> \
 	\
 	<div class="ui-field-contain"> \
