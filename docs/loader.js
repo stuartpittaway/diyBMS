@@ -339,7 +339,7 @@ script.onload = function(){
 	\
 	<div class="ui-field-contain"> \
     <label for="submit-3"></label> \
-	<h4>Balancing Settings</h4> \
+	<h4>Additional Settings</h4> \
 	<label for="autobalance_enabled">Auto Balance enabled</label> \
 	<select data-role="slider" id="autobalance_enabled" name="autobalance_enabled"> \
 	<option value="0">Off</option> \
