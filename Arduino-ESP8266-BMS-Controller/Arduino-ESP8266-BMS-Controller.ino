@@ -388,7 +388,7 @@ void loop() {
         Serial.println();  */
     
     if ((millis() > next_submit) && (WiFi.status() == WL_CONNECTED)) {
-        if (InverterMon == true ) {
+        if (myConfig.invertermon_enabled == true ) {
           Voltage = getVPP();
           VRMS = (Voltage/2.0) *0.707; 
           AmpsRMS = (VRMS * 1000)/mVperAmp;
