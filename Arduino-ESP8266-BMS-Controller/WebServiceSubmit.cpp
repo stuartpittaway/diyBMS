@@ -86,7 +86,7 @@ void Influxdb::postData(eeprom_settings myConfig, cell_module (&cell_array)[24],
      }
   }
   poststring = poststring + ("Cells Battery-Balancing=" + String(balance_status) + "\n");
-  if (myConfig.invertermon_enabled == true) poststring = poststring + ("Inverter Amp Usage=" + String(AmpsRMS) + "\n");
+  if (myConfig.invertermon_enabled == true) poststring = poststring + ("Cells Inverter-Usage=" + String(AmpsRMS) + "\n");
 
   http.begin(url);
   http.addHeader("Content-Type", "data-binary");
