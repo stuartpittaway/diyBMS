@@ -62,8 +62,8 @@ function refreshConfig() {
 		var myswitch_autobalance = $( "#autobalance_enabled" );
 		myswitch_autobalance[0].selectedIndex = data.autobalance_enabled ? 1:0;
 		myswitch_autobalance.slider( "refresh" );
-		var myswitch_InverterMon = $( "#InverterMon_enabled" );
-		myswitch_InverterMon[0].selectedIndex = data.InverterMon_enabled ? 1:0;
+		var myswitch_InverterMon = $( "#invertermon_enabled" );
+		myswitch_InverterMon[0].selectedIndex = data.invertermon_enabled ? 1:0;
 		myswitch_InverterMon.slider( "refresh" );
 		$("#max_voltage").val( data.max_voltage );
 		$("#balance_voltage").val( data.balance_voltage );
@@ -350,8 +350,8 @@ script.onload = function(){
 	\
 	<div class="ui-field-contain"> \
     <label for="submit-4"></label> \
-	<label for="InverterMon_enabled">Inverter Monitoring enabled</label> \
-	<select data-role="slider" id="InverterMon_enabled" name="InverterMon_enabled"> \
+	<label for="invertermon_enabled">Inverter Monitoring enabled</label> \
+	<select data-role="slider" id="invertermon_enabled" name="invertermon_enabled"> \
 	<option value="0">Off</option> \
 	<option value="1">On</option> \
 	</select> \
