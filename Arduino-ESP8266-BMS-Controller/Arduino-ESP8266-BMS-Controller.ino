@@ -36,7 +36,7 @@ extern "C"
 #include "bms_values.h"
 #include "i2c_cmds.h"
 #include "settings.h"
-#include "softap.h"
+#include "SoftAP.h"
 #include "WebServiceSubmit.h"
 
 //Allow up to 24 modules

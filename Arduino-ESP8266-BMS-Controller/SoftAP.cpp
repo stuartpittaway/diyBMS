@@ -1,7 +1,7 @@
 #include "Arduino.h"
 
 #include "bms_values.h"
-#include "softap.h"
+#include "SoftAP.h"
 #include "settings.h"
 #include "bms_values.h"
 
