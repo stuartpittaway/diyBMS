@@ -4,7 +4,7 @@
    )(_) )_)(_  \  /  ) _ < )    ( \__ \
   (____/(____) (__) (____/(_/\/\_)(___/
 
-  (c) 2017 Stuart Pittaway
+  (c) 2017/2018 Stuart Pittaway
 
   This is the code for the controller - it talks to the cell modules over isolated i2c bus
 

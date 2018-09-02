@@ -4,7 +4,7 @@
    )(_) )_)(_  \  /  ) _ < )    ( \__ \
   (____/(____) (__) (____/(_/\/\_)(___/
 
-  (c) 2017 Stuart Pittaway
+  (c) 2017/2018 Stuart Pittaway
 
   This is the code for the cell module (one is needed for each series cell in a modular battery array (pack))
 
@@ -34,7 +34,7 @@
 #endif
 
 #if !(F_CPU == 8000000)
-#error Processor speed should be 8Mhz internal
+#error Processor speed should be 8Mhz internal dont forget to burn the bootloader/fuses!
 #endif
 
 #include <USIWire.h>
@@ -496,11 +496,7 @@ float Update_VCCMillivolts() {
     extraBits = extraBits + analogVal[k];
   }
   //Shift the bits to match OVERSAMPLE_LOOP size (buffer size of 8=3 shifts, 16=4 shifts)
-  //Assume perfect reference of 2560mV for reference - we will correct for this with VCCCalibration
-
   uint16_t raw = (extraBits >> 4);
-  //TODO: DONT THINK WE NEED THIS ANY LONGER!
-  //unsigned int raw = map((extraBits >> 4), 0, 1023, 0, 2560);
 
   //TODO: Get rid of the need for float variables....
   return (int)((float)raw * myConfig.VCCCalibration);
@@ -673,14 +669,12 @@ ISR(ADC_vect) {
   if (reading_count == TEMP_READING_LOOP_FREQ ) {
     //Use A0 (RESET PIN) to act as an analogue input
     //note that we cannot take the pin below 1.4V or the CPU resets
-    //so we use the top half between 1.6V and 2.56V (voltage reference)
-    //we avoid switching references (VCC vs 2.56V) so the capacitors dont have to keep draining and recharging
     reading_count = 0;
 
     //We reduce the value by 512 as we have a DC offset we need to remove
     temperature_probe = value;
 
-    // use ADC3 for input for next reading (voltage)
+    //use ADC3 for input for next reading (voltage)
     ADMUX = B10010011;
 
     //Set skipNextADC to delay the next TIMER1 call to ADC reading to allow the ADC to settle after changing MUX
@@ -704,7 +698,6 @@ ISR(ADC_vect) {
     if (reading_count == TEMP_READING_LOOP_FREQ) {
       //use ADC0 for temp probe input on next ADC loop
 
-      //We have to set the registers directly because the ATTINYCORE appears broken for internal 2v56 register without bypass capacitor
       ADMUX = B10010000;
 
       //Set skipNextADC to delay the next TIMER1 call to ADC reading to allow the ADC to settle after changing MUX
