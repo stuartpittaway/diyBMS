@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source E:\Dropbox\diyBMS\BMS-Cell-Module-Circuit\BMS_Cell_Module.sch)
-    (date "26/09/2018 19:37:38")
+    (date "26/09/2018 19:45:29")
     (tool "Eeschema (5.0.0)")
     (sheet (number 1) (name /) (tstamps /)
       (title_block

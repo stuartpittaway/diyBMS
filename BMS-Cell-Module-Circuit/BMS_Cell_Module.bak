@@ -28,34 +28,34 @@ $EndComp
 $Comp
 L MCU_Microchip_ATtiny:ATtiny85-20SU U3
 U 1 1 59FF3B15
-P 7570 5010
-F 0 "U3" H 6420 5410 50  0000 C CNN
-F 1 "ATTINY85V-10SU 8S2 EIAJ SOIC" H 7550 4360 50  0000 C CNN
-F 2 "Package_SO:SOIJ-8_5.3x5.3mm_P1.27mm" H 8520 5010 50  0001 C CIN
-F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf" H 7570 5010 50  0001 C CNN
-	1    7570 5010
+P 7250 5200
+F 0 "U3" H 6100 5600 50  0000 C CNN
+F 1 "ATTINY85V-10SU 8S2 EIAJ SOIC" H 7210 5900 50  0000 C CNN
+F 2 "Package_SO:SOIJ-8_5.3x5.3mm_P1.27mm" H 8200 5200 50  0001 C CIN
+F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf" H 7250 5200 50  0001 C CNN
+	1    7250 5200
 	-1   0    0    -1  
 $EndComp
 $Comp
 L Device:LED D4
 U 1 1 59FF3E62
-P 10300 4550
-F 0 "D4" H 10300 4650 50  0000 C CNN
-F 1 "LED GREEN" H 10300 4400 50  0000 C CNN
-F 2 "LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder" H 10300 4550 50  0001 C CNN
-F 3 "" H 10300 4550 50  0001 C CNN
-	1    10300 4550
+P 9070 4550
+F 0 "D4" H 9070 4650 50  0000 C CNN
+F 1 "LED GREEN" H 9070 4400 50  0000 C CNN
+F 2 "LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder" H 9070 4550 50  0001 C CNN
+F 3 "" H 9070 4550 50  0001 C CNN
+	1    9070 4550
 	0    1    -1   0   
 $EndComp
 $Comp
 L Device:CP C5
 U 1 1 59FF4558
-P 9600 5050
-F 0 "C5" H 9625 5150 50  0000 L CNN
-F 1 "0.1uF" H 9625 4950 50  0000 L CNN
-F 2 "Capacitor_SMD:C_0805_2012Metric_Pad1.33x1.40mm_HandSolder" H 9638 4900 50  0001 C CNN
-F 3 "" H 9600 5050 50  0001 C CNN
-	1    9600 5050
+P 8370 5050
+F 0 "C5" H 8395 5150 50  0000 L CNN
+F 1 "0.1uF" H 8395 4950 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0805_2012Metric_Pad1.33x1.40mm_HandSolder" H 8408 4900 50  0001 C CNN
+F 3 "" H 8370 5050 50  0001 C CNN
+	1    8370 5050
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -170,9 +170,9 @@ F 3 "" H 5450 4900 50  0001 C CNN
 $EndComp
 Text GLabel 4050 3550 3    60   Input ~ 12
 3V3
-Text GLabel 9800 4900 2    60   Input ~ 12
+Text GLabel 8570 4900 2    60   Input ~ 12
 3V3
-Text GLabel 10400 5400 2    60   Input ~ 12
+Text GLabel 9170 5400 2    60   Input ~ 12
 GND
 Text Notes 5575 4200 2    60   ~ 0
 Battery voltage divider\n1.8→4.5V maps to\nADC3=1.029V→2.571V
@@ -192,12 +192,12 @@ $EndComp
 $Comp
 L Device:R R12
 U 1 1 5A017EFB
-P 10300 5050
-F 0 "R12" V 10380 5050 50  0000 C CNN
-F 1 "4K7" V 10200 5050 50  0000 C CNN
-F 2 "Resistor_SMD:R_0805_2012Metric_Pad1.33x1.40mm_HandSolder" V 10230 5050 50  0001 C CNN
-F 3 "" H 10300 5050 50  0001 C CNN
-	1    10300 5050
+P 9070 5050
+F 0 "R12" V 9150 5050 50  0000 C CNN
+F 1 "4K7" V 8970 5050 50  0000 C CNN
+F 2 "Resistor_SMD:R_0805_2012Metric_Pad1.33x1.40mm_HandSolder" V 9000 5050 50  0001 C CNN
+F 3 "" H 9070 5050 50  0001 C CNN
+	1    9070 5050
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -381,16 +381,15 @@ $EndComp
 Text GLabel 1400 5050 2    60   Input ~ 12
 GND
 Wire Wire Line
-	9600 5400 9600 5200
-Connection ~ 9600 5400
+	8370 5400 8370 5200
 Wire Wire Line
 	5700 5200 5700 5450
 Connection ~ 5700 5200
 Wire Wire Line
 	5700 5850 5700 5750
 Wire Wire Line
-	9700 5850 9700 5400
-Connection ~ 9700 5400
+	8470 5850 8470 5400
+Connection ~ 8470 5400
 Wire Wire Line
 	5450 5050 5450 5200
 Wire Wire Line
@@ -412,20 +411,17 @@ Wire Wire Line
 	4200 5400 6350 5400
 Connection ~ 4200 5400
 Wire Wire Line
-	10300 4250 10300 4400
+	9070 4250 9070 4400
 Wire Wire Line
-	10300 4700 10300 4900
+	9070 4700 9070 4900
 Wire Wire Line
-	9350 5400 9600 5400
-Connection ~ 10300 5400
-Wire Wire Line
-	6500 4250 10300 4250
+	6500 4250 9070 4250
 Wire Wire Line
 	6500 4250 6500 5000
 Wire Wire Line
 	6500 5000 6650 5000
 Wire Wire Line
-	10300 5200 10300 5400
+	9070 5200 9070 5400
 Wire Wire Line
 	5950 1300 5900 1400
 Wire Wire Line
@@ -661,25 +657,25 @@ C1/C2/C6 ceramic, X7R or X5R
 $Comp
 L Connector:TestPoint TP2
 U 1 1 5A804029
-P 9990 5350
-F 0 "TP2" H 9975 5550 50  0000 C BNN
-F 1 "TPGND" H 10000 5225 50  0000 C CNN
-F 2 "TestPoint:TestPoint_Pad_D1.5mm" H 9990 5350 50  0001 C CNN
-F 3 "" H 9990 5350 50  0001 C CNN
-	1    9990 5350
+P 8760 5350
+F 0 "TP2" H 8745 5550 50  0000 C BNN
+F 1 "TPGND" H 8770 5225 50  0000 C CNN
+F 2 "TestPoint:TestPoint_Pad_D1.5mm" H 8760 5350 50  0001 C CNN
+F 3 "" H 8760 5350 50  0001 C CNN
+	1    8760 5350
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	9990 5350 9990 5400
-Connection ~ 9990 5400
+	8760 5350 8760 5400
+Connection ~ 8760 5400
 Wire Wire Line
-	9600 5400 9700 5400
+	8370 5400 8470 5400
 Wire Wire Line
 	5700 5200 6650 5200
 Wire Wire Line
-	9700 5400 9990 5400
+	8470 5400 8760 5400
 Wire Wire Line
-	5700 5850 9700 5850
+	5700 5850 8470 5850
 Wire Wire Line
 	5450 5200 5450 5450
 Wire Wire Line
@@ -689,7 +685,7 @@ Wire Wire Line
 Wire Wire Line
 	4200 5400 4200 5450
 Wire Wire Line
-	10300 5400 10400 5400
+	9070 5400 9170 5400
 Wire Wire Line
 	6350 1700 6350 1850
 Wire Wire Line
@@ -737,7 +733,7 @@ Wire Wire Line
 Wire Wire Line
 	3090 4200 3090 5550
 Wire Wire Line
-	9990 5400 10300 5400
+	8760 5400 9070 5400
 $Comp
 L Device:Q_NMOS_GSD Q1
 U 1 1 5B707DC7
@@ -838,5 +834,22 @@ N-channel MOSFET
 Wire Wire Line
 	5450 4300 5450 4750
 Wire Wire Line
-	9350 4900 9800 4900
+	8120 4900 8370 4900
+Wire Wire Line
+	8120 4900 8120 4590
+Wire Wire Line
+	7250 4590 7250 4600
+Wire Wire Line
+	8120 4590 7250 4590
+Connection ~ 8370 4900
+Wire Wire Line
+	8370 4900 8570 4900
+Wire Wire Line
+	8370 5400 8070 5400
+Wire Wire Line
+	8070 5400 8070 5800
+Wire Wire Line
+	8070 5800 7250 5800
+Connection ~ 8370 5400
+Connection ~ 9070 5400
 $EndSCHEMATC
