@@ -76,7 +76,7 @@ P 1540 3700
 F 0 "C2" H 1565 3800 50  0000 L CNN
 F 1 "2.2uF" H 1640 3700 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0805_2012Metric_Pad1.33x1.40mm_HandSolder" H 1578 3550 50  0001 C CNN
-F 3 "http://uk.farnell.com/kemet/c1206x224k5ractu/cap-mlcc-x7r-220nf-50v-1206/dp/1414056" H 1540 3700 50  0001 C CNN
+F 3 "" H 1540 3700 50  0001 C CNN
 	1    1540 3700
 	1    0    0    -1  
 $EndComp
@@ -87,7 +87,7 @@ P 3230 4490
 F 0 "C1" H 3255 4590 50  0000 L CNN
 F 1 "2.2uF" H 3360 4500 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0805_2012Metric_Pad1.33x1.40mm_HandSolder" H 3268 4340 50  0001 C CNN
-F 3 "http://uk.farnell.com/kemet/c1206x224k5ractu/cap-mlcc-x7r-220nf-50v-1206/dp/1414056" H 3230 4490 50  0001 C CNN
+F 3 "" H 3230 4490 50  0001 C CNN
 	1    3230 4490
 	1    0    0    -1  
 $EndComp
@@ -374,7 +374,7 @@ P 2300 6850
 F 0 "R1" V 2380 6850 50  0000 C CNN
 F 1 "2R/10W" V 2200 6850 50  0000 C CNN
 F 2 "Resistors_THT:R_Axial_Power_L50.0mm_W9.0mm_P60.96mm" V 2230 6850 50  0001 C CNN
-F 3 "http://uk.rs-online.com/web/p/panel-mount-fixed-resistors/0160916/" H 2300 6850 50  0001 C CNN
+F 3 "" H 2300 6850 50  0001 C CNN
 	1    2300 6850
 	0    1    1    0   
 $EndComp
@@ -621,7 +621,7 @@ P 3280 3900
 F 0 "C6" H 3305 4000 50  0000 L CNN
 F 1 "0.22uF" H 3320 3810 50  0000 L CNN
 F 2 "Capacitor_SMD:C_0805_2012Metric_Pad1.33x1.40mm_HandSolder" H 3318 3750 50  0001 C CNN
-F 3 "http://uk.farnell.com/kemet/c1206x224k5ractu/cap-mlcc-x7r-220nf-50v-1206/dp/1414056" H 3280 3900 50  0001 C CNN
+F 3 "" H 3280 3900 50  0001 C CNN
 	1    3280 3900
 	1    0    0    -1  
 $EndComp
@@ -763,7 +763,7 @@ Wire Wire Line
 	3975 7050 4550 7050
 Connection ~ 4550 7050
 Text Notes 6500 2400 0    60   ~ 0
-2-channel bidirectional digital isolator\nfor external I2C bus\n(can replace with ISO1540DR)
+2-channel bidirectional digital isolator for external I2C bus\n
 Text Notes 5275 2625 0    60   ~ 0
 side 1\nstrict I2C
 Text Notes 5275 1925 0    60   ~ 0

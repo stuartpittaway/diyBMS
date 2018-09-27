@@ -2,7 +2,7 @@
 <export version="D">
   <design>
     <source>E:\Dropbox\diyBMS\BMS-Cell-Module-Circuit\BMS_Cell_Module.sch</source>
-    <date>26/09/2018 19:46:40</date>
+    <date>27/09/2018 12:43:14</date>
     <tool>Eeschema (5.0.0)</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
@@ -68,7 +68,6 @@
     <comp ref="C1">
       <value>2.2uF</value>
       <footprint>Capacitor_SMD:C_0805_2012Metric_Pad1.33x1.40mm_HandSolder</footprint>
-      <datasheet>http://uk.farnell.com/kemet/c1206x224k5ractu/cap-mlcc-x7r-220nf-50v-1206/dp/1414056</datasheet>
       <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A00C037</tstamp>
@@ -196,7 +195,6 @@
     <comp ref="R1">
       <value>2R/10W</value>
       <footprint>Resistors_THT:R_Axial_Power_L50.0mm_W9.0mm_P60.96mm</footprint>
-      <datasheet>http://uk.rs-online.com/web/p/panel-mount-fixed-resistors/0160916/</datasheet>
       <libsource lib="Device" part="R" description="Resistor"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A04A81B</tstamp>
@@ -226,7 +224,6 @@
     <comp ref="C6">
       <value>0.22uF</value>
       <footprint>Capacitor_SMD:C_0805_2012Metric_Pad1.33x1.40mm_HandSolder</footprint>
-      <datasheet>http://uk.farnell.com/kemet/c1206x224k5ractu/cap-mlcc-x7r-220nf-50v-1206/dp/1414056</datasheet>
       <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A22BFBC</tstamp>
