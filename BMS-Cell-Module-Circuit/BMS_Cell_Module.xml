@@ -2,7 +2,7 @@
 <export version="D">
   <design>
     <source>E:\Dropbox\diyBMS\BMS-Cell-Module-Circuit\BMS_Cell_Module.sch</source>
-    <date>27/09/2018 12:43:14</date>
+    <date>27/09/2018 13:17:44</date>
     <tool>Eeschema (5.0.0)</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
@@ -43,7 +43,7 @@
       <tstamp>59FF3E62</tstamp>
     </comp>
     <comp ref="C5">
-      <value>0.1uF</value>
+      <value>0.1uF polarized</value>
       <footprint>Capacitor_SMD:C_0805_2012Metric_Pad1.33x1.40mm_HandSolder</footprint>
       <libsource lib="Device" part="CP" description="Polarised capacitor"/>
       <sheetpath names="/" tstamps="/"/>
@@ -60,7 +60,6 @@
     <comp ref="C2">
       <value>2.2uF</value>
       <footprint>Capacitor_SMD:C_0805_2012Metric_Pad1.33x1.40mm_HandSolder</footprint>
-      <datasheet>http://uk.farnell.com/kemet/c1206x224k5ractu/cap-mlcc-x7r-220nf-50v-1206/dp/1414056</datasheet>
       <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamp>5A00BF06</tstamp>
