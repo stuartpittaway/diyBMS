@@ -40,6 +40,10 @@ For obvious reasons, safety is critical, so care must be taken to ensure compone
 
 Why am I doing this? For fun :slight_smile: I really must get out more!
 
+# WARNING
+
+Just a reminder that this is a DIY product/solution so don’t use this for safety critical systems or in any situation where there could be a risk to life.  There is no warranty, it may not work as expected or at all.
+
 # Parameters
 
 I’m working to the the following design parameters, which are taken from research into the area (what most others are doing!)
