@@ -107,7 +107,7 @@ L Device:R R3
 U 1 1 5A00CE37
 P 4200 5000
 F 0 "R3" V 4280 5000 50  0000 C CNN
-F 1 "20K" V 4100 5000 50  0000 C CNN
+F 1 "68K" V 4100 5000 50  0000 C CNN
 F 2 "Resistors_SMD:R_1206_HandSoldering" V 4130 5000 50  0001 C CNN
 F 3 "" H 4200 5000 50  0001 C CNN
 	1    4200 5000
@@ -194,13 +194,13 @@ L Device:R R4
 U 1 1 5A01584D
 P 4200 5600
 F 0 "R4" V 4280 5600 50  0000 C CNN
-F 1 "10K" V 4100 5600 50  0000 C CNN
+F 1 "20K" V 4100 5600 50  0000 C CNN
 F 2 "Resistors_SMD:R_1206_HandSoldering" V 4130 5600 50  0001 C CNN
 F 3 "" H 4200 5600 50  0001 C CNN
 	1    4200 5600
 	1    0    0    -1  
 $EndComp
-Text Notes 2950 5300 0    60   ~ 0
+Text Notes 2720 5300 0    60   ~ 0
 Thermistor into ADC0 \n(RESET PIN) must not go \nbelow VCC/2 or reset is forced
 $Comp
 L Device:R R12
