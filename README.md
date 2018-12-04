@@ -4,6 +4,11 @@ Do it yourself battery management system to Lithium ion battery packs/cells
 More discussion
 https://community.openenergymonitor.org/t/diy-lithium-battery-balancer-and-monitoring-bms/5594/10
 
+# YouTube
+
+https://www.youtube.com/watch?v=-CusvENqC4I&t=12s
+
+
 # Problem
 
 A DIY Powerwall is the DIY construction of a pack of battery cells to create an energy store which can be used via inverters to power electrical items in the home. Generally cells are salvaged/second hand, and typically use Lithium 18650 cells.
