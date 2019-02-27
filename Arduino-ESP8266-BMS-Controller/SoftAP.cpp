@@ -47,7 +47,7 @@ void handleRoot()
   //F Macro - http://arduino-esp8266.readthedocs.io/en/latest/PROGMEM.html
   s += F("<h2>WiFi Setup</h2><p>Select local WIFI to connect to:</p><form autocomplete=\"off\" method=\"post\" enctype=\"application/x-www-form-urlencoded\" action=\"\\save\"><label for=\"ssid\">SSID:</label><select id=\"ssid\" name=\"ssid\">");
   s += networks;
-  s += F("</select><label for=\"pass\">Password:</label><input type=\"password\" id=\"id\" name=\"pass\"><br/><input minlength=\"8\" maxlength=\"32\" type=\"submit\" value=\"Submit\"></form>");
+  s += F("</select><label for=\"pass\">Password:</label><input type=\"text\" id=\"id\" name=\"pass\"><br/><input minlength=\"8\" maxlength=\"32\" type=\"submit\" value=\"Submit\"></form>");
   s += htmlFooter();
 
   sendHeaders();
