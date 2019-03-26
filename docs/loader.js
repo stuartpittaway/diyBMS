@@ -39,14 +39,14 @@ function refreshConfig() {
 	  url: getsettingsurl,
 	  dataType: "json",
 	  success: function(data) {	
-		
+
 		var myswitch = $( "#emoncms_enabled" );
 		myswitch[0].selectedIndex = data.emoncms_enabled ? 1:0;
 		myswitch.slider( "refresh" );
 		
-		var myswitch_influxdb = $( "#influxdb_enabled" );
+		var myswitch_influxdb = $("#influxdb_enabled");
 		myswitch_influxdb[0].selectedIndex = data.influxdb_enabled ? 1:0;
-		myswitch_influxdb.slider( "refresh" );
+		myswitch_influxdb.slider("refresh");
 		
 		$("#emoncms_apikey").val( data.emoncms_apikey );
 		$("#emoncms_host").val( data.emoncms_host );
@@ -162,9 +162,7 @@ function refreshGraph(){
       dataType: "json",
       success: function(data) {		 
         if (plot1) plot1.destroy();
-
 		var t=[];
-
 		for (var i = 0; i < data[0].length; i++) {
 			data[0][i]= data[0][i] / 1000.0;
 			data[2][i]= data[2][i] / 1000.0;
@@ -204,8 +202,8 @@ function refreshGraph(){
 						lineWidth: 3, color: 'green',
 		markerRenderer: $.jqplot.MarkerRenderer,
 		markerOptions: {
-			show: true,			style: 'circle',			color: 'green',			lineWidth: 10,			size: 2,			shadow: true,
-			shadowAngle: 0,			shadowOffset: 0,			shadowDepth: 1,			shadowAlpha: 0.07		}	
+			show: true, style: 'circle', color: 'green',lineWidth: 10,size: 2,shadow:true,	
+			shadowAngle: 0,	shadowOffset: 0, shadowDepth: 1,shadowAlpha: 0.07}	
 			,linePattern: 'dashed', yaxis : 'yaxis',label : 'VoltMax'
 			,pointLabels:{show:true,formatString:'%.2f'}
 			}, 
@@ -213,8 +211,8 @@ function refreshGraph(){
 		lineWidth: 3,
 		color: 'orange',
 		markerRenderer: $.jqplot.MarkerRenderer,
-		markerOptions: {			show: true,			style: 'circle',			color: 'orange',			lineWidth: 10,			size: 2,
-			shadow: true,			shadowAngle: 0,			shadowOffset: 0,			shadowDepth: 1,			shadowAlpha: 0.07		}	
+		markerOptions: {show: true,style: 'circle',color: 'orange',lineWidth: 10,size: 2,
+		shadow: true,shadowAngle: 0,shadowOffset: 0,shadowDepth: 1,shadowAlpha: 0.07}	
 			,linePattern: 'dashed', yaxis : 'yaxis',label : 'VoltMin'
 			,pointLabels:{show:true,formatString:'%.2f'}
 					}
@@ -222,11 +220,10 @@ function refreshGraph(){
 					show:false }					
 					]	
 			  });
-			  
-			  
+		  
 	$('#chart1').height($(window).height()*0.85);
-	
-	 $(window).bind('resize', function(event, ui) {
+
+	$(window).bind('resize', function(event, ui) {
         $('#chart1').height($(window).height()*0.85);
         $('#chart1').width($(window).width()*0.90);
         plot1.replot({resetAxes:true});
