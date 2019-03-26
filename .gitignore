@@ -1,2 +1,4 @@
 
-docs/loader.js
+*.bak
+*.kicad_pcb-bak
+*.bak

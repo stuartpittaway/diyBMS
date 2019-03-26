@@ -1,4 +1,4 @@
-update=04/12/2018 19:48:44
+update=11/08/2018 16:54:05
 version=1
 last_client=kicad
 [cvpcb]
@@ -25,9 +25,6 @@ BoardOutlineThickness=0.15
 ModuleOutlineThickness=0.15
 [general]
 version=1
-[eeschema]
-version=1
-LibDir=
 [schematic_editor]
 version=1
 PageLayoutDescrFile=
@@ -35,6 +32,9 @@ PlotDirectoryName=BMS-Cell-Module.pdf
 SubpartIdSeparator=0
 SubpartFirstId=65
 NetFmtName=Pcbnew
-SpiceAjustPassiveValues=0
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
 LabSize=60
-ERC_TestSimilarLabels=1
+[eeschema]
+version=1
+LibDir=
