@@ -34,6 +34,20 @@ void FactoryResetSettings() {
   const char emoncms_apikey[]="1234567890abcdef1234567890abcdef";
   const char emoncms_url[]="/emoncms/input/bulk?data=";
 
+  const char influxdb_host[] = "192.168.0.129";
+ 
+  const char influxdb_database[] = "powerwall";
+  const char influxdb_user[] = "root";
+  const char influxdb_password[] = "root";
+
+  strcpy(myConfig.influxdb_host, influxdb_host );
+  strcpy(myConfig.influxdb_database, influxdb_database );
+  strcpy(myConfig.influxdb_user, influxdb_user );
+  strcpy(myConfig.influxdb_password, influxdb_password );
+
+  myConfig.influxdb_enabled=false;
+  myConfig.influxdb_httpPort=8086;
+
   strcpy(myConfig.emoncms_host, emoncms_host );
   strcpy(myConfig.emoncms_apikey, emoncms_apikey);
   strcpy(myConfig.emoncms_url, emoncms_url);
@@ -70,11 +84,13 @@ bool LoadConfigFromEEPROM() {
 
   if (checksum == existingChecksum) {
     //Clone the config into our global variable and return all OK
-    memcpy(&myConfig, &restoredConfig, sizeof(eeprom_settings));
+    memcpy(&myConfig, &restoredConfig, sizeof(eeprom_settings));   
     return true;
   }
 
+  
   //Config is not configured or gone bad, return FALSE
+  Serial.println("Config is not configured or gone bad");
   return false;
 }
 

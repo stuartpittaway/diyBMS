@@ -159,12 +159,13 @@ uint8_t command_set_bypass_voltage(uint8_t cell_id, uint16_t  value) {
 void initWire() {
   Wire.setTimeout(1000);  //1000ms timeout
   Wire.setClock(100000);  //100khz
-  Wire.setClockStretchLimit(1000);
+  Wire.setClockStretchLimit(1000);  
 
   // join i2c bus
   // DATA=GPIO4/D2, CLOCK=GPIO5/D1
   Wire.begin(4, 5); //SDA/SCL
-}
+
+  }
 
 bool testModuleExists(uint8_t address) {
   Wire.beginTransmission(address);

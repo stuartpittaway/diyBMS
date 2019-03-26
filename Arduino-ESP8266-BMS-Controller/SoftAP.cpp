@@ -4,6 +4,7 @@
 #include "SoftAP.h"
 #include "settings.h"
 #include "bms_values.h"
+#include "i2c_cmds.h"
 
 #include <ESP8266mDNS.h>
 #include <ESP8266WebServer.h>
@@ -13,6 +14,10 @@ ESP8266WebServer server(80);
 const char* ssid = "DIY_BMS_CONTROLLER";
 
 String networks;
+
+bool manual_balance = false;
+extern int balance_status;
+extern bool InverterMon;
 
 void handleNotFound()
 {
@@ -32,7 +37,7 @@ String htmlHeader() {
 
 
 String htmlManagementHeader() {
-  return String(F("<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>DIY BMS Management Console</title><script type=\"text/javascript\" src=\"https://stuartpittaway.github.io/diyBMS/loader.js\"></script></head><body></body></html>\r\n\r\n"));
+  return String(F("<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>DIY BMS Management Console</title><script type=\"text/javascript\" src=\"https://chickey.github.io/diyBMS/loader.js\"></script></head><body></body></html>\r\n\r\n"));
 }
 
 
@@ -65,6 +70,25 @@ void handleProvision() {
 }
 
 
+void handleResetESP() {
+  Serial.println("Restarting Controller");
+
+  ESP.restart();
+  server.send(200, "application/json", "[1]\r\n\r\n");
+}
+
+void handleCancelAverageBalance() {
+  if (cell_array_max > 0) {
+    for (int a = 0; a < cell_array_max; a++) {
+      command_set_bypass_voltage(cell_array[a].address,0);
+    }
+  }
+  manual_balance = false;
+  balance_status = 0;
+  Serial.println("Cancelling balancing");
+  server.send(200, "application/json", "[1]\r\n\r\n");
+}
+
 
 void handleAboveAverageBalance() {
   uint16_t avgint = 0;
@@ -85,6 +109,8 @@ void handleAboveAverageBalance() {
     }
   }
 
+  manual_balance = true;
+  balance_status = 1;
   server.send(200, "application/json", "[" + String(avgint) + "]\r\n\r\n");
 }
 
@@ -128,15 +154,37 @@ void handleSetLoadResistance() {
   server.send(500, "text/plain", "");
 }
 
+void handleSetInfluxDB() {
+
+  myConfig.influxdb_enabled = (server.arg("influxdb_enabled").toInt() == 1) ? true : false;
+  myConfig.influxdb_httpPort = server.arg("influxdb_httpPort").toInt();
+
+  server.arg("influxdb_host").toCharArray(myConfig.influxdb_host, sizeof(myConfig.influxdb_host));
+  server.arg("influxdb_database").toCharArray(myConfig.influxdb_database, sizeof(myConfig.influxdb_database));
+  server.arg("influxdb_user").toCharArray(myConfig.influxdb_user, sizeof(myConfig.influxdb_user));
+  server.arg("influxdb_password").toCharArray(myConfig.influxdb_password, sizeof(myConfig.influxdb_password));
+  
+  WriteConfigToEEPROM();
+
+  server.send(200, "text/plain", "");
+}
+
 void handleSetEmonCMS() {
-  /* Receives HTTP POST for configuring the emonCMS settings
-    emoncms_enabled:1
-    emoncms_host:192.168.0.26
-    emoncms_httpPort:80
-    emoncms_node_offset:26
-    emoncms_url:/emoncms/input/bulk?data=
-    emoncms_apikey:11111111111111111111111111111111
-  */
+
+  myConfig.autobalance_enabled = (server.arg("autobalance_enabled").toInt() == 1) ? true : false;
+  myConfig.invertermon_enabled = (server.arg("invertermon_enabled").toInt() == 1) ? true : false;
+  myConfig.max_voltage = server.arg("max_voltage").toFloat();
+  myConfig.balance_voltage = server.arg("balance_voltage").toFloat();
+  myConfig.balance_dev = server.arg("balance_dev").toFloat();
+      
+  myConfig.influxdb_enabled = (server.arg("influxdb_enabled").toInt() == 1) ? true : false;
+  myConfig.influxdb_httpPort = server.arg("influxdb_httpPort").toInt();
+
+  server.arg("influxdb_host").toCharArray(myConfig.influxdb_host, sizeof(myConfig.influxdb_host));
+  server.arg("influxdb_database").toCharArray(myConfig.influxdb_database, sizeof(myConfig.influxdb_database));
+  server.arg("influxdb_user").toCharArray(myConfig.influxdb_user, sizeof(myConfig.influxdb_user));
+  server.arg("influxdb_password").toCharArray(myConfig.influxdb_password, sizeof(myConfig.influxdb_password));
+
   myConfig.emoncms_enabled = (server.arg("emoncms_enabled").toInt() == 1) ? true : false;
   myConfig.emoncms_node_offset = server.arg("emoncms_node_offset").toInt();
   myConfig.emoncms_httpPort = server.arg("emoncms_httpPort").toInt();
@@ -197,12 +245,14 @@ void handleSetTempCalib() {
 
 void handleCellConfigurationJSON() {
   String json1 = "";
+  
   if (cell_array_max > 0) {
     for ( int a = 0; a < cell_array_max; a++) {
       json1 += "{\"address\":" + String(cell_array[a].address)
         +",\"volt\":" + String(cell_array[a].voltage)
         +",\"voltc\":" + String(cell_array[a].voltage_calib, 6)
         +",\"temp\":" + String(cell_array[a].temperature)
+        +",\"bypass\":" + String(cell_array[a].bypass_status)
         +",\"tempc\":" + String(cell_array[a].temperature_calib, 6)
         +",\"resistance\":" + String( isnan(cell_array[a].loadResistance) ? 0:cell_array[a].loadResistance, 6) 
         + "}";
@@ -221,6 +271,17 @@ void handleSettingsJSON() {
                    + ",\"emoncms_host\":\"" + String(myConfig.emoncms_host) + "\""
                    + ",\"emoncms_apikey\":\"" + String(myConfig.emoncms_apikey) + "\""
                    + ",\"emoncms_url\":\"" + String(myConfig.emoncms_url) + "\""
+                   + ",\"influxdb_enabled\":" + (myConfig.influxdb_enabled ? String("true") : String("false"))
+                   + ",\"influxdb_host\":\"" + String(myConfig.influxdb_host) + "\""
+                   + ",\"influxdb_httpPort\":" + String(myConfig.influxdb_httpPort)
+                   + ",\"influxdb_database\":\"" + String(myConfig.influxdb_database) + "\""
+                   + ",\"influxdb_user\":\"" + String(myConfig.influxdb_user) + "\""
+                   + ",\"influxdb_password\":\"" + String(myConfig.influxdb_password) + "\""
+                   + ",\"invertermon_enabled\":" + (myConfig.invertermon_enabled ? String("true") : String("false"))
+                   + ",\"autobalance_enabled\":" + (myConfig.autobalance_enabled ? String("true") : String("false"))
+                   + ",\"max_voltage\":\"" + String(myConfig.max_voltage) + "\""
+                   + ",\"balance_voltage\":\"" + String(myConfig.balance_voltage) + "\""
+                   + ",\"balance_dev\":\"" + String(myConfig.balance_dev) + "\""
                    + "}\r\n\r\n";
   server.send(200, "application/json", json1 );
 }
@@ -358,14 +419,16 @@ void SetupManagementRedirect() {
   server.on("/celljson", HTTP_GET, handleCellJSONData);
   server.on("/provision", HTTP_GET, handleProvision);
   server.on("/aboveavgbalance", HTTP_GET, handleAboveAverageBalance);
+  server.on("/cancelavgbalance", HTTP_GET, handleCancelAverageBalance);
+  server.on("/ResetESP", HTTP_GET, handleResetESP);
   server.on("/getmoduleconfig", HTTP_GET, handleCellConfigurationJSON);
   server.on("/getsettings", HTTP_GET, handleSettingsJSON);
-
   server.on("/factoryreset", HTTP_POST, handleFactoryReset);
   server.on("/setloadresistance", HTTP_POST, handleSetLoadResistance);
   server.on("/setvoltcalib", HTTP_POST, handleSetVoltCalib);
   server.on("/settempcalib", HTTP_POST, handleSetTempCalib);
   server.on("/setemoncms", HTTP_POST, handleSetEmonCMS);
+  //server.on("/handleSetInfluxDB", HTTP_POST, handleSetInfluxDB);
 
   server.onNotFound(handleNotFound);
 

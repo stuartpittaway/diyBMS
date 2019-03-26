@@ -7,7 +7,7 @@
 #define COMMAND_BIT 6
 
 #define COMMAND_green_led_pattern   1
-//unused #define COMMAND_led_off   2
+#define COMMAND_led_off   2
 #define COMMAND_factory_default 3
 #define COMMAND_set_slave_address 4
 #define COMMAND_green_led_default 5
@@ -32,7 +32,8 @@ struct cell_module {
   // 7 bit slave I2C address
   uint8_t address;
   uint16_t voltage;
-  uint16_t temperature;
+//  uint16_t temperature;
+  float temperature;
 
   uint16_t balance_target;
   
@@ -49,6 +50,8 @@ struct cell_module {
   bool valid_values;
 
   bool update_calibration;
+
+  bool bypass_status;
 };
 
 
