@@ -74,6 +74,8 @@ Building upon my existing skill set and knowledge, and also building something t
 
 # Bill Of Materials
 
+NOTE SIZES OF COMPNENTS SHOULD BE 0805 SIZED FOR THE SMALLER PCB VARIANT!
+
 See BMS_Cell_Module_BOM.html for details
 
 Links to main components
