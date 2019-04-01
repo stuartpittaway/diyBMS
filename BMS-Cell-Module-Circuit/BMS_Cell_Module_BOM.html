@@ -7,12 +7,253 @@
     </head>
     <body>
     <h1>E:\Dropbox\diyBMS\BMS-Cell-Module-Circuit\BMS_Cell_Module.sch</h1>
-    <p>27/09/2018 13:17:44</p>
-    <p>Eeschema (5.0.0)</p>
-    <p><b>Component Count:</b>29</p>
-    <table>
-    <tr><th style='width:640px'>Ref</th><th>Qnty</th><th>Value</th><th>Part</th><th>Datasheet</th><th>Description</th><th>Vendor</th></tr><tr><td>C1, C2</td><td>2</td><td>2.2uF</td><td>Device:C</td><td></td><td>Unpolarized capacitor</td><td></td></tr><tr><td>C3, C4</td><td>2</td><td>0.1uF</td><td>Device:C</td><td></td><td>Unpolarized capacitor</td><td></td></tr><tr><td>C5</td><td>1</td><td>0.1uF polarized</td><td>Device:CP</td><td></td><td>Polarised capacitor</td><td></td></tr><tr><td>C6</td><td>1</td><td>0.22uF</td><td>Device:C</td><td></td><td>Unpolarized capacitor</td><td></td></tr><tr><td>D1</td><td>1</td><td>SS34 Schottky 40V/3A</td><td>Device:D</td><td>http://uk.farnell.com/multicomp/ss34/schottky-rectifier-3a-40v-do-214ab/dp/2675144</td><td>Diode</td><td></td></tr><tr><td>D2</td><td>1</td><td>LED BLUE</td><td>Device:LED</td><td></td><td>LED generic</td><td></td></tr><tr><td>D4</td><td>1</td><td>LED GREEN</td><td>Device:LED</td><td></td><td>LED generic</td><td></td></tr><tr><td>F1</td><td>1</td><td>FUSE</td><td>Device:Fuse</td><td></td><td>Fuse, generic</td><td></td></tr><tr><td>ISP1</td><td>1</td><td>Conn_02x03_Odd_Even</td><td>Connector_Generic:Conn_02x03_Odd_Even</td><td></td><td>Generic connector, double row, 02x03, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)</td><td></td></tr><tr><td>J1</td><td>1</td><td>Conn_01x02_Female</td><td>Connector:Conn_01x02_Female</td><td></td><td>Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)</td><td></td></tr><tr><td>J2, J3</td><td>2</td><td>Conn_01x04_Female</td><td>Connector:Conn_01x04_Female</td><td></td><td>Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)</td><td></td></tr><tr><td>Q1</td><td>1</td><td>SI2312BDS-T1-E3</td><td>Device:Q_NMOS_GSD</td><td>http://www.vishay.com/docs/73235/si2312bds.pdf</td><td>Transistor N-MOSFETwith substrate diode (general)</td><td></td></tr><tr><td>R1</td><td>1</td><td>2R/10W</td><td>Device:R</td><td></td><td>Resistor</td><td></td></tr><tr><td>R2, R8, R10, R12</td><td>4</td><td>4K7</td><td>Device:R</td><td></td><td>Resistor</td><td></td></tr><tr><td>R3</td><td>1</td><td>20K</td><td>Device:R</td><td></td><td>Resistor</td><td></td></tr><tr><td>R4</td><td>1</td><td>10K</td><td>Device:R</td><td></td><td>Resistor</td><td></td></tr><tr><td>R6</td><td>1</td><td>510K</td><td>Device:R</td><td></td><td>Resistor</td><td></td></tr><tr><td>R7</td><td>1</td><td>680K</td><td>Device:R</td><td></td><td>Resistor</td><td></td></tr><tr><td>R9</td><td>1</td><td>47K</td><td>Device:R</td><td></td><td>Resistor</td><td></td></tr><tr><td>TH1</td><td>1</td><td>B57891M0103K000</td><td>Device:Thermistor_NTC</td><td>http://uk.farnell.com/epcos/b57891m0103k000/thermistor-ntc-radial-leaded/dp/2285471</td><td>temperature dependent resistor, negative temperature coefficient (NTC)</td><td></td></tr><tr><td>U1</td><td>1</td><td>REG710NA-3.3</td><td>reg710:REG710</td><td>http://www.ti.com/lit/ds/symlink/reg710-25.pdf</td><td></td><td></td></tr><tr><td>U2</td><td>1</td><td>ADUM1250ARZ</td><td>adum1250arz:ADUM1250ARZ</td><td>http://www.analog.com/media/en/technical-documentation/data-sheets/ADUM1250_1251.pdf</td><td>ADuM1250/ADuM1251</td><td></td></tr><tr><td>U3</td><td>1</td><td>ATTINY85V-10SU 8S2 EIAJ SOIC</td><td>MCU_Microchip_ATtiny:ATtiny85-20SU</td><td>http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf</td><td>20MHz, 8kB Flash, 512B SRAM, 512B EEPROM, debugWIRE, SOIJ-8</td><td></td></tr><!--TABLEROW-->
-    </table>
+<p>01/April/2019</p>
+<p>Eeschema (5.0.0)</p>
+<p><strong>Component Count:</strong>29</p>
+<table>
+<tbody>
+<tr>
+<th style="width: 640px;">Ref</th>
+<th>Qnty</th>
+<th>Value</th>
+<th>Part</th>
+<th>Datasheet</th>
+<th>Description</th>
+<th>Size</th>
+<th>Vendor</th>
+</tr>
+<tr>
+<td>C1, C2</td>
+<td>2</td>
+<td>2.2uF</td>
+<td>Device:C</td>
+<td>&nbsp;</td>
+<td>Unpolarized capacitor</td>
+<td>0805</td>
+<td>&nbsp;<a href="https://www.aliexpress.com/store/product/200pcs-0805-Ceramic-capacitor-2-2UF-4-7UF-10UF-22UF-33UF-47UF-106-225-226-336/1711463_32845737674.html?spm=2114.12010615.8148356.17.70bd1412szMuuA">AliExpress</a></td>
+</tr>
+<tr>
+<td>C3, C4</td>
+<td>2</td>
+<td>0.1uF</td>
+<td>Device:C</td>
+<td>&nbsp;</td>
+<td>Unpolarized capacitor</td>
+<td>0805</td>
+<td>&nbsp;<a href="https://www.aliexpress.com/store/product/200PCS-0805-Ceramic-capacitor-100NF-150NF-220NF-330NF-470NF-1UF-50V-104-154-224-334-474/1711463_32847170120.html?spm=2114.12010615.8148356.3.56344ae31Tn3DZ">AliExpress</a></td>
+</tr>
+<tr>
+<td>C5</td>
+<td>1</td>
+<td>0.1uF polarized</td>
+<td>Device:CP</td>
+<td>&nbsp;</td>
+<td>Polarised capacitor</td>
+<td>0805</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>C6</td>
+<td>1</td>
+<td>0.22uF</td>
+<td>Device:C</td>
+<td>&nbsp;</td>
+<td>Unpolarized capacitor</td>
+<td>0805</td>
+<td>&nbsp;<a href="https://www.aliexpress.com/store/product/200PCS-0805-Ceramic-capacitor-100NF-150NF-220NF-330NF-470NF-1UF-50V-104-154-224-334-474/1711463_32847170120.html?spm=2114.12010108.1000023.69.383c36cdYH00qN">AliExpress</a></td>
+</tr>
+<tr>
+<td>D1</td>
+<td>1</td>
+<td>SS34 Schottky 40V/3A</td>
+<td>Device:D</td>
+<td>http://uk.farnell.com/multicomp/ss34/schottky-rectifier-3a-40v-do-214ab/dp/2675144</td>
+<td>Diode</td>
+<td>&nbsp;</td>
+<td>&nbsp;<a href="https://www.digikey.com/product-detail/en/vishay-semiconductor-diodes-division/SS34-E3-57T/SS34-E3-57TGICT-ND/1091684">Digi-Key</a><br><a href="https://www.aliexpress.com/store/product/Free-Ship-100Pcs-SMD-SMA-Diode-IN-SS14-1n5819-in5819-SS16-SS24-SS34-IN5822-SS36-sr360/1711463_32828753158.html?spm=2114.12010615.8148356.1.1c67791cRIPjwt">AliExpress</a></td>
+</tr>
+<tr>
+<td>D2</td>
+<td>1</td>
+<td>LED BLUE</td>
+<td>Device:LED</td>
+<td>&nbsp;</td>
+<td>LED generic</td>
+<td>0805</td>
+<td>&nbsp;<a href="https://www.aliexpress.com/store/product/Free-Ship-100PCS-0805-light-emitting-diode-SMD-LED-bead-Red-Yellow-Green-White-Blue-Orange/1711463_32871959868.html?spm=2114.12010615.8148356.1.1176129bLvF4Gv">AliExpress</a></td>
+</tr>
+<tr>
+<td>D4</td>
+<td>1</td>
+<td>LED GREEN</td>
+<td>Device:LED</td>
+<td>&nbsp;</td>
+<td>LED generic</td>
+<td>0805</td>
+<td>&nbsp;<a href="https://www.aliexpress.com/store/product/Free-Ship-100PCS-0805-light-emitting-diode-SMD-LED-bead-Red-Yellow-Green-White-Blue-Orange/1711463_32871959868.html?spm=2114.12010615.8148356.1.1176129bLvF4Gv">AliExpress</a></td>
+</tr>
+<tr>
+<td>F1</td>
+<td>1</td>
+<td>FUSE</td>
+<td>Device:Fuse</td>
+<td>&nbsp;</td>
+<td>Fuse, generic</td>
+<td>&nbsp;</td>
+<td>&nbsp;<a href="https://www.aliexpress.com/item/20pcs-SMD-Self-restoring-fuse-1812-1-5A-1500mA-6V-8V-16V-24V-SMD-1812-Recoverable/32805363864.html?spm=a2g0s.9042311.0.0.49434c4djW1yoC">AliExpress</a></td>
+</tr>
+<tr>
+<td>ISP1</td>
+<td>1</td>
+<td>Conn_02x03_Odd_Even</td>
+<td>Connector_Generic:Conn_02x03_Odd_Even</td>
+<td>&nbsp;</td>
+<td>Generic connector, double row, 02x03, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>J1</td>
+<td>1</td>
+<td>Conn_01x02_Female</td>
+<td>Connector:Conn_01x02_Female</td>
+<td>&nbsp;</td>
+<td>Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)</td>
+<td>&nbsp;</td>
+<td>&nbsp;<a href="https://www.aliexpress.com/item/100-pcs-of-PH-2-0mm-2-10Pin-Right-Angle-JST-Socket-Male-Connector-White/32755006265.html?spm=a2g0s.9042311.0.0.49434c4djW1yoC">AliExpress</a></td>
+</tr>
+<tr>
+<td>J2, J3</td>
+<td>2</td>
+<td>Conn_01x04_Female</td>
+<td>Connector:Conn_01x04_Female</td>
+<td>&nbsp;</td>
+<td>Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)</td>
+<td>&nbsp;</td>
+<td>&nbsp;<a href="https://www.aliexpress.com/item/100-pcs-of-PH-2-0mm-2-10Pin-Right-Angle-JST-Socket-Male-Connector-White/32755006265.html?spm=a2g0s.9042311.0.0.49434c4djW1yoC">AliExpress</a></td>
+</tr>
+<tr>
+<td>Q1</td>
+<td>1</td>
+<td>SI2312BDS-T1-E3</td>
+<td>Device:Q_NMOS_GSD</td>
+<td>http://www.vishay.com/docs/73235/si2312bds.pdf</td>
+<td>Transistor N-MOSFETwith substrate diode (general)</td>
+<td>&nbsp;</td>
+<td>&nbsp;<a href="https://www.digikey.com/product-detail/en/vishay-siliconix/SI2312BDS-T1-E3/SI2312BDS-T1-E3CT-ND/1656844">Digi-Key</a></td>
+</tr>
+<tr>
+<td>R1</td>
+<td>1</td>
+<td>2R/10W</td>
+<td>Device:R</td>
+<td>&nbsp;</td>
+<td>Resistor</td>
+<td>&nbsp;</td>
+<td>&nbsp;<a href="https://www.aliexpress.com/item/10PCS-LOT-10W-cement-resistance-10-10W47R-cement-resistance-pine-Electronics/32700781121.html?spm=a2g0s.9042311.0.0.49434c4djW1yoC">AliExpress</a></td>
+</tr>
+<tr>
+<td>R2, R8, R10, R12</td>
+<td>4</td>
+<td>4K7</td>
+<td>Device:R</td>
+<td>&nbsp;</td>
+<td>Resistor</td>
+<td>0805</td>
+<td>&nbsp;<a href="https://www.aliexpress.com/store/product/300pcs-lot-SMD-Chip-Resistor-0805-3-3K-3-6K-3-9K-4-3K-4-7K/1711463_32830173621.html?spm=2114.12010612.8148356.1.1d161817Hzqenf">AliExpress</a></td>
+</tr>
+<tr>
+<td>R3</td>
+<td>1</td>
+<td>20K</td>
+<td>Device:R</td>
+<td>&nbsp;</td>
+<td>Resistor</td>
+<td>0805</td>
+<td>&nbsp;<a href="https://www.aliexpress.com/store/product/300pcs-lot-SMD-Chip-Resistor-0805-13K-15K-16K-18K-20K-Ohm-5-Resistance-13-15/1711463_32830209257.html?spm=2114.12010612.8148356.1.19631817XRz8Cn">AliExpress</a></td>
+</tr>
+<tr>
+<td>R4</td>
+<td>1</td>
+<td>10K</td>
+<td>Device:R</td>
+<td>&nbsp;</td>
+<td>Resistor</td>
+<td>0805</td>
+<td>&nbsp;<a href="https://www.aliexpress.com/store/product/300pcs-lot-SMD-Chip-Resistor-0805-8-2K-9-1K-10K-11K-12K-Ohm-5-Resistance/1711463_32831298611.html?spm=2114.12010612.8148356.1.7f341817FTAyAZ">AliExpress</a></td>
+</tr>
+<tr>
+<td>R6</td>
+<td>1</td>
+<td>510K</td>
+<td>Device:R</td>
+<td>&nbsp;</td>
+<td>Resistor</td>
+<td>0805</td>
+<td>&nbsp;<a href="https://www.aliexpress.com/store/product/300pcs-lot-SMD-Chip-Resistor-0805-390K-430K-470K-510K-560K-Ohm-5-Resistance-390-430/1711463_32832703103.html?spm=2114.12010612.8148356.3.2d611817aQu14Y">AliExpress</a></td>
+</tr>
+<tr>
+<td>R7</td>
+<td>1</td>
+<td>680K</td>
+<td>Device:R</td>
+<td>&nbsp;</td>
+<td>Resistor</td>
+<td>0805</td>
+<td>&nbsp;<a href="https://www.aliexpress.com/store/product/300pcs-lot-SMD-Chip-Resistor-0805-620K-680K-750K-820K-910K-Ohm-5-Resistance-620-680/1711463_32832687496.html?spm=2114.12010612.8148356.3.5b9d1817STH60L">AliExpress</a></td>
+</tr>
+<tr>
+<td>R9</td>
+<td>1</td>
+<td>47K</td>
+<td>Device:R</td>
+<td>&nbsp;</td>
+<td>Resistor</td>
+<td>0805</td>
+<td>&nbsp;<a href="https://www.aliexpress.com/store/product/300pcs-lot-SMD-Chip-Resistor-0805-36K-39K-43K-47K-51K-Ohm-5-Resistance-36-39/1711463_32830173623.html?spm=2114.12010612.8148356.3.251a1817AsbDOR">AliExpress</a></td>
+</tr>
+<tr>
+<td>TH1</td>
+<td>1</td>
+<td>B57891M0103K000</td>
+<td>Device:Thermistor_NTC</td>
+<td>http://uk.farnell.com/epcos/b57891m0103k000/thermistor-ntc-radial-leaded/dp/2285471</td>
+<td>temperature dependent resistor, negative temperature coefficient (NTC)</td>
+<td>&nbsp;</td>
+<td>&nbsp;<a href="https://www.digikey.com/product-detail/en/epcos-tdk/B57891M0103K000/495-75622-ND/3500546">Digi-Key</a></td>
+</tr>
+<tr>
+<td>U1</td>
+<td>1</td>
+<td>REG710NA-3.3</td>
+<td>reg710:REG710</td>
+<td>http://www.ti.com/lit/ds/symlink/reg710-25.pdf</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;<a href="https://www.digikey.com/product-detail/en/texas-instruments/REG710NA-3.3-250/296-12135-1-ND/404728">Digi-Key</a></td>
+</tr>
+<tr>
+<td>U2</td>
+<td>1</td>
+<td>ADUM1250ARZ</td>
+<td>adum1250arz:ADUM1250ARZ</td>
+<td>http://www.analog.com/media/en/technical-documentation/data-sheets/ADUM1250_1251.pdf</td>
+<td>ADuM1250/ADuM1251</td>
+<td>&nbsp;</td>
+<td>&nbsp;<a href="https://www.aliexpress.com/item/20pcs-ADUM1250-SOP8-Digital-Isolator-CMOS-4-KANAL-1-Mbps-8-Pin-SOIC-N-Rohr-ADUM1250ARZ/32952327581.html?spm=a2g0s.9042311.0.0.49434c4djW1yoC">AliExpress</a></td>
+</tr>
+<tr>
+<td>U3</td>
+<td>1</td>
+<td>ATTINY85V-10SU 8S2 EIAJ SOIC</td>
+<td>MCU_Microchip_ATtiny:ATtiny85-20SU</td>
+<td>http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf</td>
+<td>20MHz, 8kB Flash, 512B SRAM, 512B EEPROM, debugWIRE, SOIJ-8</td>
+<td>&nbsp;</td>
+<td>&nbsp;<a href="https://www.digikey.com/product-detail/en/microchip-technology/ATTINY85V-10SU/ATTINY85V-10SU-ND/735472">Digi-Key</a></td>
+</tr>
+<!--TABLEROW--></tbody>
+</table>
     </body>
 </html>
     
