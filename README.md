@@ -4,6 +4,11 @@ Do it yourself battery management system to Lithium ion battery packs/cells
 More discussion
 https://community.openenergymonitor.org/t/diy-lithium-battery-balancer-and-monitoring-bms/5594/10
 
+** PLEASE NOTE THIS DESIGN HAS BEEN REPLACED WITH VERSION 4 **
+
+https://github.com/stuartpittaway/diyBMSv4
+
+
 # YouTube
 
 https://www.youtube.com/watch?v=-CusvENqC4I&t=12s
